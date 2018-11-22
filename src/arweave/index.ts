@@ -1,4 +1,5 @@
 import { Arweave } from "./arweave";
+import { Transaction, Tag } from "./lib/transaction";
 
 
 
@@ -10,14 +11,18 @@ export default function init(){
 }
 
 
+// let tx = new Transaction({id: '123', tags: [new Tag('some', 'value')]});
+
+// console.log(tx);
+
 let arweave = new Arweave({api: {host: 'wallet-1.nodes.arweave.org'}});
 
 (async () => {
-    console.log(await arweave.network.info());
-    console.log(await arweave.network.peers());
-    console.log(await arweave.transactions.get('Fr6QEPtcEgE0xiXfBaPtxy5iPRCoJJuDc6dloc6onFc'));
-    console.log(await arweave.transactions.getStatus('Fr6QEPtcEgE0xiXfBaPtxy5iPRCoJJuDc6dloc6onFc'));
-    console.log(await arweave.wallets.getBalance('_qa4arkdjK2X9SjechexnWzTtbOKcPkBPhrDDej6lI8'));
+//     console.log(await arweave.network.info());
+//     console.log(await arweave.network.peers());
+    console.log((await arweave.transactions.get('Fr6QEPtcEgE0xiXfBaPtxy5iPRCoJJuDc6dloc6onFc')).getDecoded('data', {toString: true}));
+//     console.log(await arweave.transactions.getStatus('Fr6QEPtcEgE0xiXfBaPtxy5iPRCoJJuDc6dloc6onFc'));
+//     console.log(await arweave.wallets.getBalance('_qa4arkdjK2X9SjechexnWzTtbOKcPkBPhrDDej6lI8'));
 })();
 
 
