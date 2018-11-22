@@ -1,0 +1,43 @@
+{
+  "name": "arweave-js",
+  "version": "0.1.0",
+  "description": "Arweave JS client library",
+  "main": "index.js",
+  "scripts": {
+    "compile:node": "tsc -p tsconfig.node.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArweaveTeam/arweave-js.git"
+  },
+  "keywords": [
+    "arweave",
+    "js",
+    "blockchain",
+    "crypto",
+    "data",
+    "permanence",
+    "http"
+  ],
+  "author": "Kyle Beckles",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/ArweaveTeam/arweave-js/issues"
+  },
+  "homepage": "https://github.com/ArweaveTeam/arweave-js#readme",
+  "devDependencies": {
+    "ts-loader": "^5.3.0",
+    "typescript": "^3.1.6",
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10"
+  },
+  "targets": {
+    "chrome": "69",
+    "node": "8.11.3"
+  },
+  "dependencies": {
+    "axios": "^0.18.0"
+  }
+}

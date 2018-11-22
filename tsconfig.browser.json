@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist/browser/",
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "module": "es6",
+        "target": "es6",
+        "allowJs": true,
+        "moduleResolution": "node",
+        "rootDir": "src"
+    },
+    "include": [
+        "src"
+    ]
+}
