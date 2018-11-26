@@ -18,11 +18,27 @@ export default function init(){
 let arweave = new Arweave({api: {host: 'wallet-1.nodes.arweave.org'}});
 
 (async () => {
-//     console.log(await arweave.network.info());
-//     console.log(await arweave.network.peers());
+    
+    console.log(await arweave.network.info());
+    console.log(await arweave.network.peers());
+    console.log((await arweave.transactions.get('Fr6QEPtcEgE0xiXfBaPtxy5iPRCoJJuDc6dloc6onFc')).get('reward'));
     console.log((await arweave.transactions.get('Fr6QEPtcEgE0xiXfBaPtxy5iPRCoJJuDc6dloc6onFc')).getDecoded('data', {toString: true}));
-//     console.log(await arweave.transactions.getStatus('Fr6QEPtcEgE0xiXfBaPtxy5iPRCoJJuDc6dloc6onFc'));
-//     console.log(await arweave.wallets.getBalance('_qa4arkdjK2X9SjechexnWzTtbOKcPkBPhrDDej6lI8'));
+    console.log(await arweave.transactions.getStatus('Fr6QEPtcEgE0xiXfBaPtxy5iPRCoJJuDc6dloc6onFc'));
+
+    let balance = await arweave.wallets.getBalance('5g-QPcEZ37pa62O11Wu49opvtrypAOG1TxDO2GoqWm4');
+
+    console.log(typeof balance, balance, arweave.formatting.winstonToAr(balance));
+    console.log(typeof balance, balance, arweave.formatting.winstonToAr(balance, {formatted: false, decimals: 5}));
+    console.log(typeof balance, balance, arweave.formatting.winstonToAr(balance, {formatted: false, decimals: 8}));
+    console.log(typeof balance, balance, arweave.formatting.winstonToAr(balance, {formatted: true, decimals: 8}));
+    console.log(typeof balance, balance, arweave.formatting.winstonToAr(balance, {formatted: true, decimals: 3}));
+
+    let ar = "7.508";
+
+    console.log(typeof ar, ar, arweave.formatting.arToWinston(ar));
+    console.log(typeof ar, ar, arweave.formatting.arToWinston(ar, {formatted: true}));
+
+    
 })();
 
 

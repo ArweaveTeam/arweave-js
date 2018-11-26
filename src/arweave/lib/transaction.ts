@@ -64,6 +64,10 @@ export class Transaction implements TransactionInterface{
 
     public getDecoded(field: string, options = {toString: false}): string|Tag[]{
 
+        if (!Object.getOwnPropertyNames(this).includes(field)) {
+            throw new Error(`Field "${field}" is not a property of the Arweave Transaction class.`);
+        }
+
         if (options.toString) {
             return Utils.b64UrlToString(this[field]);
         }
