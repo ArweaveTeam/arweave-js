@@ -1,34 +1,40 @@
+import { Ar } from "./ar";
 import { Api, ApiConfig } from "./lib/api";
-import { Wallets } from './wallets';
-import { Transactions } from './transactions';
+import { CryptoInterface } from "./lib/crypto/crypto-interface";
 import { Network } from "./network";
-
-import { BigNumber } from 'bignumber.js';
-import { Formatting } from "./formatting";
+import { Transactions } from './transactions';
+import { Wallets } from './wallets';
 
 
 interface Config<T = object>{
-    api: ApiConfig,
+    api: ApiConfig
+    crypto: CryptoInterface
 }
 
 export class Arweave {
     
-    private api: Api;
+    public api: Api;
 
-    public readonly wallets: Wallets;
+    public wallets: Wallets;
 
-    public readonly transactions: Transactions;
+    public transactions: Transactions;
 
-    public readonly network: Network;
+    public network: Network;
     
-    public readonly formatting: Formatting;
+    public ar: Ar;
+    
+    public crypto: CryptoInterface;
 
     constructor(config: Config){
+
+        this.crypto = config.crypto;
+
         this.api = new Api(config.api);
-        this.wallets = new Wallets(this.api);
-        this.transactions = new Transactions(this.api);
+        this.wallets = new Wallets(this.api, config.crypto);
+        this.transactions = new Transactions(this.api, config.crypto);
         this.network = new Network(this.api);
-        this.formatting = new Formatting;
+        this.ar = new Ar;
+
     }
 
 

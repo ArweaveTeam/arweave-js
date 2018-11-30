@@ -1,20 +1,30 @@
-import { AxiosResponse } from "axios";
 import { Api } from "./lib/api";
+import { CryptoInterface } from "./lib/crypto/crypto-interface";
 
 export class Wallets {
-    
+
     private api: Api;
 
-    constructor(api: Api){
+    private crypto: CryptoInterface;
+
+    constructor(api: Api, crypto: CryptoInterface){
         this.api = api;
+        this.crypto = crypto;
     }
 
-    public getBalance(address: string): Promise<string>{
+    /**
+     * Get the wallet balance for the given address.
+     * 
+     * @param {string} address - The arweave address to get the balance for.
+     * 
+     * @returns {Promise<string>} - Promise which resolves with a winston string balance.
+     */
+    public getBalance(address: string): Promise<string> {
         return this.api.get(`wallet/${address}/balance`, {
             transformResponse: [
                 /**
                  * We need to specify a response transformer to override
-                 * the default JSON.parse transformation, as this causes
+                 * the default JSON.parse behaviour, as this causes
                  * balances to be converted to a number and we want to
                  * return it as a winston string.
                  * @param data 
@@ -28,12 +38,22 @@ export class Wallets {
         });
     }
 
-    public getLastTransaction(address: string): Promise<string>{
+    /**
+     * Get the last transaction ID for the given wallet address.
+     * 
+     * @param {string} address - The arweave address to get the balance for.
+     * 
+     * @returns {Promise<string>} - Promise which resolves with a winston string balance.
+     */
+    public getLastTransaction(address: string): Promise<string> {
         return this.api.get(`wallet/${address}/last_tx`).then( response => {
             return response.data;
         });
     }
 
+    public generate(){
+        return this.crypto.generateJWK();
+    }
 
 }
 

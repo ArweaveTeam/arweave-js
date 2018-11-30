@@ -1,6 +1,6 @@
 import { Api } from "./lib/api";
 
-export interface NetworkInfo{
+export interface NetworkInfoInterface {
     hosnetworkt: string,
     version: number,
     release: number,
@@ -12,7 +12,7 @@ export interface NetworkInfo{
     node_state_latency: number
 }
 
-export interface PeerList extends Array<string>{}
+export interface PeerList extends Array<string> {}
 
 export class Network {
     
@@ -22,7 +22,7 @@ export class Network {
         this.api = api;
     }
 
-    public info(): Promise<NetworkInfo>{
+    public info(): Promise<NetworkInfoInterface>{
         return this.api.get(`info`).then( response => {
             return response.data;
         });

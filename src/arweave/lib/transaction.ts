@@ -1,5 +1,4 @@
-import { Wallet} from './Wallet';
-import { Utils } from './utils';
+import { ArweaveUtils } from './utils';
 
 export class Tag {
 
@@ -32,7 +31,7 @@ export interface TransactionInterface {
 }
 
 
-export class Transaction implements TransactionInterface{
+export class Transaction implements TransactionInterface {
 
     [key:string]: any
 
@@ -46,34 +45,57 @@ export class Transaction implements TransactionInterface{
     public readonly reward: string;
     public signature: string;
 
-    public constructor(args?: Partial<TransactionInterface>){
+    public constructor(args?: Partial<TransactionInterface>) {
         Object.assign(this, args);
     }
 
-    public getMessageString(): string {
-        return this.data;
+    public clearSignature(){
+        this.signature = null;
+        this.id = null;
     }
 
-    public sign(wallet: Wallet) {
-        wallet.sign(this.getMessageString());
+    public setSignature({signature, id}: {
+        signature: string,
+        id: string,
+    }) {
+        this.signature = signature;
+        this.id = id;
+    }
+
+    public getSignatureData(): ArrayBuffer | SharedArrayBuffer {
+        return ArweaveUtils.concatBuffers([
+            this.get('owner', {decode: true, toString: false}),
+            this.get('target', {decode: true, toString: false}),
+            this.get('data', {decode: true, toString: false}),
+            ArweaveUtils.stringToBuffer(this.quantity),
+            ArweaveUtils.stringToBuffer(this.reward),
+            this.get('last_tx', {decode: true, toString: false}),
+        ]);
     }
 
     public getTags() : Tag[]{
         return this.tags
     }
 
-    public getDecoded(field: string, options = {toString: false}): string|Tag[]{
+    public get(field: string, options?: {
+        toString?: boolean,
+        decode?: boolean
+    }): string | ArrayBuffer | Uint8Array | SharedArrayBuffer | Tag[] {
 
         if (!Object.getOwnPropertyNames(this).includes(field)) {
             throw new Error(`Field "${field}" is not a property of the Arweave Transaction class.`);
         }
 
-        if (options.toString) {
-            return Utils.b64UrlToString(this[field]);
+        if (options && options.decode) {
+
+            if (options && options.toString) {
+                return ArweaveUtils.b64UrlToString(this[field]);
+            }
+
+            return ArweaveUtils.b64UrlToBuffer(this[field]);
         }
 
-        return Utils.b64UrlToBuffer(this[field]);
+        return this[field];
 
     }
-
 }

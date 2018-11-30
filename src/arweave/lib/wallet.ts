@@ -1,20 +1,14 @@
 import { Transaction } from './Transaction';
+import { CryptoInterface } from './crypto/crypto-interface';
 
-export class Wallet {
-
-    address: string;
-
-    constructor(key: CryptoKey) {
-
-    }
-
-
-    public async sign(message: string) {
-
-    }
-
-    public test (tx : Transaction){
-
-    }
-
+export interface JWKInterface {
+    kty: string;
+    e: string;
+    n: string;
+    d: string;
+    p: string;
+    q: string;
+    dp: string;
+    dq: string;
+    qi: string;
 }

@@ -39,7 +39,6 @@ export class Api {
             if (error.response && error.response.status) {
                 return error.response;
             }
-            console.log('Handled error');
 
             throw error;
         }

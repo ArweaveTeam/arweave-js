@@ -1,11 +1,10 @@
 {
     "compilerOptions": {
-        "outDir": "./dist/browser/",
+        "outDir": "./dist/web/",
         "sourceMap": true,
         "noImplicitAny": true,
         "module": "es6",
-        "target": "es6",
-        "allowJs": true,
+        "target": "es2017",
         "moduleResolution": "node",
         "rootDir": "src"
     },
