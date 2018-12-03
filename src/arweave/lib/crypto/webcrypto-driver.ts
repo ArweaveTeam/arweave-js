@@ -14,6 +14,8 @@ export class WebCryptoDriver implements CryptoInterface {
         if (!this.detectWebCrypto()) {
             throw new Error('SubtleCrypto not available!');
         }
+
+        this.driver = window.crypto.subtle;
     }
 
 
@@ -59,8 +61,8 @@ export class WebCryptoDriver implements CryptoInterface {
      * @param jwk 
      * @param data 
      */
-    async sign(jwk: JWKInterface, data: any): Promise<ArrayBuffer>{
-        return await this
+    async sign(jwk: JWKInterface, data: any): Promise<Uint8Array>{
+        let signature = await this
             .driver
             .sign({
                     name: 'RSA-PSS',
@@ -69,16 +71,19 @@ export class WebCryptoDriver implements CryptoInterface {
                 (await this.jwkToCryptoKey(jwk)),
                 data
             );
+
+        return new Uint8Array(signature);
     }
 
-    async hash(data: any): Promise<string> {
+    async hash(data: Uint8Array): Promise<Uint8Array> {
         let digest = await this
             .driver
             .digest(
                 'SHA-256',
                 data
             );
-        return btoa(ArweaveUtils.bufferTob64(digest));
+
+        return new Uint8Array(digest);
     }
 
     private async jwkToCryptoKey(jwk: JWKInterface): Promise<CryptoKey>{

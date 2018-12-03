@@ -1,18 +1,46 @@
 import { ArweaveUtils } from './utils';
 
-export class Tag {
+class BaseObject {
 
-    readonly key: string;
+    [key:string]: any;
+
+    public get(field: string): string;
+    public get(field: string, options: {decode: true, string: false}): Uint8Array;
+    public get(field: string, options: {decode: true, string: true}): string;
+
+    public get(field: string, options?: {
+        string?: boolean,
+        decode?: boolean
+     }): string | Uint8Array | Tag[] {
+     
+        if (!Object.getOwnPropertyNames(this).includes(field)) {
+            throw new Error(`Field "${field}" is not a property of the Arweave Transaction class.`);
+        }
+     
+        if (options && options.decode == true) {
+     
+            if (options && options.string) {
+                return ArweaveUtils.b64UrlToString(this[field]);
+            }
+     
+            return ArweaveUtils.b64UrlToBuffer(this[field]);
+        }
+     
+        return this[field];
+     }
+}
+
+export class Tag extends BaseObject {
+
+    readonly name: string;
     readonly value: string;
 
-    public constructor(key: string, value: string, decode = false){
-        this.key = key;
+    public constructor(name: string, value: string, decode = false){
+        super();
+        this.name = name;
         this.value = value;
     }
 
-    public static decode(t: Tag){
-
-    }
 }
 
 export interface TransactionInterface {
@@ -31,27 +59,44 @@ export interface TransactionInterface {
 }
 
 
-export class Transaction implements TransactionInterface {
+export class Transaction  extends BaseObject implements TransactionInterface {
 
     [key:string]: any
 
     public id: string;
-    public readonly last_tx: string;
-    public readonly owner: string;
-    public readonly tags: Tag[];
-    public readonly target: string;
-    public readonly quantity: string;
-    public readonly data: string;
-    public readonly reward: string;
-    public signature: string;
+    public readonly last_tx:string = '';
+    public readonly owner:string  = '';
+    public readonly tags: Tag[] = [];
+    public readonly target: string = '';
+    public readonly quantity: string = '0';
+    public readonly data: string = '';
+    public readonly reward: string = '0';
+    public signature: string = '';
 
-    public constructor(args?: Partial<TransactionInterface>) {
-        Object.assign(this, args);
+    public constructor(attributes?: Partial<TransactionInterface>) {
+        super();
+        Object.assign(this, attributes);
     }
 
-    public clearSignature(){
-        this.signature = null;
-        this.id = null;
+    public addTag(name: string, value: string){
+        this.tags.push(new Tag(
+            ArweaveUtils.stringToB64Url(name),
+            ArweaveUtils.stringToB64Url(value)
+        ));
+    }
+
+    public toJSON(){
+        return {
+            id: this.id,
+            last_tx: this.last_tx,
+            owner: this.owner,
+            tags: this.tags,
+            target: this.target,
+            quantity: this.quantity,
+            data: this.data,
+            reward: this.reward,
+            signature: this.signature
+        };
     }
 
     public setSignature({signature, id}: {
@@ -62,40 +107,20 @@ export class Transaction implements TransactionInterface {
         this.id = id;
     }
 
-    public getSignatureData(): ArrayBuffer | SharedArrayBuffer {
+    public getSignatureData(): Uint8Array {
+
+        let tagString = this.tags.reduce((accumulator: string, tag: Tag) => {
+            return accumulator + '' + tag.get('name', {decode: true, string: true}) + '' + tag.get('value', {decode: true, string: true})
+        }, '');
+
         return ArweaveUtils.concatBuffers([
-            this.get('owner', {decode: true, toString: false}),
-            this.get('target', {decode: true, toString: false}),
-            this.get('data', {decode: true, toString: false}),
+            this.get('owner', {decode: true, string: false}),
+            this.get('target', {decode: true, string: false}),
+            this.get('data', {decode: true, string: false}),
             ArweaveUtils.stringToBuffer(this.quantity),
             ArweaveUtils.stringToBuffer(this.reward),
-            this.get('last_tx', {decode: true, toString: false}),
+            this.get('last_tx', {decode: true, string: false}),
+            ArweaveUtils.stringToBuffer(tagString)
         ]);
-    }
-
-    public getTags() : Tag[]{
-        return this.tags
-    }
-
-    public get(field: string, options?: {
-        toString?: boolean,
-        decode?: boolean
-    }): string | ArrayBuffer | Uint8Array | SharedArrayBuffer | Tag[] {
-
-        if (!Object.getOwnPropertyNames(this).includes(field)) {
-            throw new Error(`Field "${field}" is not a property of the Arweave Transaction class.`);
-        }
-
-        if (options && options.decode) {
-
-            if (options && options.toString) {
-                return ArweaveUtils.b64UrlToString(this[field]);
-            }
-
-            return ArweaveUtils.b64UrlToBuffer(this[field]);
-        }
-
-        return this[field];
-
     }
 }

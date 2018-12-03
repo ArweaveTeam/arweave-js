@@ -2,9 +2,9 @@ import { Arweave } from "../arweave";
 import { NodeCryptoDriver } from "../lib/crypto/node-driver";
 
 
-export function init(): Arweave{
+export function init(apiConfig: object): Arweave{
     return new Arweave({
-        api: {host: 'wallet-1.nodes.arweave.org'},
+        api: apiConfig,
         crypto: new NodeCryptoDriver
     });
 }

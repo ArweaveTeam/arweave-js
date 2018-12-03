@@ -4,7 +4,7 @@ export interface CryptoInterface {
 
     generateJWK(): Promise<JWKInterface>;
 
-    sign(jwk: JWKInterface, data: any): Promise<ArrayBuffer>
+    sign(jwk: JWKInterface, data: Uint8Array): Promise<Uint8Array>
 
-    hash(data: any):  Promise<string>
+    hash(data: Uint8Array):  Promise<Uint8Array>
 }

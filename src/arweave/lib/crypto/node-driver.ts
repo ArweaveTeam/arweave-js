@@ -39,7 +39,7 @@ export class NodeCryptoDriver implements CryptoInterface {
      * @param jwk 
      * @param data 
      */
-    sign(jwk: object, data: any): Promise<ArrayBuffer>{
+    sign(jwk: object, data: Uint8Array): Promise<Uint8Array>{
         return new Promise((resolve, reject) => {
             resolve(crypto
                 .createSign(this.hashAlgorithm)
@@ -52,12 +52,12 @@ export class NodeCryptoDriver implements CryptoInterface {
         });
     }
 
-    hash(data: any): Promise<string> {
+    hash(data: Buffer): Promise<Uint8Array> {
         return new Promise((resolve, reject) => {
             resolve(crypto
                 .createHash(this.hashAlgorithm)
                 .update(data)
-                .digest('base64')
+                .digest()
             );
         });
     }

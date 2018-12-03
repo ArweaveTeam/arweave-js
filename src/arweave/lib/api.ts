@@ -1,7 +1,7 @@
 import Axios, { AxiosResponse, AxiosRequestConfig, AxiosInstance } from 'axios';
 
 export interface ApiConfig<T = object> {
-    host: string,
+    host?: string,
     protocol?: string,
     port?: string|number,
     timeout?: string|number,

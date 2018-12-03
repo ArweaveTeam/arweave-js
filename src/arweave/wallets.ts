@@ -1,5 +1,7 @@
 import { Api } from "./lib/api";
 import { CryptoInterface } from "./lib/crypto/crypto-interface";
+import { JWKInterface } from "./lib/Wallet";
+import { ArweaveUtils } from "./lib/utils";
 
 export class Wallets {
 
@@ -45,7 +47,7 @@ export class Wallets {
      * 
      * @returns {Promise<string>} - Promise which resolves with a winston string balance.
      */
-    public getLastTransaction(address: string): Promise<string> {
+    public getLastTransactionID(address: string): Promise<string> {
         return this.api.get(`wallet/${address}/last_tx`).then( response => {
             return response.data;
         });
@@ -53,6 +55,10 @@ export class Wallets {
 
     public generate(){
         return this.crypto.generateJWK();
+    }
+
+    public async jwkToAddress(jwk: JWKInterface): Promise<string>{
+        return ArweaveUtils.bufferTob64Url(await this.crypto.hash(ArweaveUtils.b64UrlToBuffer(jwk.n)));
     }
 
 }

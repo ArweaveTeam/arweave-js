@@ -2,9 +2,9 @@ import { Arweave } from "../arweave";
 import { WebCryptoDriver } from "../lib/crypto/webcrypto-driver";
 
 (<any>window).arweave = {
-    init(): Arweave{
+    init(apiConfig: object): Arweave{
         return new Arweave({
-            api: {host: 'wallet-1.nodes.arweave.org'},
+            api: apiConfig,
             crypto: new WebCryptoDriver
         });
     }

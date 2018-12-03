@@ -1,9 +1,10 @@
 import { Api } from "./lib/api";
 import { CryptoInterface } from './lib/crypto/crypto-interface';
 import { ArweaveError, ArweaveErrorType } from './lib/error';
-import { Transaction } from "./lib/transaction";
+import { Transaction, Tag, TransactionInterface } from "./lib/transaction";
 import { ArweaveUtils } from './lib/utils';
 import { JWKInterface } from './lib/Wallet';
+import { Wallets } from "./wallets";
 
 export class Transactions {
     
@@ -15,7 +16,7 @@ export class Transactions {
         this.crypto = crypto;
     }
 
-    public getPrice(byteSize: number, targetAddress?: string): Promise<number> {
+    public getPrice(byteSize: number, targetAddress?: string): Promise<string> {
 
         let endpoint = targetAddress ? `price/${byteSize}/${targetAddress}` : `price/${byteSize}`;
 
@@ -68,16 +69,18 @@ export class Transactions {
     public async sign(transaction: Transaction, jwk: JWKInterface): Promise<Transaction> {
 
         let dataToSign = transaction.getSignatureData();
+
         let rawSignature = await this.crypto.sign(jwk, dataToSign);
+
         let id = await this.crypto.hash(rawSignature);
 
         transaction.setSignature({
-            signature: ArweaveUtils.bufferTob64(rawSignature),
-            id: id
+            signature: ArweaveUtils.bufferTob64Url(rawSignature),
+            id: ArweaveUtils.bufferTob64Url(id)
         });
 
         return transaction;
     }
 
-}
 
+}
