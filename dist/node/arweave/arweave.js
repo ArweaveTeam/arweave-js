@@ -5,7 +5,7 @@ const api_1 = require("./lib/api");
 const network_1 = require("./network");
 const transactions_1 = require("./transactions");
 const wallets_1 = require("./wallets");
-const Transaction_1 = require("./lib/Transaction");
+const transaction_1 = require("./lib/transaction");
 const utils_1 = require("./lib/utils");
 class Arweave {
     constructor(config) {
@@ -36,7 +36,7 @@ class Arweave {
         if (attributes.data) {
             attributes.data = utils_1.ArweaveUtils.stringToB64Url(attributes.data);
         }
-        return new Transaction_1.Transaction(attributes);
+        return new transaction_1.Transaction(attributes);
     }
 }
 exports.Arweave = Arweave;

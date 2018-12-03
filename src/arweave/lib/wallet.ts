@@ -1,6 +1,3 @@
-import { Transaction } from './Transaction';
-import { CryptoInterface } from './crypto/crypto-interface';
-
 export interface JWKInterface {
     kty: string;
     e: string;

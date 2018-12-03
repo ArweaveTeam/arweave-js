@@ -3,7 +3,7 @@ import { Api } from "./lib/api";
 import { Network } from "./network";
 import { Transactions } from './transactions';
 import { Wallets } from './wallets';
-import { Transaction } from "./lib/Transaction";
+import { Transaction } from "./lib/transaction";
 import { ArweaveUtils } from "./lib/utils";
 export class Arweave {
     constructor(config) {

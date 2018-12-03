@@ -72,4 +72,4 @@ class Transaction extends BaseObject {
     }
 }
 exports.Transaction = Transaction;
-//# sourceMappingURL=Transaction.js.map
+//# sourceMappingURL=transaction.js.map

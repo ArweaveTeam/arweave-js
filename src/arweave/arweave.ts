@@ -4,7 +4,7 @@ import { CryptoInterface } from "./lib/crypto/crypto-interface";
 import { Network } from "./network";
 import { Transactions } from './transactions';
 import { Wallets } from './wallets';
-import { TransactionInterface, Transaction } from "./lib/Transaction";
+import { TransactionInterface, Transaction } from "./lib/transaction";
 import { JWKInterface } from "./lib/Wallet";
 import { ArweaveUtils } from "./lib/utils";
 

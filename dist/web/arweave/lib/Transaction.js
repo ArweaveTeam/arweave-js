@@ -68,4 +68,4 @@ export class Transaction extends BaseObject {
         ]);
     }
 }
-//# sourceMappingURL=Transaction.js.map
+//# sourceMappingURL=transaction.js.map
