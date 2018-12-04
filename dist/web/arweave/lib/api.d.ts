@@ -13,7 +13,7 @@ export declare class Api {
     constructor(config: ApiConfig);
     private mergeDefaults;
     get(endpoint: string, config?: AxiosRequestConfig): Promise<AxiosResponse>;
-    post(): Promise<void>;
+    post(endpoint: string, body: object, config?: AxiosRequestConfig): Promise<AxiosResponse>;
     /**
      * Get an AxiosInstance with the base configuration setup to fire off
      * a request to the network.

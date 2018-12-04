@@ -15,6 +15,6 @@ export interface PeerList extends Array<string> {
 export declare class Network {
     private api;
     constructor(api: Api);
-    info(): Promise<NetworkInfoInterface>;
-    peers(): Promise<PeerList>;
+    getInfo(): Promise<NetworkInfoInterface>;
+    getPeers(): Promise<PeerList>;
 }

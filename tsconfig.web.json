@@ -6,12 +6,13 @@
         "module": "es6",
         "target": "es2017",
         "moduleResolution": "node",
-        "rootDir": "src"
+        "rootDir": "./",
     },
     "include": [
         "src"
     ],
     "exclude": [
-        "src/node.ts"
+        "src/node.ts",
+        "node_modules",
     ]
 }

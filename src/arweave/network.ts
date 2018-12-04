@@ -22,13 +22,13 @@ export class Network {
         this.api = api;
     }
 
-    public info(): Promise<NetworkInfoInterface>{
+    public getInfo(): Promise<NetworkInfoInterface>{
         return this.api.get(`info`).then( response => {
             return response.data;
         });
     }
 
-    public peers(): Promise<PeerList>{
+    public getPeers(): Promise<PeerList>{
         return this.api.get(`peers`).then( response => {
             return response.data;
         });

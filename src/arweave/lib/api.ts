@@ -31,9 +31,7 @@ export class Api {
 
     public async get(endpoint: string, config?: AxiosRequestConfig): Promise<AxiosResponse>{
         try {
-
             return await this.request().get(endpoint, config);
-
         } catch (error) {
 
             if (error.response && error.response.status) {
@@ -44,8 +42,19 @@ export class Api {
         }
     }
 
-    public async post(){
+    public async post(endpoint: string, body: object, config?: AxiosRequestConfig): Promise<AxiosResponse>{
+        try {
 
+            return await this.request().post(endpoint, body, config);
+
+        } catch (error) {
+
+            if (error.response && error.response.status) {
+                return error.response;
+            }
+
+            throw error;
+        }
     }
 
     /**

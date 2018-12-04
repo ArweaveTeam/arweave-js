@@ -5,6 +5,7 @@ import { Transaction, Tag, TransactionInterface } from "./lib/transaction";
 import { ArweaveUtils } from './lib/utils';
 import { JWKInterface } from './lib/Wallet';
 import { Wallets } from "./wallets";
+import { AxiosResponse } from "axios";
 
 export class Transactions {
     
@@ -80,6 +81,12 @@ export class Transactions {
         });
 
         return transaction;
+    }
+
+    public post(transaction: Transaction): Promise<AxiosResponse> {
+        return this.api.post(`tx`, transaction).then( response => {
+            return response;
+        });
     }
 
 

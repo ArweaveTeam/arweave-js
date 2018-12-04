@@ -11,7 +11,6 @@ export class Ar {
      */
     protected readonly BigNum: Function;
 
-
 	constructor() {
         // Configure and assign the constructor function for the bignumber library.
         this.BigNum = (value: string, decimals: number): BigNumber => {
@@ -19,7 +18,6 @@ export class Ar {
             return new instance(value);
         }
 	}
-
 
     public winstonToAr(winstonString: string, { formatted = false, decimals = 12, trim = true} = {}){
 

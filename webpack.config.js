@@ -5,7 +5,7 @@ const config = {};
 
 config.node = {
     name: 'node',
-    entry: './src/node.ts',
+    entry: './node.ts',
     mode: 'development',
     target: 'node',
     module: {
@@ -33,7 +33,7 @@ config.node = {
 
 config.web = {
     name: 'web',
-    entry: './src/web.ts',
+    entry: './web.ts',
     mode: 'development',
     target: 'web',
     module: {
@@ -60,7 +60,7 @@ config.web = {
 
 config.webprod = {
     name: 'web-prod',
-    entry: './src/web.ts',
+    entry: './web.ts',
     mode: 'production',
     target: 'web',
     module: {
