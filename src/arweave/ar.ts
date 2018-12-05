@@ -32,6 +32,32 @@ export class Ar {
         return formatted ? number.toFormat() : number.toFixed(0);
     }
 
+    public compare(winstonStringA: string, winstonStringB: string): number{
+        let a = this.stringToBigNum(winstonStringA);
+        let b = this.stringToBigNum(winstonStringB);
+
+        return a.comparedTo(b);
+    }
+
+    public isEqual(winstonStringA: string, winstonStringB: string): boolean{
+        return this.compare(winstonStringA, winstonStringB) === 0;
+    }
+
+
+    public isLessThan(winstonStringA: string, winstonStringB: string): boolean{
+        let a = this.stringToBigNum(winstonStringA);
+        let b = this.stringToBigNum(winstonStringB);
+
+        return a.isLessThan(b);
+    }
+
+    public isGreaterThan(winstonStringA: string, winstonStringB: string): boolean{
+        let a = this.stringToBigNum(winstonStringA);
+        let b = this.stringToBigNum(winstonStringB);
+
+        return a.isGreaterThan(b);
+    }
+
     private stringToBigNum(stringValue: string, decimalPlaces: number = 12): BigNumber{
         return this.BigNum(stringValue, decimalPlaces);
     }
