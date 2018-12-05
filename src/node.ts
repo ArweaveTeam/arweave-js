@@ -1,5 +1,5 @@
-import { Arweave } from "./src/arweave/arweave";
-import { NodeCryptoDriver } from "./src/arweave/lib/crypto/node-driver";
+import { Arweave } from "./arweave/arweave";
+import { NodeCryptoDriver } from "./arweave/lib/crypto/node-driver";
 
 
 

@@ -1,5 +1,5 @@
-import { Arweave } from "./src/arweave/arweave";
-import { WebCryptoDriver } from "./src/arweave/lib/crypto/webcrypto-driver";
+import { Arweave } from "./arweave/arweave";
+import { WebCryptoDriver } from "./arweave/lib/crypto/webcrypto-driver";
 
 
 (<any>window).arweave = {

@@ -16,5 +16,9 @@ export declare class Ar {
     arToWinston(arString: string, { formatted }?: {
         formatted?: boolean;
     }): string;
+    compare(winstonStringA: string, winstonStringB: string): number;
+    isEqual(winstonStringA: string, winstonStringB: string): boolean;
+    isLessThan(winstonStringA: string, winstonStringB: string): boolean;
+    isGreaterThan(winstonStringA: string, winstonStringB: string): boolean;
     private stringToBigNum;
 }

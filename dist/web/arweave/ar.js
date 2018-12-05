@@ -15,6 +15,24 @@ export class Ar {
         let number = this.stringToBigNum(arString).shiftedBy(12);
         return formatted ? number.toFormat() : number.toFixed(0);
     }
+    compare(winstonStringA, winstonStringB) {
+        let a = this.stringToBigNum(winstonStringA);
+        let b = this.stringToBigNum(winstonStringB);
+        return a.comparedTo(b);
+    }
+    isEqual(winstonStringA, winstonStringB) {
+        return this.compare(winstonStringA, winstonStringB) === 0;
+    }
+    isLessThan(winstonStringA, winstonStringB) {
+        let a = this.stringToBigNum(winstonStringA);
+        let b = this.stringToBigNum(winstonStringB);
+        return a.isLessThan(b);
+    }
+    isGreaterThan(winstonStringA, winstonStringB) {
+        let a = this.stringToBigNum(winstonStringA);
+        let b = this.stringToBigNum(winstonStringB);
+        return a.isGreaterThan(b);
+    }
     stringToBigNum(stringValue, decimalPlaces = 12) {
         return this.BigNum(stringValue, decimalPlaces);
     }
