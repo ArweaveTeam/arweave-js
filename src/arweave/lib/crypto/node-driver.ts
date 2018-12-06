@@ -1,8 +1,8 @@
 import { JWKInterface } from "../Wallet";
 import { CryptoInterface } from "./crypto-interface";
 
-const pemToJWK = require('pem-jwk').pem2jwk;
-const JWKTopem = require('pem-jwk').jwk2pem;
+import {pem2jwk, jwk2pem} from "./pem";
+
 const crypto = require('crypto');
 
 export class NodeCryptoDriver implements CryptoInterface {
@@ -12,6 +12,11 @@ export class NodeCryptoDriver implements CryptoInterface {
     public readonly hashAlgorithm = 'sha256';
 
     generateJWK(): Promise<JWKInterface> {
+
+        if (typeof !crypto.generateKeyPair == 'function') {
+            throw new Error('Keypair generation not supported in this version of Node, only supported in versions 10.x+');
+        }
+
         return new Promise((resolve, reject) => {
             crypto
                 .generateKeyPair('rsa', {
@@ -63,11 +68,12 @@ export class NodeCryptoDriver implements CryptoInterface {
     }
 
     private jwkToPem(jwk: object): string{
-        return JWKTopem(jwk);
+        return jwk2pem(jwk);
     }
 
     private pemToJWK(pem: string): JWKInterface{
-        return pemToJWK(pem);
+        let jwk = pem2jwk(pem);
+        return jwk;
     }
 
 }

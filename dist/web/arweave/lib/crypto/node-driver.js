@@ -1,5 +1,4 @@
-const pemToJWK = require('pem-jwk').pem2jwk;
-const JWKTopem = require('pem-jwk').jwk2pem;
+import { pem2jwk, jwk2pem } from "./pem";
 const crypto = require('crypto');
 export class NodeCryptoDriver {
     constructor() {
@@ -8,6 +7,9 @@ export class NodeCryptoDriver {
         this.hashAlgorithm = 'sha256';
     }
     generateJWK() {
+        if (typeof !crypto.generateKeyPair == 'function') {
+            throw new Error('Keypair generation not supported in this version of Node, only supported in versions 10.x+');
+        }
         return new Promise((resolve, reject) => {
             crypto
                 .generateKeyPair('rsa', {
@@ -55,10 +57,11 @@ export class NodeCryptoDriver {
         });
     }
     jwkToPem(jwk) {
-        return JWKTopem(jwk);
+        return jwk2pem(jwk);
     }
     pemToJWK(pem) {
-        return pemToJWK(pem);
+        let jwk = pem2jwk(pem);
+        return jwk;
     }
 }
 //# sourceMappingURL=node-driver.js.map

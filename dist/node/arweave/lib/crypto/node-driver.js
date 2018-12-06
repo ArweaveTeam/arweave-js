@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const pemToJWK = require('pem-jwk').pem2jwk;
-const JWKTopem = require('pem-jwk').jwk2pem;
+const pem_1 = require("./pem");
 const crypto = require('crypto');
 class NodeCryptoDriver {
     constructor() {
@@ -10,6 +9,9 @@ class NodeCryptoDriver {
         this.hashAlgorithm = 'sha256';
     }
     generateJWK() {
+        if (typeof !crypto.generateKeyPair == 'function') {
+            throw new Error('Keypair generation not supported in this version of Node, only supported in versions 10.x+');
+        }
         return new Promise((resolve, reject) => {
             crypto
                 .generateKeyPair('rsa', {
@@ -57,10 +59,11 @@ class NodeCryptoDriver {
         });
     }
     jwkToPem(jwk) {
-        return JWKTopem(jwk);
+        return pem_1.jwk2pem(jwk);
     }
     pemToJWK(pem) {
-        return pemToJWK(pem);
+        let jwk = pem_1.pem2jwk(pem);
+        return jwk;
     }
 }
 exports.NodeCryptoDriver = NodeCryptoDriver;

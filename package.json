@@ -46,6 +46,7 @@
     "node": "8.11"
   },
   "dependencies": {
+    "asn1.js": "arweave-kyle/asn1.js",
     "axios": "^0.18.0",
     "base64-js": "^1.3.0",
     "bignumber.js": "^8.0.1",

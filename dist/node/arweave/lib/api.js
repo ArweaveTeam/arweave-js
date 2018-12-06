@@ -13,7 +13,7 @@ class Api {
             protocol: config.protocol || 'http',
             port: config.port || 1984,
             timeout: config.timeout || 20000,
-            logging: false,
+            logging: config.logging || false,
         };
     }
     async get(endpoint, config) {
