@@ -35,6 +35,16 @@ class Ar {
         let b = this.stringToBigNum(winstonStringB);
         return a.isGreaterThan(b);
     }
+    add(winstonStringA, winstonStringB) {
+        let a = this.stringToBigNum(winstonStringA);
+        let b = this.stringToBigNum(winstonStringB);
+        return a.plus(winstonStringB).toFixed(0);
+    }
+    sub(winstonStringA, winstonStringB) {
+        let a = this.stringToBigNum(winstonStringA);
+        let b = this.stringToBigNum(winstonStringB);
+        return a.minus(winstonStringB).toFixed(0);
+    }
     stringToBigNum(stringValue, decimalPlaces = 12) {
         return this.BigNum(stringValue, decimalPlaces);
     }

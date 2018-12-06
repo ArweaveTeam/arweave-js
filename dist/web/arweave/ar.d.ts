@@ -20,5 +20,7 @@ export declare class Ar {
     isEqual(winstonStringA: string, winstonStringB: string): boolean;
     isLessThan(winstonStringA: string, winstonStringB: string): boolean;
     isGreaterThan(winstonStringA: string, winstonStringB: string): boolean;
+    add(winstonStringA: string, winstonStringB: string): string;
+    sub(winstonStringA: string, winstonStringB: string): string;
     private stringToBigNum;
 }

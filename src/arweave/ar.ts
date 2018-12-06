@@ -58,6 +58,19 @@ export class Ar {
         return a.isGreaterThan(b);
     }
 
+    public add(winstonStringA: string, winstonStringB: string): string{
+        let a = this.stringToBigNum(winstonStringA);
+        let b = this.stringToBigNum(winstonStringB);
+
+        return a.plus(winstonStringB).toFixed(0);
+    }
+
+    public sub(winstonStringA: string, winstonStringB: string): string{
+        let a = this.stringToBigNum(winstonStringA);
+        let b = this.stringToBigNum(winstonStringB);
+        return a.minus(winstonStringB).toFixed(0);
+    }
+
     private stringToBigNum(stringValue: string, decimalPlaces: number = 12): BigNumber{
         return this.BigNum(stringValue, decimalPlaces);
     }
