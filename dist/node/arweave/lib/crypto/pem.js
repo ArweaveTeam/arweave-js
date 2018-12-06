@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // @ts-ignore
-const asn = require("asn1.js");
+const asn = require("arweave-asn1");
 function urlize(base64) {
     return base64.replace(/\+/g, '-')
         .replace(/\//g, '_')
