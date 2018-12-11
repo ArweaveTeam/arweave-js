@@ -42,7 +42,7 @@ export class Api {
         }
     }
 
-    public async post(endpoint: string, body: object, config?: AxiosRequestConfig): Promise<AxiosResponse>{
+    public async post(endpoint: string, body: Buffer|string|object, config?: AxiosRequestConfig): Promise<AxiosResponse>{
         try {
 
             return await this.request().post(endpoint, body, config);

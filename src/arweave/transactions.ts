@@ -83,7 +83,7 @@ export class Transactions {
         return transaction;
     }
 
-    public post(transaction: Transaction): Promise<AxiosResponse> {
+    public post(transaction: Transaction|Buffer|string|object): Promise<AxiosResponse> {
         return this.api.post(`tx`, transaction).then( response => {
             return response;
         });

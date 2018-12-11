@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Api } from "./lib/api";
 import { CryptoInterface } from './lib/crypto/crypto-interface';
 import { Transaction } from "./lib/transaction";
@@ -11,5 +12,5 @@ export declare class Transactions {
     get(id: string): Promise<Transaction>;
     getStatus(id: string): Promise<number>;
     sign(transaction: Transaction, jwk: JWKInterface): Promise<Transaction>;
-    post(transaction: Transaction): Promise<AxiosResponse>;
+    post(transaction: Transaction | Buffer | string | object): Promise<AxiosResponse>;
 }
