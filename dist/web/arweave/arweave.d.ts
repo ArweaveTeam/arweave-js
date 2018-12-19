@@ -20,6 +20,7 @@ export declare class Arweave {
     crypto: CryptoInterface;
     utils: ArweaveUtils;
     constructor(config: Config);
+    getConfig(): Config;
     createTransaction(attributes: Partial<TransactionInterface>, jwk: JWKInterface): Promise<Transaction>;
 }
 export {};

@@ -5,7 +5,13 @@ class Api {
     constructor(config) {
         this.METHOD_GET = 'GET';
         this.METHOD_POST = 'POST';
+        this.applyConfig(config);
+    }
+    applyConfig(config) {
         this.config = this.mergeDefaults(config);
+    }
+    getConfig() {
+        return this.config;
     }
     mergeDefaults(config) {
         return {

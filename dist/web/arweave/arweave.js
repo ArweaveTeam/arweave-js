@@ -15,6 +15,12 @@ export class Arweave {
         this.ar = new Ar;
         this.utils = ArweaveUtils;
     }
+    getConfig() {
+        return {
+            api: this.api.getConfig(),
+            crypto: null
+        };
+    }
     async createTransaction(attributes, jwk) {
         if (!attributes.data && !(attributes.target && attributes.quantity)) {
             throw new Error(`A new Arweave transaction must have a 'data' value, or 'target' and 'quantity' values.`);
