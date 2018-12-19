@@ -13,10 +13,18 @@ export class Api {
     public readonly METHOD_GET = 'GET';
     public readonly METHOD_POST = 'POST';
 
-    private config: ApiConfig;
+    public config: ApiConfig;
 
     constructor(config: ApiConfig){
+        this.applyConfig(config);
+    }
+
+    public applyConfig(config: ApiConfig){
         this.config = this.mergeDefaults(config);
+    }
+
+    public getConfig(){
+        return this.config;
     }
 
     private mergeDefaults(config: ApiConfig): ApiConfig{

@@ -43,6 +43,13 @@ export class Arweave {
         this.utils = ArweaveUtils;
     }
 
+    public getConfig(): Config {
+        return {
+            api: this.api.getConfig(),
+            crypto: null
+        }
+    }
+
     public async createTransaction(attributes: Partial<TransactionInterface>, jwk: JWKInterface){
 
         if ( !attributes.data && !(attributes.target && attributes.quantity) ) {
