@@ -34,11 +34,6 @@ export class WebCryptoDriver {
             'qi': jwk.qi,
         };
     }
-    /**
-     *
-     * @param jwk
-     * @param data
-     */
     async sign(jwk, data) {
         let signature = await this
             .driver
@@ -54,13 +49,33 @@ export class WebCryptoDriver {
             .digest('SHA-256', data);
         return new Uint8Array(digest);
     }
+    async verify(publicModulus, data, signature) {
+        const publicKey = {
+            kty: 'RSA',
+            e: 'AQAB',
+            n: publicModulus,
+        };
+        const key = await this.jwkToPublicCryptoKey(publicKey);
+        return this.driver.verify({
+            name: 'RSA-PSS',
+            saltLength: 0,
+        }, key, signature, data);
+    }
     async jwkToCryptoKey(jwk) {
         return this.driver.importKey('jwk', jwk, {
             name: 'RSA-PSS',
             hash: {
                 name: 'SHA-256',
             }
-        }, false, ['sign']);
+        }, false, ["sign"]);
+    }
+    async jwkToPublicCryptoKey(publicJwk) {
+        return this.driver.importKey('jwk', publicJwk, {
+            name: 'RSA-PSS',
+            hash: {
+                name: 'SHA-256',
+            }
+        }, false, ["verify"]);
     }
     detectWebCrypto() {
         if (!window || !window.crypto || !window.crypto.subtle) {

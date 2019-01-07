@@ -1,6 +1,6 @@
 import { Arweave } from "./arweave/arweave";
 import { WebCryptoDriver } from "./arweave/lib/crypto/webcrypto-driver";
-window.arweave = {
+window.Arweave = {
     init(apiConfig) {
         return new Arweave({
             api: apiConfig,

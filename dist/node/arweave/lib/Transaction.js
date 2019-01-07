@@ -35,6 +35,11 @@ class Transaction extends BaseObject {
         this.reward = '0';
         this.signature = '';
         Object.assign(this, attributes);
+        if (attributes.tags) {
+            this.tags = attributes.tags.map((tag) => {
+                return new Tag(tag.name, tag.value);
+            });
+        }
     }
     addTag(name, value) {
         this.tags.push(new Tag(utils_1.ArweaveUtils.stringToB64Url(name), utils_1.ArweaveUtils.stringToB64Url(value)));
@@ -58,7 +63,7 @@ class Transaction extends BaseObject {
     }
     getSignatureData() {
         let tagString = this.tags.reduce((accumulator, tag) => {
-            return accumulator + '' + tag.get('name', { decode: true, string: true }) + '' + tag.get('value', { decode: true, string: true });
+            return accumulator + tag.get('name', { decode: true, string: true }) + tag.get('value', { decode: true, string: true });
         }, '');
         return utils_1.ArweaveUtils.concatBuffers([
             this.get('owner', { decode: true, string: false }),

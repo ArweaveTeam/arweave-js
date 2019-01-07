@@ -6,13 +6,9 @@ export declare class NodeCryptoDriver implements CryptoInterface {
     readonly publicExponent = 65537;
     readonly hashAlgorithm = "sha256";
     generateJWK(): Promise<JWKInterface>;
-    /**
-     *
-     * @param jwk
-     * @param data
-     */
     sign(jwk: object, data: Uint8Array): Promise<Uint8Array>;
+    verify(publicModulus: string, data: Uint8Array, signature: Uint8Array): Promise<boolean>;
     hash(data: Buffer): Promise<Uint8Array>;
-    private jwkToPem;
+    jwkToPem(jwk: object): string;
     private pemToJWK;
 }

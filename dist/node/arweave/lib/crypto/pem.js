@@ -117,7 +117,7 @@ function string2bn(str) {
     }
     return base64url2bn(str);
 }
-function pem2jwk(pem, extras) {
+function pemTojwk(pem, extras) {
     var text = pem.toString().split(/(\r\n|\r|\n)+/g);
     text = text.filter(function (line) {
         return line.trim().length !== 0;
@@ -126,8 +126,8 @@ function pem2jwk(pem, extras) {
     text = text.slice(1, -1).join('');
     return decoder(Buffer.from(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64'), extras);
 }
-exports.pem2jwk = pem2jwk;
-function jwk2pem(json) {
+exports.pemTojwk = pemTojwk;
+function jwkTopem(json) {
     var jwk = parse(json);
     var isPrivate = !!(jwk.d);
     var t = isPrivate ? 'PRIVATE' : 'PUBLIC';
@@ -144,5 +144,5 @@ function jwk2pem(json) {
     var body = data.toString('base64').match(/.{1,64}/g).join('\n');
     return header + body + footer;
 }
-exports.jwk2pem = jwk2pem;
+exports.jwkTopem = jwkTopem;
 //# sourceMappingURL=pem.js.map

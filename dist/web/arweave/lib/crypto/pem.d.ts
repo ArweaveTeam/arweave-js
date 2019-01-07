@@ -1,2 +1,2 @@
-export declare function pem2jwk(pem: any, extras?: any): any;
-export declare function jwk2pem(json: any): any;
+export declare function pemTojwk(pem: any, extras?: any): any;
+export declare function jwkTopem(json: any): any;

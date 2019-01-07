@@ -165,9 +165,9 @@ function string2bn(str: string): any {
   return base64url2bn(str)
 }
 
-export function pem2jwk(pem: any, extras?: any): any {
+export function pemTojwk(pem: any, extras?: any): any {
   var text = pem.toString().split(/(\r\n|\r|\n)+/g)
-  text = text.filter(function(line: string) {
+  text = text.filter(function (line: string) {
     return line.trim().length !== 0
   });
   var decoder = getDecoder(text[0])
@@ -176,7 +176,7 @@ export function pem2jwk(pem: any, extras?: any): any {
   return decoder(Buffer.from(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64'), extras)
 }
 
-export function jwk2pem(json: any): any {
+export function jwkTopem(json: any): any {
   var jwk = parse(json)
   var isPrivate = !!(jwk.d)
   var t = isPrivate ? 'PRIVATE' : 'PUBLIC'

@@ -1,4 +1,4 @@
-import { pem2jwk, jwk2pem } from "./pem";
+import { pemTojwk, jwkTopem } from "./pem";
 const crypto = require('crypto');
 export class NodeCryptoDriver {
     constructor() {
@@ -7,8 +7,8 @@ export class NodeCryptoDriver {
         this.hashAlgorithm = 'sha256';
     }
     generateJWK() {
-        if (typeof !crypto.generateKeyPair == 'function') {
-            throw new Error('Keypair generation not supported in this version of Node, only supported in versions 10.x+');
+        if (typeof crypto.generateKeyPair != "function") {
+            throw new Error('Keypair generation not supported in this version of Node, only supported in versions 10+');
         }
         return new Promise((resolve, reject) => {
             crypto
@@ -31,11 +31,6 @@ export class NodeCryptoDriver {
             });
         });
     }
-    /**
-     *
-     * @param jwk
-     * @param data
-     */
     sign(jwk, data) {
         return new Promise((resolve, reject) => {
             resolve(crypto
@@ -48,6 +43,24 @@ export class NodeCryptoDriver {
             }));
         });
     }
+    verify(publicModulus, data, signature) {
+        return new Promise((resolve, reject) => {
+            const publicKey = {
+                kty: 'RSA',
+                e: 'AQAB',
+                n: publicModulus,
+            };
+            const pem = this.jwkToPem(publicKey);
+            resolve(crypto
+                .createVerify(this.hashAlgorithm)
+                .update(data)
+                .verify({
+                key: pem,
+                padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                saltLength: 0
+            }, signature));
+        });
+    }
     hash(data) {
         return new Promise((resolve, reject) => {
             resolve(crypto
@@ -57,10 +70,10 @@ export class NodeCryptoDriver {
         });
     }
     jwkToPem(jwk) {
-        return jwk2pem(jwk);
+        return jwkTopem(jwk);
     }
     pemToJWK(pem) {
-        let jwk = pem2jwk(pem);
+        let jwk = pemTojwk(pem);
         return jwk;
     }
 }

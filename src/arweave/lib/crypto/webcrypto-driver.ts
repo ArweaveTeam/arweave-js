@@ -1,6 +1,5 @@
-import { JWKInterface } from "../Wallet";
+import { JWKInterface, JWKPublicInterface } from "../Wallet";
 import { CryptoInterface } from "./crypto-interface";
-import { ArweaveUtils } from "../utils";
 
 export class WebCryptoDriver implements CryptoInterface {
 
@@ -10,7 +9,7 @@ export class WebCryptoDriver implements CryptoInterface {
     public readonly driver?: SubtleCrypto;
 
 
-	constructor() {
+    constructor() {
         if (!this.detectWebCrypto()) {
             throw new Error('SubtleCrypto not available!');
         }
@@ -19,7 +18,7 @@ export class WebCryptoDriver implements CryptoInterface {
     }
 
 
-    async generateJWK(): Promise<JWKInterface> {
+    public async generateJWK(): Promise<JWKInterface> {
 
         let cryptoKey = await this
             .driver
@@ -45,29 +44,24 @@ export class WebCryptoDriver implements CryptoInterface {
 
         return {
             'kty': jwk.kty,
-            'e'  : jwk.e,
-            'n'  : jwk.n,
-            'd'  : jwk.d,
-            'p'  : jwk.p,
-            'q'  : jwk.q,
-            'dp' : jwk.dp,
-            'dq' : jwk.dq,
-            'qi' : jwk.qi,
+            'e': jwk.e,
+            'n': jwk.n,
+            'd': jwk.d,
+            'p': jwk.p,
+            'q': jwk.q,
+            'dp': jwk.dp,
+            'dq': jwk.dq,
+            'qi': jwk.qi,
         };
     }
 
-    /**
-     * 
-     * @param jwk 
-     * @param data 
-     */
-    async sign(jwk: JWKInterface, data: any): Promise<Uint8Array>{
+    public async sign(jwk: JWKInterface, data: Uint8Array): Promise<Uint8Array> {
         let signature = await this
             .driver
             .sign({
-                    name: 'RSA-PSS',
-                    saltLength: 0,
-                },
+                name: 'RSA-PSS',
+                saltLength: 0,
+            },
                 (await this.jwkToCryptoKey(jwk)),
                 data
             );
@@ -75,7 +69,7 @@ export class WebCryptoDriver implements CryptoInterface {
         return new Uint8Array(signature);
     }
 
-    async hash(data: Uint8Array): Promise<Uint8Array> {
+    public async hash(data: Uint8Array): Promise<Uint8Array> {
         let digest = await this
             .driver
             .digest(
@@ -86,7 +80,23 @@ export class WebCryptoDriver implements CryptoInterface {
         return new Uint8Array(digest);
     }
 
-    private async jwkToCryptoKey(jwk: JWKInterface): Promise<CryptoKey>{
+    public async verify(publicModulus: string, data: Uint8Array, signature: Uint8Array): Promise<boolean> {
+
+        const publicKey = {
+            kty: 'RSA',
+            e: 'AQAB',
+            n: publicModulus,
+        };
+
+        const key = await this.jwkToPublicCryptoKey(publicKey);
+
+        return this.driver.verify({
+            name: 'RSA-PSS',
+            saltLength: 0,
+        }, key, signature, data);
+    }
+
+    private async jwkToCryptoKey(jwk: JWKInterface): Promise<CryptoKey> {
         return this.driver.importKey(
             'jwk',
             jwk,
@@ -97,11 +107,26 @@ export class WebCryptoDriver implements CryptoInterface {
                 }
             },
             false,
-            ['sign']
+            ["sign"]
         );
     }
 
-    private detectWebCrypto(){
+    private async jwkToPublicCryptoKey(publicJwk: JWKPublicInterface): Promise<CryptoKey> {
+        return this.driver.importKey(
+            'jwk',
+            publicJwk,
+            {
+                name: 'RSA-PSS',
+                hash: {
+                    name: 'SHA-256',
+                }
+            },
+            false,
+            ["verify"]
+        );
+    }
+
+    private detectWebCrypto() {
         if (!window || !window.crypto || !window.crypto.subtle) {
             return false;
         }

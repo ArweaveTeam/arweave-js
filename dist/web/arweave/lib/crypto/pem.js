@@ -115,7 +115,7 @@ function string2bn(str) {
     }
     return base64url2bn(str);
 }
-export function pem2jwk(pem, extras) {
+export function pemTojwk(pem, extras) {
     var text = pem.toString().split(/(\r\n|\r|\n)+/g);
     text = text.filter(function (line) {
         return line.trim().length !== 0;
@@ -124,7 +124,7 @@ export function pem2jwk(pem, extras) {
     text = text.slice(1, -1).join('');
     return decoder(Buffer.from(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64'), extras);
 }
-export function jwk2pem(json) {
+export function jwkTopem(json) {
     var jwk = parse(json);
     var isPrivate = !!(jwk.d);
     var t = isPrivate ? 'PRIVATE' : 'PUBLIC';

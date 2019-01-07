@@ -9,3 +9,9 @@ export interface JWKInterface {
     dq: string;
     qi: string;
 }
+
+export interface JWKPublicInterface {
+    kty: string;
+    e: string;
+    n: string;
+}

@@ -2,32 +2,32 @@ import { ArweaveUtils } from './utils';
 
 class BaseObject {
 
-    [key:string]: any;
+    [key: string]: any;
 
     public get(field: string): string;
-    public get(field: string, options: {decode: true, string: false}): Uint8Array;
-    public get(field: string, options: {decode: true, string: true}): string;
+    public get(field: string, options: { decode: true, string: false }): Uint8Array;
+    public get(field: string, options: { decode: true, string: true }): string;
 
     public get(field: string, options?: {
         string?: boolean,
         decode?: boolean
-     }): string | Uint8Array | Tag[] {
-     
+    }): string | Uint8Array | Tag[] {
+
         if (!Object.getOwnPropertyNames(this).includes(field)) {
             throw new Error(`Field "${field}" is not a property of the Arweave Transaction class.`);
         }
-     
+
         if (options && options.decode == true) {
-     
+
             if (options && options.string) {
                 return ArweaveUtils.b64UrlToString(this[field]);
             }
-     
+
             return ArweaveUtils.b64UrlToBuffer(this[field]);
         }
-     
+
         return this[field];
-     }
+    }
 }
 
 export class Tag extends BaseObject {
@@ -35,7 +35,7 @@ export class Tag extends BaseObject {
     readonly name: string;
     readonly value: string;
 
-    public constructor(name: string, value: string, decode = false){
+    public constructor(name: string, value: string, decode = false) {
         super();
         this.name = name;
         this.value = value;
@@ -45,12 +45,12 @@ export class Tag extends BaseObject {
 
 export interface TransactionInterface {
 
-    [key:string]: any
+    [key: string]: any
 
     id: string,
     last_tx: string,
     owner: string,
-    tags:  Tag[],
+    tags: Tag[],
     target: string,
     quantity: string,
     data: string,
@@ -59,13 +59,13 @@ export interface TransactionInterface {
 }
 
 
-export class Transaction  extends BaseObject implements TransactionInterface {
+export class Transaction extends BaseObject implements TransactionInterface {
 
-    [key:string]: any
+    [key: string]: any
 
     public id: string;
-    public readonly last_tx:string = '';
-    public readonly owner:string  = '';
+    public readonly last_tx: string = '';
+    public readonly owner: string = '';
     public readonly tags: Tag[] = [];
     public readonly target: string = '';
     public readonly quantity: string = '0';
@@ -76,16 +76,22 @@ export class Transaction  extends BaseObject implements TransactionInterface {
     public constructor(attributes?: Partial<TransactionInterface>) {
         super();
         Object.assign(this, attributes);
+
+        if (attributes.tags) {
+            this.tags = attributes.tags.map((tag: { name: string, value: string }) => {
+                return new Tag(tag.name, tag.value);
+            });
+        }
     }
 
-    public addTag(name: string, value: string){
+    public addTag(name: string, value: string) {
         this.tags.push(new Tag(
             ArweaveUtils.stringToB64Url(name),
             ArweaveUtils.stringToB64Url(value)
         ));
     }
 
-    public toJSON(){
+    public toJSON() {
         return {
             id: this.id,
             last_tx: this.last_tx,
@@ -99,7 +105,7 @@ export class Transaction  extends BaseObject implements TransactionInterface {
         };
     }
 
-    public setSignature({signature, id}: {
+    public setSignature({ signature, id }: {
         signature: string,
         id: string,
     }) {
@@ -110,16 +116,16 @@ export class Transaction  extends BaseObject implements TransactionInterface {
     public getSignatureData(): Uint8Array {
 
         let tagString = this.tags.reduce((accumulator: string, tag: Tag) => {
-            return accumulator + '' + tag.get('name', {decode: true, string: true}) + '' + tag.get('value', {decode: true, string: true})
+            return accumulator + tag.get('name', { decode: true, string: true }) + tag.get('value', { decode: true, string: true })
         }, '');
 
         return ArweaveUtils.concatBuffers([
-            this.get('owner', {decode: true, string: false}),
-            this.get('target', {decode: true, string: false}),
-            this.get('data', {decode: true, string: false}),
+            this.get('owner', { decode: true, string: false }),
+            this.get('target', { decode: true, string: false }),
+            this.get('data', { decode: true, string: false }),
             ArweaveUtils.stringToBuffer(this.quantity),
             ArweaveUtils.stringToBuffer(this.reward),
-            this.get('last_tx', {decode: true, string: false}),
+            this.get('last_tx', { decode: true, string: false }),
             ArweaveUtils.stringToBuffer(tagString)
         ]);
     }

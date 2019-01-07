@@ -12,5 +12,6 @@ export declare class Transactions {
     get(id: string): Promise<Transaction>;
     getStatus(id: string): Promise<number>;
     sign(transaction: Transaction, jwk: JWKInterface): Promise<Transaction>;
+    verify(transaction: Transaction): Promise<boolean>;
     post(transaction: Transaction | Buffer | string | object): Promise<AxiosResponse>;
 }
