@@ -11,10 +11,12 @@ const expect = chai.expect;
 
 const arweave = Arweave.init({ host: 'arweave.net', port: 1984, logging: false });
 
-const digestRegex = /[a-zA-Z0-9-_]{43}/;
-const liveAddressBalance = '0000000000004985570556';
+const digestRegex = /^[a-z0-9-_]{43}$/i;
+const liveAddressBalance = '498557055636';
 const liveAddress = '9_666Wkk2GzL0LGd3xhb0jY7HqNy71BaV4sULQlJsBQ';
-const liveTxid = 'glHacTmLlPSw55wUOU-MMaknJjWWHBLN16U8f3YuOd4';
+const liveTxid = 'CE-1SFiXqWUEu0aSTebE6LC0-5JBAc3IAehYGwdF5iI';
+
+const liveDataTxid = 'Ie-fxxzdBweiA0N1ZbzUqXhNI310uDUmaBc3ajlV6YY';
 
 describe('Initialization', function () {
     it('should have components', function () {
@@ -32,9 +34,30 @@ describe('Initialization', function () {
     })
 });
 
+
+describe('Network Info', function () {
+    it('should get network info', async function () {
+
+        this.timeout(3000);
+
+        const info = await arweave.network.getInfo();
+        const peers = await arweave.network.getPeers();
+
+        expect(info).to.be.an('object')
+
+        expect(Object.keys(info)).to.contain.members(['height', 'current', 'release', 'version', 'blocks']);
+
+        expect(info.height).to.be.a('number').greaterThan(0);
+
+        expect(peers).to.be.an('array');
+    })
+})
+
 describe('Wallets and keys', function () {
 
     it('should generate valid JWKs', async function () {
+
+        this.timeout(3000);
 
         const walletA = await arweave.wallets.generate();
         const walletB = await arweave.wallets.generate();
@@ -42,6 +65,14 @@ describe('Wallets and keys', function () {
         expect(walletA).to.be.an('object', 'New wallet is not an object');
 
         expect(walletA).to.have.all.keys('kty', 'n', 'e', 'd', 'p', 'q', 'dp', 'dq', 'qi');
+
+        expect(walletA.kty).to.equal('RSA');
+
+        expect(walletA.e).to.equal('AQAB');
+
+        expect(walletA.n).to.match(/^[a-z0-9-_]{683}$/i);
+
+        expect(walletA.d).to.match(/^[a-z0-9-_]{683}$/i);
 
         const addressA = await arweave.wallets.jwkToAddress(walletA);
         const addressB = await arweave.wallets.jwkToAddress(walletB);
@@ -57,6 +88,8 @@ describe('Wallets and keys', function () {
     })
 
     it('should get wallet info', async function () {
+
+        this.timeout(3000);
 
         const wallet = await arweave.wallets.generate();
 
@@ -78,16 +111,24 @@ describe('Wallets and keys', function () {
 
         const lastTxB = await arweave.wallets.getLastTransactionID(liveAddress);
 
-        expect(balance).to.be.a('string');
+        expect(balanceB).to.be.a('string');
 
-        expect(balance).to.equal(liveAddressBalance);
+        expect(balanceB).to.equal(liveAddressBalance);
 
-        expect(lastTx).to.be.a('string');
+        expect(lastTxB).to.be.a('string');
 
-        expect(lastTx).to.match(digestRegex);
+        expect(lastTxB).to.equal(liveTxid);
     })
 
-    it('Transactions', async function () {
+
+});
+
+
+describe('Transactions', function () {
+
+    it('should create and sign transactions', async function () {
+
+        this.timeout(3000);
 
         const wallet = await arweave.wallets.generate();
 
@@ -95,20 +136,78 @@ describe('Wallets and keys', function () {
 
         expect(transaction).to.be.an.instanceOf(Transaction);
 
+        expect(transaction.data).to.equal('dGVzdA');
+
+        expect(transaction.last_tx).to.equal('');
+
+        expect(transaction.reward).to.match(/^[0-9]+$/);
+
         await arweave.transactions.sign(transaction, wallet);
 
-        expect(transaction.signature).to.match(/[a-zA-Z0-9-_]+/);
+        expect(transaction.signature).to.match(/^[a-z0-9-_]+$/i);
 
         expect(transaction.id).to.match(digestRegex);
 
-        console.log('id');
-
         const verified = await arweave.transactions.verify(transaction)
+
+        expect(verified).to.be.a('boolean');
 
         expect(verified).to.be.true;
 
-        expect(verified).to.be.a('boolean');
     })
 
+
+    it('should get transaction info', async function () {
+
+        this.timeout(3000);
+
+        const transactionStatus = await arweave.transactions.getStatus(liveDataTxid);
+        const transaction = await arweave.transactions.get(liveDataTxid);
+
+        expect(transactionStatus).to.be.a('number');
+
+        expect(transactionStatus).to.equal(200);
+
+        expect(transaction.get('data', { decode: true, string: true })).to.contain('<title>Releases · ArweaveTeam/arweave</title>');
+
+        expect(await arweave.transactions.verify(transaction)).to.be.true;
+
+        transaction.signature = 'xxx';
+
+        const verifyResult = await (() => {
+            return new Promise((resolve) => {
+                arweave.transactions.verify(transaction).catch(error => {
+                    resolve(error);
+                })
+            })
+        })();
+
+        expect(verifyResult).to.be.an.instanceOf(Error).with.property('message').and.match(/^.*invalid transaction signature.*$/i)
+
+    });
+
+    it('should post transactions', async function () {
+
+        this.timeout(3000);
+
+        const wallet = await arweave.wallets.generate();
+
+        const transaction = await arweave.createTransaction({ data: 'test' }, wallet);
+
+        const unsignedResponse = await arweave.transactions.post(transaction);
+
+        expect(unsignedResponse.status).to.be.a('number');
+
+        // Unsigned transactions shouldn't be accepted (current implementation returns 500)
+        expect(unsignedResponse.status).to.equal(500);
+
+        await arweave.transactions.sign(transaction, wallet);
+
+        const signedResponse = await arweave.transactions.post(transaction);
+
+        expect(signedResponse.status).to.be.a('number');
+
+        expect(signedResponse.status).to.not.equal(500);
+    });
 
 });

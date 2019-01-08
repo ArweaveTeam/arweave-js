@@ -1,18 +1,16 @@
 {
   "name": "arweave",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Arweave JS client library",
   "main": "index.js",
   "scripts": {
     "compile:node": "tsc --declaration -project tsconfig.node.json",
     "compile:web": "tsc --declaration -project tsconfig.web.json",
-    "build:node": "npx webpack --config-name node",
-    "build:web": "npx webpack --config-name web",
-    "build:web-prod": "npx webpack --config-name web-prod",
-    "profile:node": "npx webpack --config-name node --json > ./node.profile.json && npx webpack-bundle-analyzer ./node.profile.json",
+    "bundle:web": "npx webpack --config-name web",
+    "bundle:web-prod": "npx webpack --config-name web-prod",
     "profile:web": "npx webpack --config-name web --json > ./web.profile.json && npx webpack-bundle-analyzer ./web.profile.json",
-    "build": "npm run compile:node && npm run compile:web && npm run build:node && npm run build:web && npm run build:web-prod",
-    "test": "mocha --require ts-node/register test/**/*.ts"
+    "build": "npm run compile:node && npm run compile:web && npm run bundle:web && npm run bundle:web-prod",
+    "test": "mocha --require ts-node/register test/*.ts"
   },
   "repository": {
     "type": "git",
