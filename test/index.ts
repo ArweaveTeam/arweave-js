@@ -134,6 +134,10 @@ describe('Transactions', function () {
 
         const transaction = await arweave.createTransaction({ data: 'test' }, wallet);
 
+        transaction.addTag('test-tag-1', 'test-value-1');
+        transaction.addTag('test-tag-2', 'test-value-2');
+        transaction.addTag('test-tag-3', 'test-value-3');
+
         expect(transaction).to.be.an.instanceOf(Transaction);
 
         expect(transaction.data).to.equal('dGVzdA');
@@ -153,6 +157,17 @@ describe('Transactions', function () {
         expect(verified).to.be.a('boolean');
 
         expect(verified).to.be.true;
+
+        //@ts-ignore
+        // Needs ts-ignoring as tags are readonly so chaning the tag like this isn't 
+        // normally an allowed operation, but it's a test, so...
+        transaction.tags[1].value = 'dGVzdDI';
+
+        const verifiedWithModififedTags = await arweave.transactions.verify(transaction)
+
+        expect(verifiedWithModififedTags).to.be.a('boolean');
+
+        expect(verifiedWithModififedTags).to.be.false;
 
     })
 

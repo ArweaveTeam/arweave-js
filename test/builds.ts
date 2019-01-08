@@ -1,5 +1,4 @@
 import * as chai from 'chai';
-import * as Arweave from "../src/node";
 
 const expect = chai.expect;
 
