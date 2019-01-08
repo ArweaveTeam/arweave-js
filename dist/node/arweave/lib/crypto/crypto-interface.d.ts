@@ -1,4 +1,4 @@
-import { JWKInterface } from "../Wallet";
+import { JWKInterface } from "../wallet";
 export interface CryptoInterface {
     generateJWK(): Promise<JWKInterface>;
     sign(jwk: JWKInterface, data: Uint8Array): Promise<Uint8Array>;

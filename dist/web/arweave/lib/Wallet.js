@@ -1,1 +1,1 @@
-//# sourceMappingURL=Wallet.js.map
+//# sourceMappingURL=wallet.js.map

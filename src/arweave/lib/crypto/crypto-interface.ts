@@ -1,4 +1,4 @@
-import { JWKInterface } from "../Wallet";
+import { JWKInterface } from "../wallet";
 
 export interface CryptoInterface {
 
