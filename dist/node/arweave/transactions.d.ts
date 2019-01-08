@@ -2,7 +2,7 @@
 import { Api } from "./lib/api";
 import { CryptoInterface } from './lib/crypto/crypto-interface';
 import { Transaction } from "./lib/transaction";
-import { JWKInterface } from './lib/Wallet';
+import { JWKInterface } from './lib/wallet';
 import { AxiosResponse } from "axios";
 export declare class Transactions {
     private api;

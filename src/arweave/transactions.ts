@@ -3,7 +3,7 @@ import { CryptoInterface } from './lib/crypto/crypto-interface';
 import { ArweaveError, ArweaveErrorType } from './lib/error';
 import { Transaction, Tag, TransactionInterface } from "./lib/transaction";
 import { ArweaveUtils } from './lib/utils';
-import { JWKInterface } from './lib/Wallet';
+import { JWKInterface } from './lib/wallet';
 import { Wallets } from "./wallets";
 import { AxiosResponse } from "axios";
 

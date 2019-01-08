@@ -5,17 +5,17 @@ import { Network } from "./network";
 import { Transactions } from './transactions';
 import { Wallets } from './wallets';
 import { TransactionInterface, Transaction } from "./lib/transaction";
-import { JWKInterface } from "./lib/Wallet";
+import { JWKInterface } from "./lib/wallet";
 import { ArweaveUtils } from "./lib/utils";
 
 
-interface Config<T = object>{
+interface Config<T = object> {
     api: ApiConfig
     crypto: CryptoInterface
 }
 
 export class Arweave {
-    
+
     public api: Api;
 
     public wallets: Wallets;
@@ -23,14 +23,14 @@ export class Arweave {
     public transactions: Transactions;
 
     public network: Network;
-    
+
     public ar: Ar;
-    
+
     public crypto: CryptoInterface;
-    
+
     public utils: ArweaveUtils;
 
-    constructor(config: Config){
+    constructor(config: Config) {
 
         this.crypto = config.crypto;
 
@@ -50,9 +50,9 @@ export class Arweave {
         }
     }
 
-    public async createTransaction(attributes: Partial<TransactionInterface>, jwk: JWKInterface){
+    public async createTransaction(attributes: Partial<TransactionInterface>, jwk: JWKInterface) {
 
-        if ( !attributes.data && !(attributes.target && attributes.quantity) ) {
+        if (!attributes.data && !(attributes.target && attributes.quantity)) {
             throw new Error(`A new Arweave transaction must have a 'data' value, or 'target' and 'quantity' values.`);
         }
 
