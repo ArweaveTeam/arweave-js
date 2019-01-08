@@ -1,4 +1,4 @@
-import { JWKInterface, JWKPublicInterface } from "../Wallet";
+import { JWKInterface, JWKPublicInterface } from "../wallet";
 import { CryptoInterface } from "./crypto-interface";
 
 export class WebCryptoDriver implements CryptoInterface {

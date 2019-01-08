@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { JWKInterface } from "../Wallet";
+import { JWKInterface } from "../wallet";
 import { CryptoInterface } from "./crypto-interface";
 export declare class NodeCryptoDriver implements CryptoInterface {
     readonly keyLength = 4096;

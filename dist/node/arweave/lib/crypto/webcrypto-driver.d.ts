@@ -1,4 +1,4 @@
-import { JWKInterface } from "../Wallet";
+import { JWKInterface } from "../wallet";
 import { CryptoInterface } from "./crypto-interface";
 export declare class WebCryptoDriver implements CryptoInterface {
     readonly keyLength = 4096;

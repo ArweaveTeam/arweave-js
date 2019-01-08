@@ -1,4 +1,4 @@
-import { JWKInterface } from "../Wallet";
+import { JWKInterface } from "../wallet";
 import { CryptoInterface } from "./crypto-interface";
 
 import { pemTojwk, jwkTopem } from "./pem";
