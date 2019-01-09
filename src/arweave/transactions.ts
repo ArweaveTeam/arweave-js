@@ -48,19 +48,32 @@ export class Transactions {
             }
 
             if (response.status == 202) {
-                new ArweaveError(ArweaveErrorType.TX_PENDING);
+                throw new ArweaveError(ArweaveErrorType.TX_PENDING);
             }
 
             if (response.status == 404) {
-                new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
+                throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
             }
 
             if (response.status == 410) {
-                new ArweaveError(ArweaveErrorType.TX_FAILED);
+                throw new ArweaveError(ArweaveErrorType.TX_FAILED);
             }
 
-            new ArweaveError(ArweaveErrorType.TX_INVALID);
+            throw new ArweaveError(ArweaveErrorType.TX_INVALID);
 
+        });
+    }
+
+    public async search(tagName: string, tagValue: string): Promise<string[]> {
+        return this.api.post(`arql`, {
+            op: 'equals',
+            expr1: tagName,
+            expr2: tagValue,
+        }).then(response => {
+            if (!response.data) {
+                return [];
+            }
+            return response.data;
         });
     }
 

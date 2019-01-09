@@ -1,13 +1,13 @@
 import * as chai from 'chai';
-import * as Arweave from "../src/node";
+import * as crypto from 'crypto';
 import { Api } from '../src/arweave/lib/api';
-import { Wallets } from '../src/arweave/wallets';
-import { Network } from '../src/arweave/network';
-import { Transactions } from '../src/arweave/transactions';
 import { NodeCryptoDriver } from '../src/arweave/lib/crypto/node-driver';
 import { Transaction } from '../src/arweave/lib/transaction';
-import { ArweaveUtils } from "../src/arweave/lib/utils";
-import * as crypto from 'crypto';
+import { Network } from '../src/arweave/network';
+import { SiloResource } from '../src/arweave/silo';
+import { Transactions } from '../src/arweave/transactions';
+import { Wallets } from '../src/arweave/wallets';
+import * as Arweave from "../src/node";
 
 const expect = chai.expect;
 
@@ -122,8 +122,7 @@ describe('Wallets and keys', function () {
         expect(lastTxB).to.equal(liveTxid);
     })
 
-
-});
+})
 
 
 describe('Transactions', function () {
@@ -201,7 +200,7 @@ describe('Transactions', function () {
 
         expect(verifyResult).to.be.an.instanceOf(Error).with.property('message').and.match(/^.*invalid transaction signature.*$/i)
 
-    });
+    })
 
     it('should post transactions', async function () {
 
@@ -225,9 +224,17 @@ describe('Transactions', function () {
         expect(signedResponse.status).to.be.a('number');
 
         expect(signedResponse.status).to.not.equal(500);
-    });
 
-});
+    })
+
+    it('should find transactions', async function () {
+
+        const results = await arweave.transactions.search('Silo-Name', 'BmjRGIsemI77+eQb4zX8');
+
+        expect(results).to.be.an('array').which.contains('Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE')
+    })
+
+})
 
 describe('Encryption', function () {
     it('should encrypt and decrypt using key round trip', async function () {
@@ -247,7 +254,7 @@ describe('Encryption', function () {
         expect(decrypted.toString()).to.equal(data.toString());
         expect(decrypted.toString()).to.equal(text);
 
-    });
+    })
 
     it('should encrypt and decrypt using passphrase round trip', async function () {
 
@@ -264,7 +271,25 @@ describe('Encryption', function () {
         const decrypted = await arweave.crypto.decrypt(encrypted, key);
 
         expect(decrypted.toString()).to.equal(data.toString());
+
         expect(decrypted.toString()).to.equal(text);
 
-    });
+    })
+})
+
+describe('Silo', function () {
+    it('should resolve Silo URIs', async function () {
+
+        const siloResource = await arweave.silo.parseUri('someref.1');
+
+        expect(siloResource).to.be.an.instanceOf(SiloResource);
+
+        expect(siloResource.getAccessKey()).to.equal('UOJXTuMn08uUlwg3zSnB')
+
+        const expectedKey = '97e938237d70eda6e88aa0dc3ec14c704505f744c51fbf608e5be1db33c00fb3';
+
+        const actualKey = Buffer.from(siloResource.getEncryptionKey()).toString('hex');
+
+        expect(actualKey).to.equal(expectedKey);
+    })
 })

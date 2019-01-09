@@ -31,15 +31,27 @@ export class Transactions {
                 return new Transaction(response.data);
             }
             if (response.status == 202) {
-                new ArweaveError("TX_PENDING" /* TX_PENDING */);
+                throw new ArweaveError("TX_PENDING" /* TX_PENDING */);
             }
             if (response.status == 404) {
-                new ArweaveError("TX_NOT_FOUND" /* TX_NOT_FOUND */);
+                throw new ArweaveError("TX_NOT_FOUND" /* TX_NOT_FOUND */);
             }
             if (response.status == 410) {
-                new ArweaveError("TX_FAILED" /* TX_FAILED */);
+                throw new ArweaveError("TX_FAILED" /* TX_FAILED */);
             }
-            new ArweaveError("TX_INVALID" /* TX_INVALID */);
+            throw new ArweaveError("TX_INVALID" /* TX_INVALID */);
+        });
+    }
+    async search(tagName, tagValue) {
+        return this.api.post(`arql`, {
+            op: 'equals',
+            expr1: tagName,
+            expr2: tagValue,
+        }).then(response => {
+            if (!response.data) {
+                return [];
+            }
+            return response.data;
         });
     }
     getStatus(id) {

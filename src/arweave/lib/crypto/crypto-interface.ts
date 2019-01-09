@@ -10,7 +10,7 @@ export interface CryptoInterface {
 
     encrypt(data: Uint8Array, key: string | Uint8Array): Promise<Uint8Array>
 
-    decrypt(encrypted: Uint8Array, key: string | Buffer): Promise<Uint8Array>
+    decrypt(encrypted: Uint8Array, key: string | Uint8Array): Promise<Uint8Array>
 
     hash(data: Uint8Array): Promise<Uint8Array>
 }
