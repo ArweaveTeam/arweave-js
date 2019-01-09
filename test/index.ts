@@ -4,7 +4,7 @@ import { Api } from '../src/arweave/lib/api';
 import { NodeCryptoDriver } from '../src/arweave/lib/crypto/node-driver';
 import { Transaction } from '../src/arweave/lib/transaction';
 import { Network } from '../src/arweave/network';
-import { SiloResource } from '../src/arweave/silo';
+import { SiloResource, Silo } from '../src/arweave/silo';
 import { Transactions } from '../src/arweave/transactions';
 import { Wallets } from '../src/arweave/wallets';
 import * as Arweave from "../src/node";
@@ -32,6 +32,8 @@ describe('Initialization', function () {
         expect(arweave.network).to.be.an.instanceOf(Network);
 
         expect(arweave.crypto).to.be.an.instanceOf(NodeCryptoDriver);
+
+        expect(arweave.silo).to.be.an.instanceOf(Silo);
 
     })
 });
