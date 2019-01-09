@@ -6,6 +6,8 @@ import { Network } from '../src/arweave/network';
 import { Transactions } from '../src/arweave/transactions';
 import { NodeCryptoDriver } from '../src/arweave/lib/crypto/node-driver';
 import { Transaction } from '../src/arweave/lib/transaction';
+import { ArweaveUtils } from "../src/arweave/lib/utils";
+import * as crypto from 'crypto';
 
 const expect = chai.expect;
 
@@ -226,3 +228,43 @@ describe('Transactions', function () {
     });
 
 });
+
+describe('Encryption', function () {
+    it('should encrypt and decrypt using key round trip', async function () {
+
+        const text = 'some data to encrypt';
+
+        const data = Buffer.from(text);
+
+        const key = crypto.randomBytes(32);
+
+        const encrypted = await arweave.crypto.encrypt(data, key);
+
+        expect(encrypted).to.have.lengthOf(48);
+
+        const decrypted = await arweave.crypto.decrypt(encrypted, key);
+
+        expect(decrypted.toString()).to.equal(data.toString());
+        expect(decrypted.toString()).to.equal(text);
+
+    });
+
+    it('should encrypt and decrypt using passphrase round trip', async function () {
+
+        const text = 'some data to encrypt';
+
+        const data = Buffer.from(text);
+
+        const key = 'super-secret-password';
+
+        const encrypted = await arweave.crypto.encrypt(data, key);
+
+        expect(encrypted).to.have.lengthOf(48);
+
+        const decrypted = await arweave.crypto.decrypt(encrypted, key);
+
+        expect(decrypted.toString()).to.equal(data.toString());
+        expect(decrypted.toString()).to.equal(text);
+
+    });
+})

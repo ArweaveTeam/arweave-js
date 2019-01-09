@@ -101,6 +101,12 @@ class WebCryptoDriver {
         }
         return true;
     }
+    async encrypt(data, key) {
+        return Buffer.from('');
+    }
+    async decrypt(encrypted, key) {
+        return Buffer.from('');
+    }
 }
 exports.WebCryptoDriver = WebCryptoDriver;
 //# sourceMappingURL=webcrypto-driver.js.map

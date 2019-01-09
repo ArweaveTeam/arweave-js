@@ -5,6 +5,7 @@ export class NodeCryptoDriver {
         this.keyLength = 4096;
         this.publicExponent = 0x10001;
         this.hashAlgorithm = 'sha256';
+        this.encryptionAlgorithm = 'aes-256-cbc';
     }
     generateJWK() {
         if (typeof crypto.generateKeyPair != "function") {
@@ -68,6 +69,56 @@ export class NodeCryptoDriver {
                 .update(data)
                 .digest());
         });
+    }
+    /**
+     * If a key is passed as a buffer it *must* be exactly 32 bytes.
+     * If a key is passed as a string then any length may be used.
+     *
+     * @param {Buffer} data
+     * @param {(string | Buffer)} key
+     * @returns {Promise<Uint8Array>}
+     */
+    async encrypt(data, key) {
+        // If the key is a string then we'll treat it as a passphrase and derive
+        // an actual key from that passphrase. If it's not a string then we'll
+        // assume it's a byte array and we'll use that as the encryption key directly.
+        if (typeof key == 'string') {
+            // As we're using CBC with a randomised IV per cypher we don't really need
+            // an additional random salt per passphrase.
+            key = crypto.pbkdf2Sync(key, 'salt', 100000, 32, this.hashAlgorithm);
+        }
+        const iv = crypto.randomBytes(16);
+        const cipher = crypto.createCipheriv(this.encryptionAlgorithm, key, iv);
+        const encrypted = Buffer.concat([iv, cipher.update(data), cipher.final()]);
+        return encrypted;
+    }
+    /**
+     * If a key is passed as a buffer it *must* be exactly 32 bytes.
+     * If a key is passed as a string then any length may be used.
+     *
+     * @param {Buffer} encrypted
+     * @param {(string | Buffer)} key
+     * @returns {Promise<Uint8Array>}
+     */
+    async decrypt(encrypted, key) {
+        try {
+            // If the key is a string then we'll treat it as a passphrase and derive
+            // an actual key from that passphrase. If it's not a string then we'll
+            // assume it's a byte array and we'll use that as the encryption key directly.
+            if (typeof key == 'string') {
+                // As we're using CBC with a randomised IV per cypher we don't really need
+                // an additional random salt per passphrase.
+                key = crypto.pbkdf2Sync(key, 'salt', 100000, 32, this.hashAlgorithm);
+            }
+            const iv = encrypted.slice(0, 16);
+            const data = encrypted.slice(16);
+            const decipher = crypto.createDecipheriv(this.encryptionAlgorithm, key, iv);
+            const decrypted = Buffer.concat([decipher.update(data), decipher.final()]);
+            return decrypted;
+        }
+        catch (error) {
+            throw new Error('Failed to decrypt');
+        }
     }
     jwkToPem(jwk) {
         return jwkTopem(jwk);

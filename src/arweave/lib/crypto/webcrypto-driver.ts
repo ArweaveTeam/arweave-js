@@ -156,4 +156,12 @@ export class WebCryptoDriver implements CryptoInterface {
         return true;
     }
 
+    public async encrypt(data: Buffer, key: string | Buffer): Promise<Uint8Array> {
+        return Buffer.from('');
+    }
+
+    public async decrypt(encrypted: Buffer, key: string | Buffer): Promise<Uint8Array> {
+        return Buffer.from('');
+    }
+
 }
