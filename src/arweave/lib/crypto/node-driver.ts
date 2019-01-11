@@ -95,18 +95,14 @@ export class NodeCryptoDriver implements CryptoInterface {
      */
     public async encrypt(data: Buffer, key: string | Buffer): Promise<Uint8Array> {
 
-        // If the key is a string then we'll treat it as a passphrase and derive
-        // an actual key from that passphrase. If it's not a string then we'll
-        // assume it's a byte array and we'll use that as the encryption key directly.
-        if (typeof key == 'string') {
-            // As we're using CBC with a randomised IV per cypher we don't really need
-            // an additional random salt per passphrase.
-            key = crypto.pbkdf2Sync(key, 'salt', 100000, 32, this.hashAlgorithm);
-        }
+
+        // As we're using CBC with a randomised IV per cypher we don't really need
+        // an additional random salt per passphrase.
+        const derivedKey = crypto.pbkdf2Sync(key, 'salt', 100000, 32, this.hashAlgorithm);
 
         const iv = crypto.randomBytes(16);
 
-        const cipher = crypto.createCipheriv(this.encryptionAlgorithm, key, iv);
+        const cipher = crypto.createCipheriv(this.encryptionAlgorithm, derivedKey, iv);
 
         const encrypted = Buffer.concat([iv, cipher.update(data), cipher.final()])
 
@@ -124,20 +120,15 @@ export class NodeCryptoDriver implements CryptoInterface {
     public async decrypt(encrypted: Buffer, key: string | Buffer): Promise<Uint8Array> {
         try {
 
-            // If the key is a string then we'll treat it as a passphrase and derive
-            // an actual key from that passphrase. If it's not a string then we'll
-            // assume it's a byte array and we'll use that as the encryption key directly.
-            if (typeof key == 'string') {
-                // As we're using CBC with a randomised IV per cypher we don't really need
-                // an additional random salt per passphrase.
-                key = crypto.pbkdf2Sync(key, 'salt', 100000, 32, this.hashAlgorithm);
-            }
+            // As we're using CBC with a randomised IV per cypher we don't really need
+            // an additional random salt per passphrase.
+            const derivedKey = crypto.pbkdf2Sync(key, 'salt', 100000, 32, this.hashAlgorithm);
 
             const iv = encrypted.slice(0, 16);
 
             const data = encrypted.slice(16);
 
-            const decipher = crypto.createDecipheriv(this.encryptionAlgorithm, key, iv);
+            const decipher = crypto.createDecipheriv(this.encryptionAlgorithm, derivedKey, iv);
 
             const decrypted = Buffer.concat([decipher.update(data), decipher.final()]);
 

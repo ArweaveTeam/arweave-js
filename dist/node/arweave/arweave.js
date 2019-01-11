@@ -67,6 +67,9 @@ class Arweave {
             let length = (typeof attributes.data == 'string' && attributes.data.length > 0) ? attributes.data.length : 0;
             attributes.reward = await this.transactions.getPrice(length);
         }
+        const siloResource = await this.silo.parseUri(siloUri);
+        const encrypted = await this.crypto.encrypt(utils_1.ArweaveUtils.stringToBuffer(attributes.data), siloResource.getEncryptionKey());
+        attributes.data = utils_1.ArweaveUtils.bufferTob64Url(encrypted);
         return new transaction_1.Transaction(attributes);
     }
 }

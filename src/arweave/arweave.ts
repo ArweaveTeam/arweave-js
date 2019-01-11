@@ -119,6 +119,12 @@ export class Arweave {
             attributes.reward = await this.transactions.getPrice(length);
         }
 
+        const siloResource = await this.silo.parseUri(siloUri);
+
+        const encrypted = await this.crypto.encrypt(ArweaveUtils.stringToBuffer(attributes.data), siloResource.getEncryptionKey());
+
+        attributes.data = ArweaveUtils.bufferTob64Url(encrypted);
+
         return new Transaction(attributes);
     }
 

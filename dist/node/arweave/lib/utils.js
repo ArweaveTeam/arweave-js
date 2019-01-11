@@ -26,6 +26,14 @@ class ArweaveUtils {
         }
         return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
     }
+    static bufferToString(buffer) {
+        // TextEncoder will be available in browsers, but not in node
+        if (typeof TextDecoder == 'undefined') {
+            const TextDecoder = require('util').TextDecoder;
+            return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+        }
+        return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+    }
     static stringToBuffer(string) {
         // TextEncoder will be available in browsers, but not in node
         if (typeof TextEncoder == 'undefined') {

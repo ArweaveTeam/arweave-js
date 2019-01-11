@@ -1,5 +1,6 @@
 import { JWKInterface, JWKPublicInterface } from "../wallet";
 import { CryptoInterface } from "./crypto-interface";
+import { ArweaveUtils } from '../utils';
 
 export class WebCryptoDriver implements CryptoInterface {
 
@@ -157,11 +158,97 @@ export class WebCryptoDriver implements CryptoInterface {
     }
 
     public async encrypt(data: Buffer, key: string | Buffer): Promise<Uint8Array> {
-        return Buffer.from('');
+
+        const initialKey = await this.driver.importKey(
+            'raw',
+            (typeof key == 'string' ? ArweaveUtils.stringToBuffer(key) : key),
+            {
+                name: 'PBKDF2',
+                length: 32,
+            },
+            false,
+            ['deriveKey']
+        );
+
+        const salt = ArweaveUtils.stringToBuffer('salt');
+
+        const derivedkey = await this.driver.deriveKey(
+            {
+                name: 'PBKDF2',
+                salt: salt,
+                iterations: 100000,
+                hash: 'SHA-256'
+            },
+            initialKey,
+            {
+                name: 'AES-CBC',
+                length: 256
+            },
+            false,
+            ['encrypt', 'decrypt']
+        );
+
+        const iv = new Uint8Array(16);
+
+        crypto.getRandomValues(iv);
+
+        const encryptedData = await this.driver.encrypt(
+            {
+                name: 'AES-CBC',
+                iv: iv
+            },
+            derivedkey,
+            data
+        );
+
+        return ArweaveUtils.concatBuffers([iv, encryptedData]);
     }
 
     public async decrypt(encrypted: Buffer, key: string | Buffer): Promise<Uint8Array> {
-        return Buffer.from('');
+
+        const initialKey = await this.driver.importKey(
+            'raw',
+            (typeof key == 'string' ? ArweaveUtils.stringToBuffer(key) : key),
+            {
+                name: 'PBKDF2',
+                length: 32,
+            },
+            false,
+            ['deriveKey']
+        );
+
+        const salt = ArweaveUtils.stringToBuffer('salt');
+
+        const derivedkey = await this.driver.deriveKey(
+            {
+                name: 'PBKDF2',
+                salt: salt,
+                iterations: 100000,
+                hash: 'SHA-256'
+            },
+            initialKey,
+            {
+                name: 'AES-CBC',
+                length: 256
+            },
+            false,
+            ['encrypt', 'decrypt']
+        );
+
+        const iv = encrypted.slice(0, 16);
+
+        const data = await this.driver.decrypt(
+            {
+                name:
+                    'AES-CBC',
+                iv: iv
+            },
+            derivedkey,
+            encrypted.slice(16)
+        );
+
+        // We're just using concat to convert from an array buffer to uint8array
+        return ArweaveUtils.concatBuffers([data]);
     }
 
 }

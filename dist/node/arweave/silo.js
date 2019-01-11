@@ -8,6 +8,9 @@ class Silo {
         this.transactions = transactions;
     }
     async get(siloURI) {
+        if (!siloURI) {
+            throw new Error(`No Silo URI specified`);
+        }
         const resource = await this.parseUri(siloURI);
         const ids = await this.transactions.search('Silo-Name', resource.getAccessKey());
         if (ids.length == 0) {
@@ -20,8 +23,16 @@ class Silo {
         const encrypted = transaction.get('data', { decode: true, string: false });
         return this.crypto.decrypt(encrypted, resource.getEncryptionKey());
     }
+    async readTransactionData(transaction, siloURI) {
+        if (!siloURI) {
+            throw new Error(`No Silo URI specified`);
+        }
+        const resource = await this.parseUri(siloURI);
+        const encrypted = transaction.get('data', { decode: true, string: false });
+        return this.crypto.decrypt(encrypted, resource.getEncryptionKey());
+    }
     async parseUri(siloURI) {
-        const parsed = siloURI.match(/^([a-z0-9]+)\.([0-9]+)/i);
+        const parsed = siloURI.match(/^([a-z0-9-_]+)\.([0-9]+)/i);
         if (!parsed) {
             throw new Error(`Invalid Silo name, must be a name in the format of [a-z0-9]+.[0-9]+, e.g. 'bubble.7'`);
         }

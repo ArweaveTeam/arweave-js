@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const utils_1 = require("../utils");
 class WebCryptoDriver {
     constructor() {
         this.keyLength = 4096;
@@ -102,10 +103,50 @@ class WebCryptoDriver {
         return true;
     }
     async encrypt(data, key) {
-        return Buffer.from('');
+        const initialKey = await this.driver.importKey('raw', (typeof key == 'string' ? utils_1.ArweaveUtils.stringToBuffer(key) : key), {
+            name: 'PBKDF2',
+            length: 32,
+        }, false, ['deriveKey']);
+        const salt = utils_1.ArweaveUtils.stringToBuffer('salt');
+        const derivedkey = await this.driver.deriveKey({
+            name: 'PBKDF2',
+            salt: salt,
+            iterations: 100000,
+            hash: 'SHA-256'
+        }, initialKey, {
+            name: 'AES-CBC',
+            length: 256
+        }, false, ['encrypt', 'decrypt']);
+        const iv = new Uint8Array(16);
+        crypto.getRandomValues(iv);
+        const encryptedData = await this.driver.encrypt({
+            name: 'AES-CBC',
+            iv: iv
+        }, derivedkey, data);
+        return utils_1.ArweaveUtils.concatBuffers([iv, encryptedData]);
     }
     async decrypt(encrypted, key) {
-        return Buffer.from('');
+        const initialKey = await this.driver.importKey('raw', (typeof key == 'string' ? utils_1.ArweaveUtils.stringToBuffer(key) : key), {
+            name: 'PBKDF2',
+            length: 32,
+        }, false, ['deriveKey']);
+        const salt = utils_1.ArweaveUtils.stringToBuffer('salt');
+        const derivedkey = await this.driver.deriveKey({
+            name: 'PBKDF2',
+            salt: salt,
+            iterations: 100000,
+            hash: 'SHA-256'
+        }, initialKey, {
+            name: 'AES-CBC',
+            length: 256
+        }, false, ['encrypt', 'decrypt']);
+        const iv = encrypted.slice(0, 16);
+        const data = await this.driver.decrypt({
+            name: 'AES-CBC',
+            iv: iv
+        }, derivedkey, encrypted.slice(16));
+        // We're just using concat to convert from an array buffer to uint8array
+        return utils_1.ArweaveUtils.concatBuffers([data]);
     }
 }
 exports.WebCryptoDriver = WebCryptoDriver;
