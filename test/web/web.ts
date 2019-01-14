@@ -25,17 +25,17 @@ const liveDataTxid = 'Ie-fxxzdBweiA0N1ZbzUqXhNI310uDUmaBc3ajlV6YY';
 describe('Initialization', function () {
     it('should have components', function () {
 
-        expect(arweave.api.constructor.name).to.equal('Api')
+        expect(arweave.api).to.an('object')
 
-        expect(arweave.transactions.constructor.name).to.equal('Transactions');
+        expect(arweave.transactions).to.an('object');
 
-        expect(arweave.wallets.constructor.name).to.equal('Wallets');
+        expect(arweave.wallets).to.an('object');
 
-        expect(arweave.network.constructor.name).to.equal('Network');
+        expect(arweave.network).to.an('object');
 
-        expect(arweave.crypto.constructor.name).to.equal('WebCryptoDriver');
+        expect(arweave.crypto).to.an('object');
 
-        expect(arweave.silo.constructor.name).to.equal('Silo');
+        expect(arweave.silo).to.an('object');
 
     })
 });
@@ -143,7 +143,7 @@ describe('Transactions', function () {
         transaction.addTag('test-tag-2', 'test-value-2');
         transaction.addTag('test-tag-3', 'test-value-3');
 
-        expect(transaction.constructor.name).to.equal('Transaction');
+        expect(transaction).to.be.an('object');
 
         expect(transaction.data).to.equal('dGVzdA');
 
@@ -153,15 +153,15 @@ describe('Transactions', function () {
 
         await arweave.transactions.sign(transaction, wallet);
 
+        expect(Object.keys(transaction)).to.contain.members(['id', 'data', 'tags', 'signature', 'reward', 'owner', 'last_tx']);
+
         expect(transaction.signature).to.match(/^[a-z0-9-_]+$/i);
 
         expect(transaction.id).to.match(digestRegex);
 
         const verified = await arweave.transactions.verify(transaction)
 
-        expect(verified).to.be.a('boolean');
-
-        expect(verified).to.be.true;
+        expect(verified).to.be.a('boolean').and.to.be.true;
 
         //@ts-ignore
         // Needs ts-ignoring as tags are readonly so chaning the tag like this isn't 
@@ -291,22 +291,31 @@ describe('Silo Web', function () {
         // This is a manually generated silo transaction
         // data = 'something'
         // uri = 'secret.1'
-        const transaction = new Transaction({
-            last_tx: '',
+        const transaction = arweave.transactions.fromRaw({
+            last_tx: 'Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE',
             owner:
-                '2xkkxcnA0HyqpFqR1g14rnyiF_zZKZ_2EMVos3lb0Vd8l6RxKGumxTrFairo5fMLmTvrokYVNhl_ohmZvRVojwBC3nbbrY2mLpBWgwgpIXgcFug6GMu2p1W730IYCvi4EYpWDYx5sj_IzyMrDB7FB9jabl2AAefSrAdTfsmlg8f1WVJRp2SwPq3BqeUyHy7X1XNq7Bh6DBekbbywQgnX5zL2G2o8ySmeg72EFlH5T5dKbGqP6AIhRD7My8F1cq2MUe5ov1teLZeNhgnBZGoOoJmhqnimYkCY4e7jIrhZojHuDMidFLKkAORso6WlHZPWxVKo14xkRTBpNokwB6Crf9kJ-yNbjqagbhztf5ovrlGfNVtTZp3lt2btUzEyKHHIDjnb4r3HpF6dklGbGQjSoboZ67Os5fz44trAbz8HbtjmoGYdjzziO6Svpd_DX0YDyDai1lLR1c7CERuLGXOPCWyn0g9uEXkjJzdAM3BUlsfIZMdlZnN66EWoRUor9xZQkH3MitzTxPV8Eph2vtIJKDN7hybwp5EhNxJlaGA3sjG_Fhc1esntyo0W80wpFcAbwKp1gARqTeR1xsfsj-LuzFRNIK-wj5z6jQMVD5Dxu6wwT9RkVu-kZrL-rN56uGsfPQgXpurL0WyZzBM2MbrbQTd1aDR_rkl9khhCM3X--8k',
+                'pJjRtSRLpHUVAKCtWC9pjajI_VEpiPEEAHX0k1B1jrB_jDlZsMJPyGRVX6n7N16vNyDTnKAofC_aNmTFegW-uyJmdxsteO1TXKrR_KJvuv_vACX4N8BkSgplB7mTTALBMNPmiINHXkDSxZEkBxAGV0GyL8pLd2-0X6TG16wDFShyS7rZzW8xFsQYiAp9-g330hPhCV7KBdVFtCxA0h1RifDYloMUwHbAWCTvzm72aLI1nWaLzotcM4cZTTdzw5VTdGtjo9fMdoT7uTqikIIhM3C4f9Ws-ECqjBUXtZFg7q6jYbUcTVNr1o2UFPKbLnDl4vcUZBaeqkL0FWQuo7F1hw36PVm_b9lVVzSVVkeA_HF2tQotkaITyOQmYfTHi1d31m5fwFZje_M-YgeyvOIuiqX4-lIGz8pohTutY3Z5_LKfO_a8jsJL8_jFLqcjSCRvVZSRmQDpzB4hJ9-W89m95DDmZci2wLbxFR8GwekNbpHeeC2EaJorhU0qBn_Hlcxql30fLveycjhSO03bu3MJwN9moT2q0T222iIXutEjpNezt5VzZKao8_JuI3ZnTFy5dM5GYO773TbgUihlVjVQsnv73FFPZaHfaRssK4sfGlBHjItwkzEQe9gOtFhkAFihiw45ppo6FnBkvmNcD59GfteifKPg5oSGYqMWZWcKPt0',
+            tags:
+                [{ name: 'Q29udGVudC1UeXBl', value: 'dGV4dC9odG1s' },
+                { name: 'VXNlci1BZ2VudA', value: 'QXJ3ZWF2ZURlcGxveS8xLjAuMA' },
+                { name: 'U2lsby1WZXJzaW9u', value: 'MC4xLjA' }],
             target: '',
             quantity: '0',
-            data: 'euyLRlvfca996OV5ayXwHboUNNxIiapq-I-II6zuQHo',
-            reward: '322080219',
+            data:
+                '0HgHqou5BTRNYJIsCciZb2-85Qlg9cYpiHO62KbRCEeX_cjSvn--Cex8uksInemd6FWWkczaqjs3SWzr7BRc0BSjHXxlVHkKuQp7WvRRJeNJPk_nC0KZrjkFSIPLIx_oOSeXigaPSEBSC4ry_5Iygt7z0Dgl7z1eFplIs6MlxKuBwiXfCtlwRDQK_fJlPWZhGjOpNLP5dyOLwMKrvG2dbAOeyAYbr117rn19CiDkTQAI3m2gAcJlXDZTNeA-1rJqb6X73u0AQt4Ao-OkktxdZ1UMfMfXnwdlsAEKK14NiKRbL1UbVRGh1nyWjUl90BP5Qj74L6_CKxQc_us7gxdeUhkzIKr4-LMY4LoCr-l0Law_tIGekkRsqb5oN7JiketqWazgsyo-Gq-0Blvhwh8nww',
+            reward: '349612332',
             signature:
-                'yiZRcHcOxTMQm6gkpxrt9i9Zzok_PGlPeNBwyl_EhAbvJDie_CEkbxhegoK57UzVTczAiG7hGFvAawT_NAwvqTw5pF1v7OooIYDowQvTBnHBIXzOMVTqUjL5HwZ8DrJZrY9HJ6XSmERivNYwXrwloDuDCYYBv1cTCoRBt43BTaVFRzYZdccQXla89VN6HYDHszzAIgONfhdkv5LtChaZqQgdugrr8JAgWqjyvP02uL_tB_cEsumyOhXkFpQlHjIbTlqCxA4Hr06U6S37EfScztKbqwkKxS_J73nNO2HvGgy0NBxY52_BCzQs3tBdGnd3UQn5TcqXBYSYW082mIU4eCHqa1sCj60V7cfOlUwk_1tZOgtOQt9Kx2N6qTmZs1vlQjcPhmyLRLTFrLXPw7bHpTfLGE4AEG0kcIcKCvSSxjSaN_n-LvITmSFQ05Wb8EMQFo9pUDrFjpsum4rSq2hevfB51FDJCpAQ_57Hd1infcTKs32Yom5FR4WXp9Yr0G1DpQJIh5XbkczkRIYXtk8l6j7pY1DZ4rnm7INLTXL75e4YKxW-jlOKIILE8oyJkmgd4kA-BjVZ7FsiD0MjX0c5PRo0sX6rf7VATeG8l5vvGn2XDQyXlWYAKCzUJvGr-Z5TYakPE5yawvFUA5qXav_jH_Cw4qx-rzNpnvNRiQko5i8',
-            id: 'aBrnjAQG07iVziQkrlNaZUs7kpUN9zjqqpXC7rkgGf0'
+                'DJ6V8zXFMvkyNS4nNHxdFgXx1cbMuzQfWdtP_navPG1STMUarYKHWnJvFQqNkFl5CekNql0xTOjY5hWLt2AVxfMWgvvi5498vNUpbFoWxjrVl6fk86ARx2lzYB7iQK4YFIuIQ7MdR0w8Dy836hW7c8gXe_FPRAqOI7J_l8fqUSzaUtlcwLSfvhXJM-2a3WmoGLcg8Gvj53B8-RizvM3BrKQQWrcat78zeOgb-Fzl3PQ_Ej3CiRIDgAYnTxmd7M6jI84uck1gBRjMql42n0F8pQuTgMqzDbeXW2iBuvIE5tYVmUgnNrPjkDedLWe0Hp4KLDQyDY9lO-zIJLpiYCbc7kUfDBontxCCJIy9N8XM9gHqQofCItYAEO4v3B7sXgdSAQzcibnM3j6EhB9-mhiDcKKRuTSvyJh3sBTWHFrnWylfq84JOJLNhR4aZA_UfjkccA7Z-yqoiMI0mOB0HaAEmsa6ZsoLs5C-6vDnGaBCqYeVKKqKizfOQGsc9IuzdsSQwY7yTE-C3Xb3eAgnq0BLn6iUNqFU-mkwHi-c_hpxoR0lY91k98Ra9UhrgFS5m_9x3BhCXNhDaUXb16p0fHKGYSggqgqS3FbEcdOnsQlhw3IFEccFOTvuv1xEoE1zYeZ06q6NkFKMik6soXl9LXXgJgZvpEut_2LaHKtojbWqSkc',
+            id: 'S-9ICDleH3PEx9LXVEbguVffe5dHEM0I3wEr_MJidqU'
         });
 
-        let decrypted = await arweave.silo.readTransactionData(transaction, 'secret.1');
+        const verified = await arweave.transactions.verify(transaction);
 
-        expect(ArweaveUtils.bufferToString(decrypted)).to.be.a('string').and.equal('something');
+        expect(verified).to.be.a('boolean').and.to.be.true;
+
+        const decrypted = await arweave.silo.readTransactionData(transaction, 'thing.1');
+
+        expect(ArweaveUtils.bufferToString(decrypted)).to.be.a('string').and.contain('<title>Hello world!</title>');
     })
 
     it('should pass a Silo transaction roundtrip', async function () {
@@ -316,6 +325,12 @@ describe('Silo Web', function () {
         const wallet = await arweave.wallets.generate();
 
         const transaction = await arweave.createSiloTransaction({ data: 'test data' }, wallet, 'my-silo-ref.1');
+
+        await arweave.transactions.sign(transaction, wallet);
+
+        const verified = await arweave.transactions.verify(transaction);
+
+        expect(verified).to.be.a('boolean').and.to.be.true;
 
         let decrypted = await arweave.silo.readTransactionData(transaction, 'my-silo-ref.1');
 

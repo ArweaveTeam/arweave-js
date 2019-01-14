@@ -10,6 +10,7 @@ export declare class Transactions {
     constructor(api: Api, crypto: CryptoInterface);
     getPrice(byteSize: number, targetAddress?: string): Promise<string>;
     get(id: string): Promise<Transaction>;
+    fromRaw(attributes: object): Transaction;
     search(tagName: string, tagValue: string): Promise<string[]>;
     getStatus(id: string): Promise<number>;
     sign(transaction: Transaction, jwk: JWKInterface): Promise<Transaction>;

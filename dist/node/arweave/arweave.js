@@ -63,14 +63,16 @@ class Arweave {
         if (attributes.last_tx == undefined) {
             attributes.last_tx = await this.wallets.getLastTransactionID(from);
         }
-        if (attributes.reward == undefined) {
-            let length = (typeof attributes.data == 'string' && attributes.data.length > 0) ? attributes.data.length : 0;
-            attributes.reward = await this.transactions.getPrice(length);
-        }
         const siloResource = await this.silo.parseUri(siloUri);
         const encrypted = await this.crypto.encrypt(utils_1.ArweaveUtils.stringToBuffer(attributes.data), siloResource.getEncryptionKey());
+        if (attributes.reward == undefined) {
+            attributes.reward = await this.transactions.getPrice(encrypted.byteLength);
+        }
         attributes.data = utils_1.ArweaveUtils.bufferTob64Url(encrypted);
-        return new transaction_1.Transaction(attributes);
+        const transaction = new transaction_1.Transaction(attributes);
+        transaction.addTag('Silo-Name', siloResource.getAccessKey());
+        transaction.addTag('Silo-Version', `0.1.0`);
+        return transaction;
     }
 }
 exports.Arweave = Arweave;

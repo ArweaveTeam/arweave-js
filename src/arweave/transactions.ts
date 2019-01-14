@@ -64,6 +64,10 @@ export class Transactions {
         });
     }
 
+    public fromRaw(attributes: object): Transaction {
+        return new Transaction(attributes);
+    }
+
     public async search(tagName: string, tagValue: string): Promise<string[]> {
         return this.api.post(`arql`, {
             op: 'equals',

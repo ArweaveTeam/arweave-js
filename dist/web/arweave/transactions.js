@@ -42,6 +42,9 @@ export class Transactions {
             throw new ArweaveError("TX_INVALID" /* TX_INVALID */);
         });
     }
+    fromRaw(attributes) {
+        return new Transaction(attributes);
+    }
     async search(tagName, tagValue) {
         return this.api.post(`arql`, {
             op: 'equals',

@@ -44,6 +44,9 @@ class Transactions {
             throw new error_1.ArweaveError("TX_INVALID" /* TX_INVALID */);
         });
     }
+    fromRaw(attributes) {
+        return new transaction_1.Transaction(attributes);
+    }
     async search(tagName, tagValue) {
         return this.api.post(`arql`, {
             op: 'equals',

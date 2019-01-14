@@ -1,3 +1,4 @@
+const BabelMinify = require("babel-minify-webpack-plugin");
 const path = require('path');
 const config = {};
 
@@ -46,6 +47,9 @@ config.webprod = {
     },
     devServer: {
         contentBase: './dist'
+    },
+    optimization: {
+        minimizer: [new BabelMinify({ "mangle": false })],
     },
     plugins: [],
     output: {
