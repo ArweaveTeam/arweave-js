@@ -10,3 +10,10 @@ import { WebCryptoDriver } from "./arweave/lib/crypto/webcrypto-driver";
         });
     }
 };
+
+export function init(apiConfig: object): Arweave {
+    return new Arweave({
+        api: apiConfig,
+        crypto: new WebCryptoDriver
+    });
+}

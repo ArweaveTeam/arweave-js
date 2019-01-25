@@ -1,6 +1,6 @@
 import { Api } from "./lib/api";
 import { CryptoInterface } from "./lib/crypto/crypto-interface";
-import { JWKInterface } from "./lib/Wallet";
+import { JWKInterface } from "./lib/wallet";
 export declare class Wallets {
     private api;
     private crypto;

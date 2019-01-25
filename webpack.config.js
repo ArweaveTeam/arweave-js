@@ -1,5 +1,5 @@
+const BabelMinify = require("babel-minify-webpack-plugin");
 const path = require('path');
-
 const config = {};
 
 config.web = {
@@ -48,6 +48,9 @@ config.webprod = {
     devServer: {
         contentBase: './dist'
     },
+    optimization: {
+        minimizer: [new BabelMinify({ "mangle": false })],
+    },
     plugins: [],
     output: {
         filename: 'web.bundle.min.js',
@@ -55,4 +58,32 @@ config.webprod = {
     }
 };
 
-module.exports = [config.web, config.webprod];
+config.webtests = {
+    name: 'web-tests',
+    entry: './test/web/web.ts',
+    mode: 'development',
+    target: 'web',
+    module: {
+        rules: [
+            {
+                test: /\.ts?$/,
+                use: 'ts-loader'
+            }
+        ]
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js']
+    },
+    devtool: 'inline-source-map',
+    devServer: {
+        contentBase: './dist'
+    },
+    plugins: [
+    ],
+    output: {
+        filename: 'webtests.bundle.js',
+        path: path.resolve(__dirname, 'dist')
+    }
+};
+
+module.exports = [config.web, config.webprod, config.webtests];

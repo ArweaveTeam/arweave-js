@@ -3,11 +3,11 @@ const B64js = require('base64-js');
 
 export class ArweaveUtils {
 
-    public static concatBuffers(buffers: Uint8Array[]): Uint8Array {
+    public static concatBuffers(buffers: Uint8Array[] | ArrayBuffer[]): Uint8Array {
 
         let total_length = 0;
 
-        for(let i = 0; i < buffers.length; i++) {
+        for (let i = 0; i < buffers.length; i++) {
             total_length += buffers[i].byteLength;
         }
 
@@ -17,7 +17,7 @@ export class ArweaveUtils {
         temp.set(new Uint8Array(buffers[0]), offset);
         offset += buffers[0].byteLength;
 
-        for(let i = 1; i < buffers.length; i++) {
+        for (let i = 1; i < buffers.length; i++) {
             temp.set(new Uint8Array(buffers[i]), offset);
             offset += buffers[i].byteLength;
         }
@@ -32,10 +32,21 @@ export class ArweaveUtils {
         // TextEncoder will be available in browsers, but not in node
         if (typeof TextDecoder == 'undefined') {
             const TextDecoder = require('util').TextDecoder;
-            return new TextDecoder('utf-8', {fatal: true}).decode(buffer);
+            return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
         }
 
-        return new TextDecoder('utf-8', {fatal: true}).decode(buffer);
+        return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+    }
+
+    public static bufferToString(buffer: Uint8Array | ArrayBuffer): string {
+
+        // TextEncoder will be available in browsers, but not in node
+        if (typeof TextDecoder == 'undefined') {
+            const TextDecoder = require('util').TextDecoder;
+            return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+        }
+
+        return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
     }
 
     public static stringToBuffer(string: string): Uint8Array {

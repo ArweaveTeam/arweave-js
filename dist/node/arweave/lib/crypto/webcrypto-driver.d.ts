@@ -1,4 +1,5 @@
-import { JWKInterface } from "../Wallet";
+/// <reference types="node" />
+import { JWKInterface } from "../wallet";
 import { CryptoInterface } from "./crypto-interface";
 export declare class WebCryptoDriver implements CryptoInterface {
     readonly keyLength = 4096;
@@ -13,4 +14,6 @@ export declare class WebCryptoDriver implements CryptoInterface {
     private jwkToCryptoKey;
     private jwkToPublicCryptoKey;
     private detectWebCrypto;
+    encrypt(data: Buffer, key: string | Buffer): Promise<Uint8Array>;
+    decrypt(encrypted: Buffer, key: string | Buffer): Promise<Uint8Array>;
 }
