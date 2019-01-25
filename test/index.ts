@@ -11,7 +11,7 @@ import * as Arweave from "../src/node";
 
 const expect = chai.expect;
 
-const arweave = Arweave.init({ host: 'arweave.net', port: 1984, logging: false });
+const arweave = Arweave.init({ host: 'arweave.net', logging: false });
 
 const digestRegex = /^[a-z0-9-_]{43}$/i;
 const liveAddressBalance = '498557055636';
@@ -42,7 +42,7 @@ describe('Initialization', function () {
 describe('Network Info', function () {
     it('should get network info', async function () {
 
-        this.timeout(3000);
+        this.timeout(5000);
 
         const info = await arweave.network.getInfo();
         const peers = await arweave.network.getPeers();
@@ -61,7 +61,7 @@ describe('Wallets and keys', function () {
 
     it('should generate valid JWKs', async function () {
 
-        this.timeout(3000);
+        this.timeout(5000);
 
         const walletA = await arweave.wallets.generate();
         const walletB = await arweave.wallets.generate();
@@ -93,7 +93,7 @@ describe('Wallets and keys', function () {
 
     it('should get wallet info', async function () {
 
-        this.timeout(3000);
+        this.timeout(5000);
 
         const wallet = await arweave.wallets.generate();
 
@@ -131,7 +131,7 @@ describe('Transactions', function () {
 
     it('should create and sign transactions', async function () {
 
-        this.timeout(3000);
+        this.timeout(5000);
 
         const wallet = await arweave.wallets.generate();
 
@@ -177,7 +177,7 @@ describe('Transactions', function () {
 
     it('should get transaction info', async function () {
 
-        this.timeout(3000);
+        this.timeout(5000);
 
         const transactionStatus = await arweave.transactions.getStatus(liveDataTxid);
         const transaction = await arweave.transactions.get(liveDataTxid);
@@ -206,7 +206,7 @@ describe('Transactions', function () {
 
     it('should post transactions', async function () {
 
-        this.timeout(3000);
+        this.timeout(5000);
 
         const wallet = await arweave.wallets.generate();
 

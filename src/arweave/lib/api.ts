@@ -4,8 +4,9 @@ export interface ApiConfig<T = object> {
     host?: string,
     protocol?: string,
     port?: string|number,
-    timeout?: string|number,
-    logging?: boolean
+    timeout?: number,
+    logging?: boolean,
+    logger?: Function
 }
 
 export class Api {
@@ -29,11 +30,12 @@ export class Api {
 
     private mergeDefaults(config: ApiConfig): ApiConfig{
         return {
-            host: config.host,
+            host: config.host || '127.0.0.1',
             protocol: config.protocol || 'http',
-            port: config.port || 1984,
+            port: config.port || 80,
             timeout: config.timeout || 20000,
             logging: config.logging || false,
+            logger: config.logger || console.log
         };
     }
 
@@ -73,18 +75,18 @@ export class Api {
 
         let instance = Axios.create({
             baseURL: `${this.config.protocol}://${this.config.host}:${this.config.port}`,
-            timeout: 1000,
+            timeout: this.config.timeout,
         });
 
         if (this.config.logging) {
 
             instance.interceptors.request.use( request => {
-                console.log(`Requesting: ${request.baseURL}/${request.url}`);
+                this.config.logger(`Requesting: ${request.baseURL}/${request.url}`);
                 return request;
             });
 
             instance.interceptors.response.use( response => {
-                console.log(`Response:   ${response.config.url} - ${response.status}`);
+                this.config.logger(`Response:   ${response.config.url} - ${response.status}`);
                 return response;
             });
 

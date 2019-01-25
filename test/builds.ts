@@ -11,7 +11,7 @@ describe('Node distribution', function () {
 
         expect(dist.init).to.be.a('function');
 
-        const instance = dist.init({ host: 'arweave.net', port: 1984, logging: false });
+        const instance = dist.init({ host: 'arweave.net', logging: false });
 
         expect(instance.api.constructor.name).to.equal('Api')
 
@@ -56,7 +56,7 @@ describe('Web distribution', function () {
 
         expect(dist.init).to.be.a('function');
 
-        const instance = dist.init({ host: 'arweave.net', port: 1984, logging: false });
+        const instance = dist.init({ host: 'arweave.net', logging: false });
 
         expect(instance.api.constructor.name).to.equal('Api')
 
@@ -99,7 +99,7 @@ describe('Web distribution', function () {
 
         expect(dist.init).to.be.a('function');
 
-        const instance = dist.init({ host: 'arweave.net', port: 1984, logging: false });
+        const instance = dist.init({ host: 'arweave.net', logging: false });
 
         expect(instance.api.constructor.name).to.equal('Api')
 
@@ -142,7 +142,7 @@ describe('Web distribution', function () {
 
         expect(dist.init).to.be.a('function');
 
-        const instance = dist.init({ host: 'arweave.net', port: 1984, logging: false });
+        const instance = dist.init({ host: 'arweave.net', logging: false });
 
         expect(instance).to.be.an('object');
 

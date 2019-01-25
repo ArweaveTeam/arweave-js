@@ -8,4 +8,10 @@ window.Arweave = {
         });
     }
 };
+export function init(apiConfig) {
+    return new Arweave({
+        api: apiConfig,
+        crypto: new WebCryptoDriver
+    });
+}
 //# sourceMappingURL=web.js.map

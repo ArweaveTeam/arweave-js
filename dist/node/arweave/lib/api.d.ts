@@ -4,8 +4,9 @@ export interface ApiConfig<T = object> {
     host?: string;
     protocol?: string;
     port?: string | number;
-    timeout?: string | number;
+    timeout?: number;
     logging?: boolean;
+    logger?: Function;
 }
 export declare class Api {
     readonly METHOD_GET = "GET";

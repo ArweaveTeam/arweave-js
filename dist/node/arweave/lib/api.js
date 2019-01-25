@@ -15,11 +15,12 @@ class Api {
     }
     mergeDefaults(config) {
         return {
-            host: config.host,
+            host: config.host || '127.0.0.1',
             protocol: config.protocol || 'http',
-            port: config.port || 1984,
+            port: config.port || 80,
             timeout: config.timeout || 20000,
             logging: config.logging || false,
+            logger: config.logger || console.log
         };
     }
     async get(endpoint, config) {
@@ -51,15 +52,15 @@ class Api {
     request() {
         let instance = axios_1.default.create({
             baseURL: `${this.config.protocol}://${this.config.host}:${this.config.port}`,
-            timeout: 1000,
+            timeout: this.config.timeout,
         });
         if (this.config.logging) {
             instance.interceptors.request.use(request => {
-                console.log(`Requesting: ${request.baseURL}/${request.url}`);
+                this.config.logger(`Requesting: ${request.baseURL}/${request.url}`);
                 return request;
             });
             instance.interceptors.response.use(response => {
-                console.log(`Response:   ${response.config.url} - ${response.status}`);
+                this.config.logger(`Response:   ${response.config.url} - ${response.status}`);
                 return response;
             });
         }

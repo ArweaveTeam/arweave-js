@@ -4,7 +4,7 @@ import * as Arweave from "../src/node";
 
 const expect = chai.expect;
 
-const arweave = Arweave.init({ host: 'arweave.net', port: 1984, logging: false });
+const arweave = Arweave.init({ host: 'arweave.net', logging: false });
 
 describe('Silo', function () {
     it('should resolve Silo URIs', async function () {
