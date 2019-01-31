@@ -4,15 +4,29 @@ import { CryptoInterface } from "./lib/crypto/crypto-interface";
 import { Network } from "./network";
 import { Transactions } from './transactions';
 import { Wallets } from './wallets';
-import { TransactionInterface, Transaction } from "./lib/transaction";
+import { TransactionInterface, Transaction, Tag } from "./lib/transaction";
 import { JWKInterface } from "./lib/wallet";
 import { ArweaveUtils } from "./lib/utils";
 import { Silo } from './silo';
 
 
-interface Config<T = object> {
+export interface Config<T = object> {
     api: ApiConfig
     crypto: CryptoInterface
+}
+
+
+export interface CreateTransactionInterface {
+
+    [key: string]: any
+
+    last_tx: string,
+    owner: string,
+    tags: Tag[],
+    target: string,
+    quantity: string,
+    data: string | Uint8Array,
+    reward: string,
 }
 
 export class Arweave {
@@ -56,39 +70,59 @@ export class Arweave {
         }
     }
 
-    public async createTransaction(attributes: Partial<TransactionInterface>, jwk: JWKInterface) {
+    public async createTransaction(attributes: Partial<CreateTransactionInterface>, jwk: JWKInterface): Promise<Transaction> {
+
+        const from = await this.wallets.jwkToAddress(jwk);
+
+        const transaction: Partial<CreateTransactionInterface> = {};
+        
+        Object.assign(transaction, attributes);
 
         if (!attributes.data && !(attributes.target && attributes.quantity)) {
             throw new Error(`A new Arweave transaction must have a 'data' value, or 'target' and 'quantity' values.`);
         }
 
-        let from = await this.wallets.jwkToAddress(jwk);
-
         if (attributes.owner == undefined) {
-            attributes.owner = jwk.n;
+            transaction.owner = jwk.n;
         }
 
         if (attributes.last_tx == undefined) {
-            attributes.last_tx = await this.wallets.getLastTransactionID(from);
+            transaction.last_tx = await this.wallets.getLastTransactionID(from);
         }
 
         if (attributes.reward == undefined) {
+            const length = ((data: string | Uint8Array): number => {
+                if (typeof data == 'string') {
+                    return data.length;
+                }
+                if (data instanceof Uint8Array) {
+                    return data.byteLength;
+                }
+                throw new Error('Expected data to be a string or Uint8Array');
+            })(attributes.data);
 
-            let length = (typeof attributes.data == 'string' && attributes.data.length > 0) ? attributes.data.length : 0;
-
-            let target = (typeof attributes.target == 'string' && attributes.target.length > 0) ? attributes.target : null;
-
-            attributes.reward = await this.transactions.getPrice(length, target);
+            transaction.reward = await this.transactions.getPrice(length, transaction.target ? transaction.target : null);
         }
 
         if (attributes.data) {
-            attributes.data = ArweaveUtils.stringToB64Url(attributes.data);
+            if (typeof attributes.data == 'string') {
+                transaction.data = ArweaveUtils.stringToB64Url(attributes.data);
+            }
+            if (attributes.data instanceof Uint8Array) {
+                transaction.data = ArweaveUtils.bufferTob64Url(attributes.data);
+            }
         }
 
-        return new Transaction(attributes);
+        return new Transaction(transaction as TransactionInterface);
     }
 
-    public async createSiloTransaction(attributes: Partial<TransactionInterface>, jwk: JWKInterface, siloUri: string) {
+    public async createSiloTransaction(attributes: Partial<CreateTransactionInterface>, jwk: JWKInterface, siloUri: string): Promise<Transaction> {
+
+        const from = await this.wallets.jwkToAddress(jwk);
+
+        const transaction: Partial<CreateTransactionInterface> = {};
+        
+        Object.assign(transaction, attributes);
 
         if (!attributes.data) {
             throw new Error(`Silo transactions must have a 'data' value`);
@@ -102,33 +136,34 @@ export class Arweave {
             throw new Error(`Silo transactions can only be used for storing data, sending AR to other wallets isn't supported.`);
         }
 
-        let from = await this.wallets.jwkToAddress(jwk);
-
         if (attributes.owner == undefined) {
-            attributes.owner = jwk.n;
+            transaction.owner = jwk.n;
         }
 
         if (attributes.last_tx == undefined) {
-            attributes.last_tx = await this.wallets.getLastTransactionID(from);
+            transaction.last_tx = await this.wallets.getLastTransactionID(from);
         }
 
         const siloResource = await this.silo.parseUri(siloUri);
 
-        const encrypted = await this.crypto.encrypt(ArweaveUtils.stringToBuffer(attributes.data), siloResource.getEncryptionKey());
-
-        if (attributes.reward == undefined) {
-
-            attributes.reward = await this.transactions.getPrice(encrypted.byteLength);
+        if (typeof attributes.data == 'string') {
+            const encrypted = await this.crypto.encrypt(ArweaveUtils.stringToBuffer(attributes.data), siloResource.getEncryptionKey());
+            transaction.reward = await this.transactions.getPrice(encrypted.byteLength);
+            transaction.data = ArweaveUtils.bufferTob64Url(encrypted);
         }
 
-        attributes.data = ArweaveUtils.bufferTob64Url(encrypted);
+        if (attributes.data instanceof Uint8Array) {
+            const encrypted = await this.crypto.encrypt(attributes.data, siloResource.getEncryptionKey());
+            transaction.reward = await this.transactions.getPrice(encrypted.byteLength);
+            transaction.data = ArweaveUtils.bufferTob64Url(encrypted);
+        }
 
-        const transaction = new Transaction(attributes);
+        const siloTransaction = new Transaction(transaction as TransactionInterface);
 
-        transaction.addTag('Silo-Name', siloResource.getAccessKey())
-        transaction.addTag('Silo-Version', `0.1.0`);
+        siloTransaction.addTag('Silo-Name', siloResource.getAccessKey())
+        siloTransaction.addTag('Silo-Version', `0.1.0`);
 
-        return transaction;
+        return siloTransaction;
     }
 
 

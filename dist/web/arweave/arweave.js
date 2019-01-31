@@ -24,27 +24,44 @@ export class Arweave {
         };
     }
     async createTransaction(attributes, jwk) {
+        const from = await this.wallets.jwkToAddress(jwk);
+        const transaction = {};
+        Object.assign(transaction, attributes);
         if (!attributes.data && !(attributes.target && attributes.quantity)) {
             throw new Error(`A new Arweave transaction must have a 'data' value, or 'target' and 'quantity' values.`);
         }
-        let from = await this.wallets.jwkToAddress(jwk);
         if (attributes.owner == undefined) {
-            attributes.owner = jwk.n;
+            transaction.owner = jwk.n;
         }
         if (attributes.last_tx == undefined) {
-            attributes.last_tx = await this.wallets.getLastTransactionID(from);
+            transaction.last_tx = await this.wallets.getLastTransactionID(from);
         }
         if (attributes.reward == undefined) {
-            let length = (typeof attributes.data == 'string' && attributes.data.length > 0) ? attributes.data.length : 0;
-            let target = (typeof attributes.target == 'string' && attributes.target.length > 0) ? attributes.target : null;
-            attributes.reward = await this.transactions.getPrice(length, target);
+            const length = ((data) => {
+                if (typeof data == 'string') {
+                    return data.length;
+                }
+                if (data instanceof Uint8Array) {
+                    return data.byteLength;
+                }
+                throw new Error('Expected data to be a string or Uint8Array');
+            })(attributes.data);
+            transaction.reward = await this.transactions.getPrice(length, transaction.target ? transaction.target : null);
         }
         if (attributes.data) {
-            attributes.data = ArweaveUtils.stringToB64Url(attributes.data);
+            if (typeof attributes.data == 'string') {
+                transaction.data = ArweaveUtils.stringToB64Url(attributes.data);
+            }
+            if (attributes.data instanceof Uint8Array) {
+                transaction.data = ArweaveUtils.bufferTob64Url(attributes.data);
+            }
         }
-        return new Transaction(attributes);
+        return new Transaction(transaction);
     }
     async createSiloTransaction(attributes, jwk, siloUri) {
+        const from = await this.wallets.jwkToAddress(jwk);
+        const transaction = {};
+        Object.assign(transaction, attributes);
         if (!attributes.data) {
             throw new Error(`Silo transactions must have a 'data' value`);
         }
@@ -54,23 +71,27 @@ export class Arweave {
         if (attributes.target || attributes.quantity) {
             throw new Error(`Silo transactions can only be used for storing data, sending AR to other wallets isn't supported.`);
         }
-        let from = await this.wallets.jwkToAddress(jwk);
         if (attributes.owner == undefined) {
-            attributes.owner = jwk.n;
+            transaction.owner = jwk.n;
         }
         if (attributes.last_tx == undefined) {
-            attributes.last_tx = await this.wallets.getLastTransactionID(from);
+            transaction.last_tx = await this.wallets.getLastTransactionID(from);
         }
         const siloResource = await this.silo.parseUri(siloUri);
-        const encrypted = await this.crypto.encrypt(ArweaveUtils.stringToBuffer(attributes.data), siloResource.getEncryptionKey());
-        if (attributes.reward == undefined) {
-            attributes.reward = await this.transactions.getPrice(encrypted.byteLength);
+        if (typeof attributes.data == 'string') {
+            const encrypted = await this.crypto.encrypt(ArweaveUtils.stringToBuffer(attributes.data), siloResource.getEncryptionKey());
+            transaction.reward = await this.transactions.getPrice(encrypted.byteLength);
+            transaction.data = ArweaveUtils.bufferTob64Url(encrypted);
         }
-        attributes.data = ArweaveUtils.bufferTob64Url(encrypted);
-        const transaction = new Transaction(attributes);
-        transaction.addTag('Silo-Name', siloResource.getAccessKey());
-        transaction.addTag('Silo-Version', `0.1.0`);
-        return transaction;
+        if (attributes.data instanceof Uint8Array) {
+            const encrypted = await this.crypto.encrypt(attributes.data, siloResource.getEncryptionKey());
+            transaction.reward = await this.transactions.getPrice(encrypted.byteLength);
+            transaction.data = ArweaveUtils.bufferTob64Url(encrypted);
+        }
+        const siloTransaction = new Transaction(transaction);
+        siloTransaction.addTag('Silo-Name', siloResource.getAccessKey());
+        siloTransaction.addTag('Silo-Version', `0.1.0`);
+        return siloTransaction;
     }
 }
 //# sourceMappingURL=arweave.js.map

@@ -174,6 +174,55 @@ describe('Transactions', function () {
 
     })
 
+    it('should work with buffers', async function () {
+
+        this.timeout(5000);
+
+        const wallet = await arweave.wallets.generate();
+
+        let data = crypto.randomBytes(100);
+
+        const transaction = await arweave.createTransaction({ data: data }, wallet);
+
+        transaction.addTag('test-tag-1', 'test-value-1');
+        transaction.addTag('test-tag-2', 'test-value-2');
+        transaction.addTag('test-tag-3', 'test-value-3');
+
+        expect(transaction).to.be.an.instanceOf(Transaction);
+
+        expect(Buffer.from(transaction.get('data', {decode: true, string: false}))).to.deep.equal(data);
+
+        expect(transaction.last_tx).to.equal('');
+
+        expect(transaction.reward).to.match(/^[0-9]+$/);
+
+
+        await arweave.transactions.sign(transaction, wallet);
+
+
+        expect(transaction.signature).to.match(/^[a-z0-9-_]+$/i);
+
+        expect(transaction.id).to.match(digestRegex);
+
+        const verified = await arweave.transactions.verify(transaction)
+
+        expect(verified).to.be.a('boolean');
+
+        expect(verified).to.be.true;
+
+        //@ts-ignore
+        // Needs ts-ignoring as tags are readonly so chaning the tag like this isn't 
+        // normally an allowed operation, but it's a test, so...
+        transaction.tags[1].value = 'dGVzdDI';
+
+        const verifiedWithModififedTags = await arweave.transactions.verify(transaction)
+
+        expect(verifiedWithModififedTags).to.be.a('boolean');
+
+        expect(verifiedWithModififedTags).to.be.false;
+
+    })
+
 
     it('should get transaction info', async function () {
 
