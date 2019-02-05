@@ -1,5 +1,4 @@
-const B64js = require('base64-js');
-
+import * as B64js from 'base64-js';
 
 export class ArweaveUtils {
 
