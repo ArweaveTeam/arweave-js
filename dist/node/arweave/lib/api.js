@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = require("axios");
 class Api {
     constructor(config) {
-        this.METHOD_GET = 'GET';
-        this.METHOD_POST = 'POST';
+        this.METHOD_GET = "GET";
+        this.METHOD_POST = "POST";
         this.applyConfig(config);
     }
     applyConfig(config) {
@@ -15,8 +15,8 @@ class Api {
     }
     mergeDefaults(config) {
         return {
-            host: config.host || '127.0.0.1',
-            protocol: config.protocol || 'http',
+            host: config.host || "127.0.0.1",
+            protocol: config.protocol || "http",
             port: config.port || 80,
             timeout: config.timeout || 20000,
             logging: config.logging || false,
@@ -52,7 +52,7 @@ class Api {
     request() {
         let instance = axios_1.default.create({
             baseURL: `${this.config.protocol}://${this.config.host}:${this.config.port}`,
-            timeout: this.config.timeout,
+            timeout: this.config.timeout
         });
         if (this.config.logging) {
             instance.interceptors.request.use(request => {

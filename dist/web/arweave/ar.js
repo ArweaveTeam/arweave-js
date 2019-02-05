@@ -1,4 +1,4 @@
-import { BigNumber } from 'bignumber.js';
+import { BigNumber } from "bignumber.js";
 export class Ar {
     constructor() {
         // Configure and assign the constructor function for the bignumber library.

@@ -14,7 +14,8 @@ class Wallets {
      * @returns {Promise<string>} - Promise which resolves with a winston string balance.
      */
     getBalance(address) {
-        return this.api.get(`wallet/${address}/balance`, {
+        return this.api
+            .get(`wallet/${address}/balance`, {
             transformResponse: [
                 /**
                  * We need to specify a response transformer to override
@@ -27,7 +28,8 @@ class Wallets {
                     return data;
                 }
             ]
-        }).then(response => {
+        })
+            .then(response => {
             return response.data;
         });
     }

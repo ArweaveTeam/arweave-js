@@ -16,7 +16,7 @@ class Arweave {
         this.transactions = new transactions_1.Transactions(this.api, config.crypto);
         this.silo = new silo_1.Silo(this.api, this.crypto, this.transactions);
         this.network = new network_1.Network(this.api);
-        this.ar = new ar_1.Ar;
+        this.ar = new ar_1.Ar();
         this.utils = utils_1.ArweaveUtils;
     }
     getConfig() {
@@ -40,18 +40,18 @@ class Arweave {
         }
         if (attributes.reward == undefined) {
             const length = ((data) => {
-                if (typeof data == 'string') {
+                if (typeof data == "string") {
                     return data.length;
                 }
                 if (data instanceof Uint8Array) {
                     return data.byteLength;
                 }
-                throw new Error('Expected data to be a string or Uint8Array');
+                throw new Error("Expected data to be a string or Uint8Array");
             })(attributes.data);
             transaction.reward = await this.transactions.getPrice(length, transaction.target ? transaction.target : null);
         }
         if (attributes.data) {
-            if (typeof attributes.data == 'string') {
+            if (typeof attributes.data == "string") {
                 transaction.data = utils_1.ArweaveUtils.stringToB64Url(attributes.data);
             }
             if (attributes.data instanceof Uint8Array) {
@@ -80,7 +80,7 @@ class Arweave {
             transaction.last_tx = await this.wallets.getLastTransactionID(from);
         }
         const siloResource = await this.silo.parseUri(siloUri);
-        if (typeof attributes.data == 'string') {
+        if (typeof attributes.data == "string") {
             const encrypted = await this.crypto.encrypt(utils_1.ArweaveUtils.stringToBuffer(attributes.data), siloResource.getEncryptionKey());
             transaction.reward = await this.transactions.getPrice(encrypted.byteLength);
             transaction.data = utils_1.ArweaveUtils.bufferTob64Url(encrypted);
@@ -91,8 +91,8 @@ class Arweave {
             transaction.data = utils_1.ArweaveUtils.bufferTob64Url(encrypted);
         }
         const siloTransaction = new transaction_1.Transaction(transaction);
-        siloTransaction.addTag('Silo-Name', siloResource.getAccessKey());
-        siloTransaction.addTag('Silo-Version', `0.1.0`);
+        siloTransaction.addTag("Silo-Name", siloResource.getAccessKey());
+        siloTransaction.addTag("Silo-Version", `0.1.0`);
         return siloTransaction;
     }
 }

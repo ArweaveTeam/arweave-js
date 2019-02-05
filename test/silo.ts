@@ -1,57 +1,69 @@
-import * as chai from 'chai';
-import { SiloResource } from '../src/arweave/silo';
+import * as chai from "chai";
+import { SiloResource } from "../src/arweave/silo";
 import * as Arweave from "../src/node";
 
 const expect = chai.expect;
 
-const arweave = Arweave.init({ host: 'arweave.net', logging: false });
+const arweave = Arweave.init({ host: "arweave.net", logging: false });
 
-describe('Silo', function () {
-    it('should resolve Silo URIs', async function () {
+describe("Silo", function() {
+  it("should resolve Silo URIs", async function() {
+    const siloResource = await arweave.silo.parseUri("someref.1");
 
-        const siloResource = await arweave.silo.parseUri('someref.1');
+    expect(siloResource).to.be.an.instanceOf(SiloResource);
 
-        expect(siloResource).to.be.an.instanceOf(SiloResource);
+    expect(siloResource.getAccessKey()).to.equal("UOJXTuMn08uUlwg3zSnB");
 
-        expect(siloResource.getAccessKey()).to.equal('UOJXTuMn08uUlwg3zSnB')
+    const expectedKey =
+      "97e938237d70eda6e88aa0dc3ec14c704505f744c51fbf608e5be1db33c00fb3";
 
-        const expectedKey = '97e938237d70eda6e88aa0dc3ec14c704505f744c51fbf608e5be1db33c00fb3';
+    const actualKey = Buffer.from(siloResource.getEncryptionKey()).toString(
+      "hex"
+    );
 
-        const actualKey = Buffer.from(siloResource.getEncryptionKey()).toString('hex');
+    expect(actualKey).to.equal(expectedKey);
+  });
 
-        expect(actualKey).to.equal(expectedKey);
-    })
+  it("should read and write encrpted data", async function() {
+    const siloURI = "some-secret.1";
 
-    it('should read and write encrpted data', async function () {
+    const wallet = await arweave.wallets.generate();
 
-        const siloURI = 'some-secret.1';
+    const siloTransaction = await arweave.createSiloTransaction(
+      {
+        data: "something"
+      },
+      wallet,
+      siloURI
+    );
 
-        const wallet = await arweave.wallets.generate();
+    await arweave.transactions.sign(siloTransaction, wallet);
 
-        const siloTransaction = await arweave.createSiloTransaction({
-            data: 'something'
-        }, wallet, siloURI);
+    const verified = await arweave.transactions.verify(siloTransaction);
 
-        await arweave.transactions.sign(siloTransaction, wallet);
+    expect(verified).to.be.a("boolean").and.to.be.true;
 
-        const verified = await arweave.transactions.verify(siloTransaction);
+    expect(siloTransaction.data).to.not.equal("something");
 
-        expect(verified).to.be.a('boolean').and.to.be.true;
+    const decrypted = Buffer.from(
+      await arweave.silo.readTransactionData(siloTransaction, siloURI)
+    );
 
-        expect(siloTransaction.data).to.not.equal('something');
+    expect(decrypted.toString()).to.equal("something");
 
-        const decrypted = Buffer.from(await arweave.silo.readTransactionData(siloTransaction, siloURI));
+    const misdecrypted = await (() => {
+      return new Promise(resolve => {
+        arweave.silo
+          .readTransactionData(siloTransaction, "wronguri.1")
+          .catch(error => {
+            resolve(error);
+          });
+      });
+    })();
 
-        expect(decrypted.toString()).to.equal('something');
-
-        const misdecrypted = await (() => {
-            return new Promise((resolve) => {
-                arweave.silo.readTransactionData(siloTransaction, 'wronguri.1').catch(error => {
-                    resolve(error)
-                })
-            })
-        })();
-
-        expect(misdecrypted).to.be.an.instanceOf(Error).with.property('message').and.match(/^.*failed to decrypt*$/i)
-    })
-})
+    expect(misdecrypted)
+      .to.be.an.instanceOf(Error)
+      .with.property("message")
+      .and.match(/^.*failed to decrypt*$/i);
+  });
+});

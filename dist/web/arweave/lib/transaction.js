@@ -1,4 +1,4 @@
-import { ArweaveUtils } from './utils';
+import { ArweaveUtils } from "./utils";
 class BaseObject {
     get(field, options) {
         if (!Object.getOwnPropertyNames(this).includes(field)) {
@@ -23,14 +23,14 @@ export class Tag extends BaseObject {
 export class Transaction extends BaseObject {
     constructor(attributes) {
         super();
-        this.last_tx = '';
-        this.owner = '';
+        this.last_tx = "";
+        this.owner = "";
         this.tags = [];
-        this.target = '';
-        this.quantity = '0';
-        this.data = '';
-        this.reward = '0';
-        this.signature = '';
+        this.target = "";
+        this.quantity = "0";
+        this.data = "";
+        this.reward = "0";
+        this.signature = "";
         Object.assign(this, attributes);
         if (attributes.tags) {
             this.tags = attributes.tags.map((tag) => {
@@ -60,15 +60,17 @@ export class Transaction extends BaseObject {
     }
     getSignatureData() {
         let tagString = this.tags.reduce((accumulator, tag) => {
-            return accumulator + tag.get('name', { decode: true, string: true }) + tag.get('value', { decode: true, string: true });
-        }, '');
+            return (accumulator +
+                tag.get("name", { decode: true, string: true }) +
+                tag.get("value", { decode: true, string: true }));
+        }, "");
         return ArweaveUtils.concatBuffers([
-            this.get('owner', { decode: true, string: false }),
-            this.get('target', { decode: true, string: false }),
-            this.get('data', { decode: true, string: false }),
+            this.get("owner", { decode: true, string: false }),
+            this.get("target", { decode: true, string: false }),
+            this.get("data", { decode: true, string: false }),
             ArweaveUtils.stringToBuffer(this.quantity),
             ArweaveUtils.stringToBuffer(this.reward),
-            this.get('last_tx', { decode: true, string: false }),
+            this.get("last_tx", { decode: true, string: false }),
             ArweaveUtils.stringToBuffer(tagString)
         ]);
     }

@@ -3,38 +3,43 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // @ts-ignore
 const asn = require("arweave-asn1");
 function urlize(base64) {
-    return base64.replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=/g, '');
+    return base64
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=/g, "");
 }
 function hex2b64url(str) {
-    return urlize(Buffer.from(str, 'hex').toString('base64'));
+    return urlize(Buffer.from(str, "hex").toString("base64"));
 }
-var RSAPublicKey = asn.define('RSAPublicKey', function () {
-    this.seq().obj(this.key('n').int(), this.key('e').int());
+var RSAPublicKey = asn.define("RSAPublicKey", function () {
+    this.seq().obj(this.key("n").int(), this.key("e").int());
 });
-var AlgorithmIdentifier = asn.define('AlgorithmIdentifier', function () {
-    this.seq().obj(this.key('algorithm').objid(), this.key('parameters').optional().any());
+var AlgorithmIdentifier = asn.define("AlgorithmIdentifier", function () {
+    this.seq().obj(this.key("algorithm").objid(), this.key("parameters")
+        .optional()
+        .any());
 });
-var PublicKeyInfo = asn.define('PublicKeyInfo', function () {
-    this.seq().obj(this.key('algorithm').use(AlgorithmIdentifier), this.key('publicKey').bitstr());
+var PublicKeyInfo = asn.define("PublicKeyInfo", function () {
+    this.seq().obj(this.key("algorithm").use(AlgorithmIdentifier), this.key("publicKey").bitstr());
 });
-var Version = asn.define('Version', function () {
+var Version = asn.define("Version", function () {
     this.int({
-        0: 'two-prime',
-        1: 'multi'
+        0: "two-prime",
+        1: "multi"
     });
 });
-var OtherPrimeInfos = asn.define('OtherPrimeInfos', function () {
-    this.seq().obj(this.key('ri').int(), this.key('di').int(), this.key('ti').int());
+var OtherPrimeInfos = asn.define("OtherPrimeInfos", function () {
+    this.seq().obj(this.key("ri").int(), this.key("di").int(), this.key("ti").int());
 });
-var RSAPrivateKey = asn.define('RSAPrivateKey', function () {
-    this.seq().obj(this.key('version').use(Version), this.key('n').int(), this.key('e').int(), this.key('d').int(), this.key('p').int(), this.key('q').int(), this.key('dp').int(), this.key('dq').int(), this.key('qi').int(), this.key('other').optional().use(OtherPrimeInfos));
+var RSAPrivateKey = asn.define("RSAPrivateKey", function () {
+    this.seq().obj(this.key("version").use(Version), this.key("n").int(), this.key("e").int(), this.key("d").int(), this.key("p").int(), this.key("q").int(), this.key("dp").int(), this.key("dq").int(), this.key("qi").int(), this.key("other")
+        .optional()
+        .use(OtherPrimeInfos));
 });
-var PrivateKeyInfo = asn.define('PrivateKeyInfo', function () {
-    this.seq().obj(this.key('version').use(Version), this.key('algorithm').use(AlgorithmIdentifier), this.key('privateKey').bitstr());
+var PrivateKeyInfo = asn.define("PrivateKeyInfo", function () {
+    this.seq().obj(this.key("version").use(Version), this.key("algorithm").use(AlgorithmIdentifier), this.key("privateKey").bitstr());
 });
-const RSA_OID = '1.2.840.113549.1.1.1';
+const RSA_OID = "1.2.840.113549.1.1.1";
 function addExtras(obj, extras) {
     extras = extras || {};
     Object.keys(extras).forEach(function (key) {
@@ -43,23 +48,23 @@ function addExtras(obj, extras) {
     return obj;
 }
 function pad(hex) {
-    return (hex.length % 2 === 1) ? '0' + hex : hex;
+    return hex.length % 2 === 1 ? "0" + hex : hex;
 }
 function decodeRsaPublic(buffer, extras) {
-    var key = RSAPublicKey.decode(buffer, 'der');
+    var key = RSAPublicKey.decode(buffer, "der");
     var e = pad(key.e.toString(16));
     var jwk = {
-        kty: 'RSA',
+        kty: "RSA",
         n: bn2base64url(key.n),
         e: hex2b64url(e)
     };
     return addExtras(jwk, extras);
 }
 function decodeRsaPrivate(buffer, extras) {
-    var key = RSAPrivateKey.decode(buffer, 'der');
+    var key = RSAPrivateKey.decode(buffer, "der");
     var e = pad(key.e.toString(16));
     var jwk = {
-        kty: 'RSA',
+        kty: "RSA",
         n: bn2base64url(key.n),
         e: hex2b64url(e),
         d: bn2base64url(key.d),
@@ -72,11 +77,11 @@ function decodeRsaPrivate(buffer, extras) {
     return addExtras(jwk, extras);
 }
 function decodePublic(buffer, extras) {
-    var info = PublicKeyInfo.decode(buffer, 'der');
+    var info = PublicKeyInfo.decode(buffer, "der");
     return decodeRsaPublic(info.publicKey.data, extras);
 }
 function decodePrivate(buffer, extras) {
-    var info = PrivateKeyInfo.decode(buffer, 'der');
+    var info = PrivateKeyInfo.decode(buffer, "der");
     return decodeRsaPrivate(info.privateKey.data, extras);
 }
 function getDecoder(header) {
@@ -84,8 +89,8 @@ function getDecoder(header) {
     if (!match) {
         return null;
     }
-    var isRSA = !!(match[1]);
-    var isPrivate = (match[2] === 'PRIVATE');
+    var isRSA = !!match[1];
+    var isPrivate = match[2] === "PRIVATE";
     if (isPrivate) {
         return isRSA ? decodeRsaPrivate : decodePrivate;
     }
@@ -109,7 +114,7 @@ function bn2base64url(bn) {
     return hex2b64url(pad(bn.toString(16)));
 }
 function base64url2bn(str) {
-    return new asn.bignum(Buffer.from(str, 'base64'));
+    return new asn.bignum(Buffer.from(str, "base64"));
 }
 function string2bn(str) {
     if (/^[0-9]+$/.test(str)) {
@@ -123,25 +128,28 @@ function pemTojwk(pem, extras) {
         return line.trim().length !== 0;
     });
     var decoder = getDecoder(text[0]);
-    text = text.slice(1, -1).join('');
-    return decoder(Buffer.from(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64'), extras);
+    text = text.slice(1, -1).join("");
+    return decoder(Buffer.from(text.replace(/[^\w\d\+\/=]+/g, ""), "base64"), extras);
 }
 exports.pemTojwk = pemTojwk;
 function jwkTopem(json) {
     var jwk = parse(json);
-    var isPrivate = !!(jwk.d);
-    var t = isPrivate ? 'PRIVATE' : 'PUBLIC';
-    var header = '-----BEGIN RSA ' + t + ' KEY-----\n';
-    var footer = '\n-----END RSA ' + t + ' KEY-----\n';
+    var isPrivate = !!jwk.d;
+    var t = isPrivate ? "PRIVATE" : "PUBLIC";
+    var header = "-----BEGIN RSA " + t + " KEY-----\n";
+    var footer = "\n-----END RSA " + t + " KEY-----\n";
     var data = Buffer.alloc(0);
     if (isPrivate) {
-        jwk.version = 'two-prime';
-        data = RSAPrivateKey.encode(jwk, 'der');
+        jwk.version = "two-prime";
+        data = RSAPrivateKey.encode(jwk, "der");
     }
     else {
-        data = RSAPublicKey.encode(jwk, 'der');
+        data = RSAPublicKey.encode(jwk, "der");
     }
-    var body = data.toString('base64').match(/.{1,64}/g).join('\n');
+    var body = data
+        .toString("base64")
+        .match(/.{1,64}/g)
+        .join("\n");
     return header + body + footer;
 }
 exports.jwkTopem = jwkTopem;

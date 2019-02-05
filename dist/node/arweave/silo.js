@@ -12,7 +12,7 @@ class Silo {
             throw new Error(`No Silo URI specified`);
         }
         const resource = await this.parseUri(siloURI);
-        const ids = await this.transactions.search('Silo-Name', resource.getAccessKey());
+        const ids = await this.transactions.search("Silo-Name", resource.getAccessKey());
         if (ids.length == 0) {
             throw new Error(`No data could be found for the Silo URI: ${siloURI}`);
         }
@@ -20,7 +20,7 @@ class Silo {
         if (!transaction) {
             throw new Error(`No data could be found for the Silo URI: ${siloURI}`);
         }
-        const encrypted = transaction.get('data', { decode: true, string: false });
+        const encrypted = transaction.get("data", { decode: true, string: false });
         return this.crypto.decrypt(encrypted, resource.getEncryptionKey());
     }
     async readTransactionData(transaction, siloURI) {
@@ -28,7 +28,7 @@ class Silo {
             throw new Error(`No Silo URI specified`);
         }
         const resource = await this.parseUri(siloURI);
-        const encrypted = transaction.get('data', { decode: true, string: false });
+        const encrypted = transaction.get("data", { decode: true, string: false });
         return this.crypto.decrypt(encrypted, resource.getEncryptionKey());
     }
     async parseUri(siloURI) {
@@ -45,7 +45,7 @@ class Silo {
     }
     async hash(input, iterations) {
         let digest = await this.crypto.hash(input);
-        for (let count = 0; count < (iterations - 1); count++) {
+        for (let count = 0; count < iterations - 1; count++) {
             digest = await this.crypto.hash(digest);
         }
         return digest;

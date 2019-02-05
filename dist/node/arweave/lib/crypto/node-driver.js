@@ -1,30 +1,29 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const pem_1 = require("./pem");
-const crypto = require('crypto');
+const crypto = require("crypto");
 class NodeCryptoDriver {
     constructor() {
         this.keyLength = 4096;
         this.publicExponent = 0x10001;
-        this.hashAlgorithm = 'sha256';
-        this.encryptionAlgorithm = 'aes-256-cbc';
+        this.hashAlgorithm = "sha256";
+        this.encryptionAlgorithm = "aes-256-cbc";
     }
     generateJWK() {
         if (typeof crypto.generateKeyPair != "function") {
-            throw new Error('Keypair generation not supported in this version of Node, only supported in versions 10+');
+            throw new Error("Keypair generation not supported in this version of Node, only supported in versions 10+");
         }
         return new Promise((resolve, reject) => {
-            crypto
-                .generateKeyPair('rsa', {
+            crypto.generateKeyPair("rsa", {
                 modulusLength: this.keyLength,
                 publicExponent: this.publicExponent,
                 privateKeyEncoding: {
-                    type: 'pkcs1',
-                    format: 'pem'
+                    type: "pkcs1",
+                    format: "pem"
                 },
                 publicKeyEncoding: {
-                    type: 'pkcs1',
-                    format: 'pem'
+                    type: "pkcs1",
+                    format: "pem"
                 }
             }, (err, publicKey, privateKey) => {
                 if (err) {
@@ -49,9 +48,9 @@ class NodeCryptoDriver {
     verify(publicModulus, data, signature) {
         return new Promise((resolve, reject) => {
             const publicKey = {
-                kty: 'RSA',
-                e: 'AQAB',
-                n: publicModulus,
+                kty: "RSA",
+                e: "AQAB",
+                n: publicModulus
             };
             const pem = this.jwkToPem(publicKey);
             resolve(crypto
@@ -83,7 +82,7 @@ class NodeCryptoDriver {
     async encrypt(data, key) {
         // As we're using CBC with a randomised IV per cypher we don't really need
         // an additional random salt per passphrase.
-        const derivedKey = crypto.pbkdf2Sync(key, 'salt', 100000, 32, this.hashAlgorithm);
+        const derivedKey = crypto.pbkdf2Sync(key, "salt", 100000, 32, this.hashAlgorithm);
         const iv = crypto.randomBytes(16);
         const cipher = crypto.createCipheriv(this.encryptionAlgorithm, derivedKey, iv);
         const encrypted = Buffer.concat([iv, cipher.update(data), cipher.final()]);
@@ -101,15 +100,18 @@ class NodeCryptoDriver {
         try {
             // As we're using CBC with a randomised IV per cypher we don't really need
             // an additional random salt per passphrase.
-            const derivedKey = crypto.pbkdf2Sync(key, 'salt', 100000, 32, this.hashAlgorithm);
+            const derivedKey = crypto.pbkdf2Sync(key, "salt", 100000, 32, this.hashAlgorithm);
             const iv = encrypted.slice(0, 16);
             const data = encrypted.slice(16);
             const decipher = crypto.createDecipheriv(this.encryptionAlgorithm, derivedKey, iv);
-            const decrypted = Buffer.concat([decipher.update(data), decipher.final()]);
+            const decrypted = Buffer.concat([
+                decipher.update(data),
+                decipher.final()
+            ]);
             return decrypted;
         }
         catch (error) {
-            throw new Error('Failed to decrypt');
+            throw new Error("Failed to decrypt");
         }
     }
     jwkToPem(jwk) {

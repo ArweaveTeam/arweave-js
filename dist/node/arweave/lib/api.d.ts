@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { AxiosResponse, AxiosRequestConfig, AxiosInstance } from 'axios';
+import { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios";
 export interface ApiConfig<T = object> {
     host?: string;
     protocol?: string;

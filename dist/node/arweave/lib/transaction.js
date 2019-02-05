@@ -26,14 +26,14 @@ exports.Tag = Tag;
 class Transaction extends BaseObject {
     constructor(attributes) {
         super();
-        this.last_tx = '';
-        this.owner = '';
+        this.last_tx = "";
+        this.owner = "";
         this.tags = [];
-        this.target = '';
-        this.quantity = '0';
-        this.data = '';
-        this.reward = '0';
-        this.signature = '';
+        this.target = "";
+        this.quantity = "0";
+        this.data = "";
+        this.reward = "0";
+        this.signature = "";
         Object.assign(this, attributes);
         if (attributes.tags) {
             this.tags = attributes.tags.map((tag) => {
@@ -63,15 +63,17 @@ class Transaction extends BaseObject {
     }
     getSignatureData() {
         let tagString = this.tags.reduce((accumulator, tag) => {
-            return accumulator + tag.get('name', { decode: true, string: true }) + tag.get('value', { decode: true, string: true });
-        }, '');
+            return (accumulator +
+                tag.get("name", { decode: true, string: true }) +
+                tag.get("value", { decode: true, string: true }));
+        }, "");
         return utils_1.ArweaveUtils.concatBuffers([
-            this.get('owner', { decode: true, string: false }),
-            this.get('target', { decode: true, string: false }),
-            this.get('data', { decode: true, string: false }),
+            this.get("owner", { decode: true, string: false }),
+            this.get("target", { decode: true, string: false }),
+            this.get("data", { decode: true, string: false }),
             utils_1.ArweaveUtils.stringToBuffer(this.quantity),
             utils_1.ArweaveUtils.stringToBuffer(this.reward),
-            this.get('last_tx', { decode: true, string: false }),
+            this.get("last_tx", { decode: true, string: false }),
             utils_1.ArweaveUtils.stringToBuffer(tagString)
         ]);
     }

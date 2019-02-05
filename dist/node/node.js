@@ -5,7 +5,7 @@ const node_driver_1 = require("./arweave/lib/crypto/node-driver");
 function init(apiConfig) {
     return new arweave_1.Arweave({
         api: apiConfig,
-        crypto: new node_driver_1.NodeCryptoDriver
+        crypto: new node_driver_1.NodeCryptoDriver()
     });
 }
 exports.init = init;

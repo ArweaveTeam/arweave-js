@@ -1,150 +1,142 @@
-import * as chai from 'chai';
+import * as chai from "chai";
 
 const expect = chai.expect;
 
-describe('Node distribution', function () {
-    it('should initilize from compiled node dist', async function () {
+describe("Node distribution", function() {
+  it("should initilize from compiled node dist", async function() {
+    const dist = require("../dist/node/node");
 
-        const dist = require('../dist/node/node');
+    expect(dist).to.be.a("object");
 
-        expect(dist).to.be.a('object');
+    expect(dist.init).to.be.a("function");
 
-        expect(dist.init).to.be.a('function');
+    const instance = dist.init({ host: "arweave.net", logging: false });
 
-        const instance = dist.init({ host: 'arweave.net', logging: false });
+    expect(instance.api.constructor.name).to.equal("Api");
 
-        expect(instance.api.constructor.name).to.equal('Api')
+    expect(instance.transactions.constructor.name).to.equal("Transactions");
 
-        expect(instance.transactions.constructor.name).to.equal('Transactions');
+    expect(instance.wallets.constructor.name).to.equal("Wallets");
 
-        expect(instance.wallets.constructor.name).to.equal('Wallets');
+    expect(instance.network.constructor.name).to.equal("Network");
 
-        expect(instance.network.constructor.name).to.equal('Network');
+    expect(instance.crypto.constructor.name).to.equal("NodeCryptoDriver");
 
-        expect(instance.crypto.constructor.name).to.equal('NodeCryptoDriver');
-
-        expect(instance.silo.constructor.name).to.equal('Silo');
-    })
+    expect(instance.silo.constructor.name).to.equal("Silo");
+  });
 });
 
+describe("Web distribution", function() {
+  it("should initilize from web compiled dist", async function() {
+    // The web distro will attach to the browser window so we just
+    // need to mock a global window object with a subtle crypto stub
+    // to make this test work.
+    let globals = <any>global;
 
-describe('Web distribution', function () {
-    it('should initilize from web compiled dist', async function () {
+    globals.window = {
+      crypto: {
+        subtle: {
+          generateKey: async () => {},
+          importKey: async () => {},
+          exportKey: async () => {},
+          digest: async () => {},
+          sign: async () => {}
+        }
+      }
+    };
 
-        // The web distro will attach to the browser window so we just
-        // need to mock a global window object with a subtle crypto stub
-        // to make this test work.
-        let globals = (<any>global);
+    require("../dist/web/web");
 
-        globals.window = {
-            crypto: {
-                subtle: {
-                    generateKey: async () => { },
-                    importKey: async () => { },
-                    exportKey: async () => { },
-                    digest: async () => { },
-                    sign: async () => { },
-                }
-            }
-        };
+    const dist = globals.window.Arweave;
 
-        require('../dist/web/web');
+    expect(dist).to.be.a("object");
 
-        const dist = globals.window.Arweave;
+    expect(dist.init).to.be.a("function");
 
-        expect(dist).to.be.a('object');
+    const instance = dist.init({ host: "arweave.net", logging: false });
 
-        expect(dist.init).to.be.a('function');
+    expect(instance.api.constructor.name).to.equal("Api");
 
-        const instance = dist.init({ host: 'arweave.net', logging: false });
+    expect(instance.transactions.constructor.name).to.equal("Transactions");
 
-        expect(instance.api.constructor.name).to.equal('Api')
+    expect(instance.wallets.constructor.name).to.equal("Wallets");
 
-        expect(instance.transactions.constructor.name).to.equal('Transactions');
+    expect(instance.network.constructor.name).to.equal("Network");
 
-        expect(instance.wallets.constructor.name).to.equal('Wallets');
+    expect(instance.crypto.constructor.name).to.equal("WebCryptoDriver");
 
-        expect(instance.network.constructor.name).to.equal('Network');
+    expect(instance.silo.constructor.name).to.equal("Silo");
+  });
 
-        expect(instance.crypto.constructor.name).to.equal('WebCryptoDriver');
+  it("should initilize from web bundle", async function() {
+    // The web distro will attach to the browser window so we just
+    // need to mock a global window object with a subtle crypto stub
+    // to make this test work.
+    let globals = <any>global;
 
-        expect(instance.silo.constructor.name).to.equal('Silo');
+    globals.window = {
+      crypto: {
+        subtle: {
+          generateKey: async () => {},
+          importKey: async () => {},
+          exportKey: async () => {},
+          digest: async () => {},
+          sign: async () => {}
+        }
+      }
+    };
 
-    })
+    require("../dist/web.bundle");
 
-    it('should initilize from web bundle', async function () {
+    const dist = globals.window.Arweave;
 
-        // The web distro will attach to the browser window so we just
-        // need to mock a global window object with a subtle crypto stub
-        // to make this test work.
-        let globals = (<any>global);
+    expect(dist).to.be.a("object");
 
-        globals.window = {
-            crypto: {
-                subtle: {
-                    generateKey: async () => { },
-                    importKey: async () => { },
-                    exportKey: async () => { },
-                    digest: async () => { },
-                    sign: async () => { },
-                }
-            }
-        };
+    expect(dist.init).to.be.a("function");
 
-        require('../dist/web.bundle');
+    const instance = dist.init({ host: "arweave.net", logging: false });
 
-        const dist = globals.window.Arweave;
+    expect(instance.api.constructor.name).to.equal("Api");
 
-        expect(dist).to.be.a('object');
+    expect(instance.transactions.constructor.name).to.equal("Transactions");
 
-        expect(dist.init).to.be.a('function');
+    expect(instance.wallets.constructor.name).to.equal("Wallets");
 
-        const instance = dist.init({ host: 'arweave.net', logging: false });
+    expect(instance.network.constructor.name).to.equal("Network");
 
-        expect(instance.api.constructor.name).to.equal('Api')
+    expect(instance.crypto.constructor.name).to.equal("WebCryptoDriver");
 
-        expect(instance.transactions.constructor.name).to.equal('Transactions');
+    expect(instance.silo.constructor.name).to.equal("Silo");
+  });
 
-        expect(instance.wallets.constructor.name).to.equal('Wallets');
+  it("should initilize from minified web bundle", async function() {
+    // The web distro will attach to the browser window so we just
+    // need to mock a global window object with a subtle crypto stub
+    // to make this test work.
+    let globals = <any>global;
 
-        expect(instance.network.constructor.name).to.equal('Network');
+    globals.window = {
+      crypto: {
+        subtle: {
+          generateKey: async () => {},
+          importKey: async () => {},
+          exportKey: async () => {},
+          digest: async () => {},
+          sign: async () => {}
+        }
+      }
+    };
 
-        expect(instance.crypto.constructor.name).to.equal('WebCryptoDriver');
+    require("../dist/web.bundle.min");
 
-        expect(instance.silo.constructor.name).to.equal('Silo');
+    const dist = globals.window.Arweave;
 
-    })
+    expect(dist).to.be.a("object");
 
-    it('should initilize from minified web bundle', async function () {
+    expect(dist.init).to.be.a("function");
 
-        // The web distro will attach to the browser window so we just
-        // need to mock a global window object with a subtle crypto stub
-        // to make this test work.
-        let globals = (<any>global);
+    const instance = dist.init({ host: "arweave.net", logging: false });
 
-        globals.window = {
-            crypto: {
-                subtle: {
-                    generateKey: async () => { },
-                    importKey: async () => { },
-                    exportKey: async () => { },
-                    digest: async () => { },
-                    sign: async () => { },
-                }
-            }
-        };
-
-        require('../dist/web.bundle.min');
-
-        const dist = globals.window.Arweave;
-
-        expect(dist).to.be.a('object');
-
-        expect(dist.init).to.be.a('function');
-
-        const instance = dist.init({ host: 'arweave.net', logging: false });
-
-        expect(instance).to.be.an('object');
-
-    })
+    expect(instance).to.be.an("object");
+  });
 });

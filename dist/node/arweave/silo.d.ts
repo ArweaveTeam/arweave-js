@@ -1,7 +1,7 @@
 import { Api } from "./lib/api";
-import { CryptoInterface } from './lib/crypto/crypto-interface';
-import { Transactions } from './transactions';
-import { Transaction } from './lib/transaction';
+import { CryptoInterface } from "./lib/crypto/crypto-interface";
+import { Transactions } from "./transactions";
+import { Transaction } from "./lib/transaction";
 export declare class Silo {
     private api;
     private crypto;

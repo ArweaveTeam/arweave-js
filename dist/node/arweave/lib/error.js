@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-;
 class ArweaveError extends Error {
     constructor(type, optional) {
         if (optional.message) {

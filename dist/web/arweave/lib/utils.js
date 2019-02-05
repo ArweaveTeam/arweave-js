@@ -1,4 +1,4 @@
-import * as B64js from 'base64-js';
+import * as B64js from "base64-js";
 export class ArweaveUtils {
     static concatBuffers(buffers) {
         let total_length = 0;
@@ -18,24 +18,24 @@ export class ArweaveUtils {
     static b64UrlToString(b64UrlString) {
         let buffer = ArweaveUtils.b64UrlToBuffer(b64UrlString);
         // TextEncoder will be available in browsers, but not in node
-        if (typeof TextDecoder == 'undefined') {
-            const TextDecoder = require('util').TextDecoder;
-            return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+        if (typeof TextDecoder == "undefined") {
+            const TextDecoder = require("util").TextDecoder;
+            return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
         }
-        return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+        return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
     }
     static bufferToString(buffer) {
         // TextEncoder will be available in browsers, but not in node
-        if (typeof TextDecoder == 'undefined') {
-            const TextDecoder = require('util').TextDecoder;
-            return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+        if (typeof TextDecoder == "undefined") {
+            const TextDecoder = require("util").TextDecoder;
+            return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
         }
-        return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+        return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
     }
     static stringToBuffer(string) {
         // TextEncoder will be available in browsers, but not in node
-        if (typeof TextEncoder == 'undefined') {
-            const TextEncoder = require('util').TextEncoder;
+        if (typeof TextEncoder == "undefined") {
+            const TextEncoder = require("util").TextEncoder;
             return new TextEncoder().encode(string);
         }
         return new TextEncoder().encode(string);
@@ -53,12 +53,17 @@ export class ArweaveUtils {
         return ArweaveUtils.b64UrlEncode(ArweaveUtils.bufferTob64(buffer));
     }
     static b64UrlEncode(b64UrlString) {
-        return b64UrlString.replace(/\+/g, "-").replace(/\//g, "_").replace(/\=/g, "");
+        return b64UrlString
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/\=/g, "");
     }
     static b64UrlDecode(b64UrlString) {
         b64UrlString = b64UrlString.replace(/\-/g, "+").replace(/\_/g, "/");
         let padding;
-        b64UrlString.length % 4 == 0 ? padding = 0 : padding = 4 - (b64UrlString.length % 4);
+        b64UrlString.length % 4 == 0
+            ? (padding = 0)
+            : (padding = 4 - (b64UrlString.length % 4));
         return b64UrlString.concat("=".repeat(padding));
     }
 }

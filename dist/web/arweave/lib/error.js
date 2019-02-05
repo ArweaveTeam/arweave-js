@@ -1,4 +1,3 @@
-;
 export class ArweaveError extends Error {
     constructor(type, optional) {
         if (optional.message) {

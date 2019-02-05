@@ -9,8 +9,11 @@ class Transactions {
         this.crypto = crypto;
     }
     getPrice(byteSize, targetAddress) {
-        let endpoint = targetAddress ? `price/${byteSize}/${targetAddress}` : `price/${byteSize}`;
-        return this.api.get(endpoint, {
+        let endpoint = targetAddress
+            ? `price/${byteSize}/${targetAddress}`
+            : `price/${byteSize}`;
+        return this.api
+            .get(endpoint, {
             transformResponse: [
                 /**
                  * We need to specify a response transformer to override
@@ -23,7 +26,8 @@ class Transactions {
                     return data;
                 }
             ]
-        }).then(response => {
+        })
+            .then(response => {
             return response.data;
         });
     }
@@ -48,11 +52,13 @@ class Transactions {
         return new transaction_1.Transaction(attributes);
     }
     async search(tagName, tagValue) {
-        return this.api.post(`arql`, {
-            op: 'equals',
+        return this.api
+            .post(`arql`, {
+            op: "equals",
             expr1: tagName,
-            expr2: tagValue,
-        }).then(response => {
+            expr2: tagValue
+        })
+            .then(response => {
             if (!response.data) {
                 return [];
             }
@@ -80,14 +86,17 @@ class Transactions {
          * The transaction ID should be a SHA-256 hash of the raw signature bytes, so this needs
          * to be recalculated from the signature and checked against the transaction ID.
          */
-        const rawSignature = transaction.get('signature', { decode: true, string: false });
+        const rawSignature = transaction.get("signature", {
+            decode: true,
+            string: false
+        });
         const expectedId = utils_1.ArweaveUtils.bufferTob64Url(await this.crypto.hash(rawSignature));
         if (transaction.id !== expectedId) {
             throw new Error(`Invalid transaction signature or ID! The transaction ID doesn't match the expected SHA-256 hash of the signature.`);
         }
         /**
          * Now verify the signature is valid and signed by the owner wallet (owner field = originating wallet public key).
-        */
+         */
         return this.crypto.verify(transaction.owner, signaturePayload, rawSignature);
     }
     post(transaction) {
