@@ -8,7 +8,7 @@ window.Arweave = {
         });
     }
 };
-export function init(apiConfig) {
+export function init(apiConfig = {}) {
     return new Arweave({
         api: apiConfig,
         crypto: new WebCryptoDriver

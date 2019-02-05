@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const B64js = require('base64-js');
+const B64js = require("base64-js");
 class ArweaveUtils {
     static concatBuffers(buffers) {
         let total_length = 0;
