@@ -4,7 +4,7 @@ const expect = chai.expect;
 
 describe("Node distribution", function() {
   it("should initilize from compiled node dist", async function() {
-    const dist = require("../dist/node/node");
+    const dist = require("../node");
 
     expect(dist).to.be.a("object");
 
@@ -45,7 +45,7 @@ describe("Web distribution", function() {
       }
     };
 
-    require("../dist/web/web");
+    require("../web");
 
     const dist = globals.window.Arweave;
 
@@ -86,7 +86,7 @@ describe("Web distribution", function() {
       }
     };
 
-    require("../dist/web.bundle");
+    require("../bundles/web.bundle");
 
     const dist = globals.window.Arweave;
 
@@ -127,7 +127,7 @@ describe("Web distribution", function() {
       }
     };
 
-    require("../dist/web.bundle.min");
+    require("../bundles/web.bundle.min");
 
     const dist = globals.window.Arweave;
 

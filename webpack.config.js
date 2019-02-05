@@ -4,57 +4,33 @@ const config = {};
 
 config.web = {
   name: "web",
-  entry: "./src/web.ts",
+  entry: "./web/index.js",
   mode: "development",
   target: "web",
-  module: {
-    rules: [
-      {
-        test: /\.ts?$/,
-        use: "ts-loader"
-      }
-    ]
-  },
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"]
-  },
   devtool: "inline-source-map",
   devServer: {
     contentBase: "./dist"
   },
-  plugins: [],
   output: {
     filename: "web.bundle.js",
-    path: path.resolve(__dirname, "dist")
+    path: path.resolve(__dirname, "bundles")
   }
 };
 
 config.webprod = {
   name: "web-prod",
-  entry: "./src/web.ts",
+  entry: "./web/index.js",
   mode: "production",
   target: "web",
-  module: {
-    rules: [
-      {
-        test: /\.ts?$/,
-        use: "ts-loader"
-      }
-    ]
-  },
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"]
-  },
   devServer: {
     contentBase: "./dist"
   },
   optimization: {
     minimizer: [new BabelMinify({ mangle: false })]
   },
-  plugins: [],
   output: {
     filename: "web.bundle.min.js",
-    path: path.resolve(__dirname, "dist")
+    path: path.resolve(__dirname, "bundles")
   }
 };
 
@@ -81,7 +57,7 @@ config.webtests = {
   plugins: [],
   output: {
     filename: "webtests.bundle.js",
-    path: path.resolve(__dirname, "dist")
+    path: path.resolve(__dirname, "bundles")
   }
 };
 

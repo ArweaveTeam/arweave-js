@@ -3,16 +3,16 @@
         "outDir": "./dist/web/",
         "sourceMap": true,
         "noImplicitAny": true,
-        "module": "es6",
         "target": "es2017",
         "moduleResolution": "node",
-        "rootDir": "./src",
+        "module": "commonjs",
+        "rootDirs": [
+            "src/common",
+            "src/web"
+        ]
     },
     "include": [
-        "src"
-    ],
-    "exclude": [
-        "src/node.ts",
-        "node_modules",
+        "src/common",
+        "src/web"
     ]
 }

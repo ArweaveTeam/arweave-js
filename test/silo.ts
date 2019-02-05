@@ -1,10 +1,14 @@
 import * as chai from "chai";
-import { SiloResource } from "../src/arweave/silo";
-import * as Arweave from "../src/node";
+import { SiloResource } from "../src/common/arweave/silo";
+import { Arweave } from "../src/common/arweave/arweave";
+import { NodeCryptoDriver } from "../src/common/arweave/lib/crypto/node-driver";
 
 const expect = chai.expect;
 
-const arweave = Arweave.init({ host: "arweave.net", logging: false });
+const arweave = new Arweave({
+  api: { host: "arweave.net", logging: false },
+  crypto: new NodeCryptoDriver()
+});
 
 describe("Silo", function() {
   it("should resolve Silo URIs", async function() {

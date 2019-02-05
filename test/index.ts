@@ -1,17 +1,20 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
-import { Api } from "../src/arweave/lib/api";
-import { NodeCryptoDriver } from "../src/arweave/lib/crypto/node-driver";
-import { Transaction } from "../src/arweave/lib/transaction";
-import { Network } from "../src/arweave/network";
-import { SiloResource, Silo } from "../src/arweave/silo";
-import { Transactions } from "../src/arweave/transactions";
-import { Wallets } from "../src/arweave/wallets";
-import * as Arweave from "../src/node";
+import { Api } from "../src/common/arweave/lib/api";
+import { NodeCryptoDriver } from "../src/common/arweave/lib/crypto/node-driver";
+import { Transaction } from "../src/common/arweave/lib/transaction";
+import { Network } from "../src/common/arweave/network";
+import { SiloResource, Silo } from "../src/common/arweave/silo";
+import { Transactions } from "../src/common/arweave/transactions";
+import { Wallets } from "../src/common/arweave/wallets";
+import { Arweave } from "../src/common/arweave/arweave";
 
 const expect = chai.expect;
 
-const arweave = Arweave.init({ host: "arweave.net", logging: false });
+const arweave = new Arweave({
+  api: { host: "arweave.net", logging: false },
+  crypto: new NodeCryptoDriver()
+});
 
 const digestRegex = /^[a-z0-9-_]{43}$/i;
 const liveAddressBalance = "498557055636";

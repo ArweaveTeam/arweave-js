@@ -3,13 +3,24 @@
   "version": "1.1.8",
   "description": "Arweave JS client library",
   "main": "index.js",
+  "files": [
+    "node",
+    "web",
+    "bundles"
+  ],
   "scripts": {
     "compile:node": "tsc --declaration -project tsconfig.node.json",
     "compile:web": "tsc --declaration -project tsconfig.web.json",
     "bundle:web": "npx webpack --config-name web",
     "bundle:web-prod": "npx webpack --config-name web-prod",
     "profile:web": "npx webpack --config-name web --json > ./web.profile.json && npx webpack-bundle-analyzer ./web.profile.json",
-    "build": "npm run compile:node && npm run compile:web && npm run bundle:web && npm run bundle:web-prod",
+    "package": "mkdir -p node web && mv dist/node/common/* dist/node/node/* node && mv dist/web/common/* dist/web/web/* web && npm run clean:dist",
+    "build": "npm run compile:node && npm run compile:web && npm run package && npm run bundle:web && npm run bundle:web-prod",
+    "clean:dist": "rm -rf dist",
+    "clean:package": "rm -rf node web",
+    "clean:bundle": "rm -rf bundles",
+    "clean": "npm run clean:dist && npm run clean:package && npm  run clean:bundle",
+    "prepare": "npm run clean && npm run build",
     "test": "mocha --require ts-node/register test/*.ts",
     "test:web": "npm run bundle:web && npx webpack --config-name web-tests && open test/web/web.html"
   },
