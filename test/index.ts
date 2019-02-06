@@ -1,329 +1,346 @@
-import * as chai from 'chai';
-import * as crypto from 'crypto';
-import { Api } from '../src/arweave/lib/api';
-import { NodeCryptoDriver } from '../src/arweave/lib/crypto/node-driver';
-import { Transaction } from '../src/arweave/lib/transaction';
-import { Network } from '../src/arweave/network';
-import { SiloResource, Silo } from '../src/arweave/silo';
-import { Transactions } from '../src/arweave/transactions';
-import { Wallets } from '../src/arweave/wallets';
-import * as Arweave from "../src/node";
+import * as chai from "chai";
+import * as crypto from "crypto";
+import { Api } from "../src/common/arweave/lib/api";
+import { NodeCryptoDriver } from "../src/common/arweave/lib/crypto/node-driver";
+import { Transaction } from "../src/common/arweave/lib/transaction";
+import { Network } from "../src/common/arweave/network";
+import { SiloResource, Silo } from "../src/common/arweave/silo";
+import { Transactions } from "../src/common/arweave/transactions";
+import { Wallets } from "../src/common/arweave/wallets";
+import { Arweave } from "../src/common/arweave/arweave";
 
 const expect = chai.expect;
 
-const arweave = Arweave.init({ host: 'arweave.net', logging: false });
-
-const digestRegex = /^[a-z0-9-_]{43}$/i;
-const liveAddressBalance = '498557055636';
-const liveAddress = '9_666Wkk2GzL0LGd3xhb0jY7HqNy71BaV4sULQlJsBQ';
-const liveTxid = 'CE-1SFiXqWUEu0aSTebE6LC0-5JBAc3IAehYGwdF5iI';
-
-const liveDataTxid = 'Ie-fxxzdBweiA0N1ZbzUqXhNI310uDUmaBc3ajlV6YY';
-
-describe('Initialization', function () {
-    it('should have components', function () {
-
-        expect(arweave.api).to.be.an.instanceOf(Api);
-
-        expect(arweave.transactions).to.be.an.instanceOf(Transactions);
-
-        expect(arweave.wallets).to.be.an.instanceOf(Wallets);
-
-        expect(arweave.network).to.be.an.instanceOf(Network);
-
-        expect(arweave.crypto).to.be.an.instanceOf(NodeCryptoDriver);
-
-        expect(arweave.silo).to.be.an.instanceOf(Silo);
-
-    })
+const arweave = new Arweave({
+  api: { host: "arweave.net", logging: false },
+  crypto: new NodeCryptoDriver()
 });
 
+const digestRegex = /^[a-z0-9-_]{43}$/i;
+const liveAddressBalance = "498557055636";
+const liveAddress = "9_666Wkk2GzL0LGd3xhb0jY7HqNy71BaV4sULQlJsBQ";
+const liveTxid = "CE-1SFiXqWUEu0aSTebE6LC0-5JBAc3IAehYGwdF5iI";
 
-describe('Network Info', function () {
-    it('should get network info', async function () {
+const liveDataTxid = "Ie-fxxzdBweiA0N1ZbzUqXhNI310uDUmaBc3ajlV6YY";
 
-        this.timeout(5000);
+describe("Initialization", function() {
+  it("should have components", function() {
+    expect(arweave.api).to.be.an.instanceOf(Api);
 
-        const info = await arweave.network.getInfo();
-        const peers = await arweave.network.getPeers();
+    expect(arweave.transactions).to.be.an.instanceOf(Transactions);
 
-        expect(info).to.be.an('object')
+    expect(arweave.wallets).to.be.an.instanceOf(Wallets);
 
-        expect(Object.keys(info)).to.contain.members(['height', 'current', 'release', 'version', 'blocks']);
+    expect(arweave.network).to.be.an.instanceOf(Network);
 
-        expect(info.height).to.be.a('number').greaterThan(0);
+    expect(arweave.crypto).to.be.an.instanceOf(NodeCryptoDriver);
 
-        expect(peers).to.be.an('array');
-    })
-})
+    expect(arweave.silo).to.be.an.instanceOf(Silo);
+  });
+});
 
-describe('Wallets and keys', function () {
+describe("Network Info", function() {
+  it("should get network info", async function() {
+    this.timeout(5000);
 
-    it('should generate valid JWKs', async function () {
+    const info = await arweave.network.getInfo();
+    const peers = await arweave.network.getPeers();
 
-        this.timeout(5000);
+    expect(info).to.be.an("object");
 
-        const walletA = await arweave.wallets.generate();
-        const walletB = await arweave.wallets.generate();
+    expect(Object.keys(info)).to.contain.members([
+      "height",
+      "current",
+      "release",
+      "version",
+      "blocks"
+    ]);
 
-        expect(walletA).to.be.an('object', 'New wallet is not an object');
+    expect(info.height)
+      .to.be.a("number")
+      .greaterThan(0);
 
-        expect(walletA).to.have.all.keys('kty', 'n', 'e', 'd', 'p', 'q', 'dp', 'dq', 'qi');
+    expect(peers).to.be.an("array");
+  });
+});
 
-        expect(walletA.kty).to.equal('RSA');
+describe("Wallets and keys", function() {
+  it("should generate valid JWKs", async function() {
+    this.timeout(5000);
 
-        expect(walletA.e).to.equal('AQAB');
+    const walletA = await arweave.wallets.generate();
+    const walletB = await arweave.wallets.generate();
 
-        expect(walletA.n).to.match(/^[a-z0-9-_]{683}$/i);
+    expect(walletA).to.be.an("object", "New wallet is not an object");
 
-        expect(walletA.d).to.match(/^[a-z0-9-_]{683}$/i);
+    expect(walletA).to.have.all.keys(
+      "kty",
+      "n",
+      "e",
+      "d",
+      "p",
+      "q",
+      "dp",
+      "dq",
+      "qi"
+    );
 
-        const addressA = await arweave.wallets.jwkToAddress(walletA);
-        const addressB = await arweave.wallets.jwkToAddress(walletB);
+    expect(walletA.kty).to.equal("RSA");
 
-        expect(addressA).to.be.a('string');
+    expect(walletA.e).to.equal("AQAB");
 
-        expect(addressA).to.match(digestRegex);
+    expect(walletA.n).to.match(/^[a-z0-9-_]{683}$/i);
 
-        expect(addressB).to.match(digestRegex);
+    expect(walletA.d).to.match(/^[a-z0-9-_]{683}$/i);
 
-        expect(addressA).to.not.equal(addressB);
+    const addressA = await arweave.wallets.jwkToAddress(walletA);
+    const addressB = await arweave.wallets.jwkToAddress(walletB);
 
-    })
+    expect(addressA).to.be.a("string");
 
-    it('should get wallet info', async function () {
+    expect(addressA).to.match(digestRegex);
 
-        this.timeout(5000);
+    expect(addressB).to.match(digestRegex);
 
-        const wallet = await arweave.wallets.generate();
+    expect(addressA).to.not.equal(addressB);
+  });
 
-        const address = await arweave.wallets.jwkToAddress(wallet);
+  it("should get wallet info", async function() {
+    this.timeout(5000);
 
-        const balance = await arweave.wallets.getBalance(address);
+    const wallet = await arweave.wallets.generate();
 
-        const lastTx = await arweave.wallets.getLastTransactionID(address);
+    const address = await arweave.wallets.jwkToAddress(wallet);
 
-        expect(balance).to.be.a('string');
+    const balance = await arweave.wallets.getBalance(address);
 
-        expect(balance).to.equal('0');
+    const lastTx = await arweave.wallets.getLastTransactionID(address);
 
-        expect(lastTx).to.be.a('string');
+    expect(balance).to.be.a("string");
 
-        expect(lastTx).to.equal('');
+    expect(balance).to.equal("0");
 
-        const balanceB = await arweave.wallets.getBalance(liveAddress);
+    expect(lastTx).to.be.a("string");
 
-        const lastTxB = await arweave.wallets.getLastTransactionID(liveAddress);
+    expect(lastTx).to.equal("");
 
-        expect(balanceB).to.be.a('string');
+    const balanceB = await arweave.wallets.getBalance(liveAddress);
 
-        expect(balanceB).to.equal(liveAddressBalance);
+    const lastTxB = await arweave.wallets.getLastTransactionID(liveAddress);
 
-        expect(lastTxB).to.be.a('string');
+    expect(balanceB).to.be.a("string");
 
-        expect(lastTxB).to.equal(liveTxid);
-    })
+    expect(balanceB).to.equal(liveAddressBalance);
 
-})
+    expect(lastTxB).to.be.a("string");
 
+    expect(lastTxB).to.equal(liveTxid);
+  });
+});
 
-describe('Transactions', function () {
+describe("Transactions", function() {
+  it("should create and sign transactions", async function() {
+    this.timeout(5000);
 
-    it('should create and sign transactions', async function () {
+    const wallet = await arweave.wallets.generate();
 
-        this.timeout(5000);
+    const transaction = await arweave.createTransaction(
+      { data: "test" },
+      wallet
+    );
 
-        const wallet = await arweave.wallets.generate();
+    transaction.addTag("test-tag-1", "test-value-1");
+    transaction.addTag("test-tag-2", "test-value-2");
+    transaction.addTag("test-tag-3", "test-value-3");
 
-        const transaction = await arweave.createTransaction({ data: 'test' }, wallet);
+    expect(transaction).to.be.an.instanceOf(Transaction);
 
-        transaction.addTag('test-tag-1', 'test-value-1');
-        transaction.addTag('test-tag-2', 'test-value-2');
-        transaction.addTag('test-tag-3', 'test-value-3');
+    expect(transaction.data).to.equal("dGVzdA");
 
-        expect(transaction).to.be.an.instanceOf(Transaction);
+    expect(transaction.last_tx).to.equal("");
 
-        expect(transaction.data).to.equal('dGVzdA');
+    expect(transaction.reward).to.match(/^[0-9]+$/);
 
-        expect(transaction.last_tx).to.equal('');
+    await arweave.transactions.sign(transaction, wallet);
 
-        expect(transaction.reward).to.match(/^[0-9]+$/);
+    expect(transaction.signature).to.match(/^[a-z0-9-_]+$/i);
 
-        await arweave.transactions.sign(transaction, wallet);
+    expect(transaction.id).to.match(digestRegex);
 
-        expect(transaction.signature).to.match(/^[a-z0-9-_]+$/i);
+    const verified = await arweave.transactions.verify(transaction);
 
-        expect(transaction.id).to.match(digestRegex);
+    expect(verified).to.be.a("boolean");
 
-        const verified = await arweave.transactions.verify(transaction)
+    expect(verified).to.be.true;
 
-        expect(verified).to.be.a('boolean');
+    //@ts-ignore
+    // Needs ts-ignoring as tags are readonly so chaning the tag like this isn't
+    // normally an allowed operation, but it's a test, so...
+    transaction.tags[1].value = "dGVzdDI";
 
-        expect(verified).to.be.true;
+    const verifiedWithModififedTags = await arweave.transactions.verify(
+      transaction
+    );
 
-        //@ts-ignore
-        // Needs ts-ignoring as tags are readonly so chaning the tag like this isn't 
-        // normally an allowed operation, but it's a test, so...
-        transaction.tags[1].value = 'dGVzdDI';
+    expect(verifiedWithModififedTags).to.be.a("boolean");
 
-        const verifiedWithModififedTags = await arweave.transactions.verify(transaction)
+    expect(verifiedWithModififedTags).to.be.false;
+  });
 
-        expect(verifiedWithModififedTags).to.be.a('boolean');
+  it("should work with buffers", async function() {
+    this.timeout(5000);
 
-        expect(verifiedWithModififedTags).to.be.false;
+    const wallet = await arweave.wallets.generate();
 
-    })
+    let data = crypto.randomBytes(100);
 
-    it('should work with buffers', async function () {
+    const transaction = await arweave.createTransaction({ data: data }, wallet);
 
-        this.timeout(5000);
+    transaction.addTag("test-tag-1", "test-value-1");
+    transaction.addTag("test-tag-2", "test-value-2");
+    transaction.addTag("test-tag-3", "test-value-3");
 
-        const wallet = await arweave.wallets.generate();
+    expect(transaction).to.be.an.instanceOf(Transaction);
 
-        let data = crypto.randomBytes(100);
+    expect(
+      Buffer.from(transaction.get("data", { decode: true, string: false }))
+    ).to.deep.equal(data);
 
-        const transaction = await arweave.createTransaction({ data: data }, wallet);
+    expect(transaction.last_tx).to.equal("");
 
-        transaction.addTag('test-tag-1', 'test-value-1');
-        transaction.addTag('test-tag-2', 'test-value-2');
-        transaction.addTag('test-tag-3', 'test-value-3');
+    expect(transaction.reward).to.match(/^[0-9]+$/);
 
-        expect(transaction).to.be.an.instanceOf(Transaction);
+    await arweave.transactions.sign(transaction, wallet);
 
-        expect(Buffer.from(transaction.get('data', {decode: true, string: false}))).to.deep.equal(data);
+    expect(transaction.signature).to.match(/^[a-z0-9-_]+$/i);
 
-        expect(transaction.last_tx).to.equal('');
+    expect(transaction.id).to.match(digestRegex);
 
-        expect(transaction.reward).to.match(/^[0-9]+$/);
+    const verified = await arweave.transactions.verify(transaction);
 
+    expect(verified).to.be.a("boolean");
 
-        await arweave.transactions.sign(transaction, wallet);
+    expect(verified).to.be.true;
 
+    //@ts-ignore
+    // Needs ts-ignoring as tags are readonly so chaning the tag like this isn't
+    // normally an allowed operation, but it's a test, so...
+    transaction.tags[1].value = "dGVzdDI";
 
-        expect(transaction.signature).to.match(/^[a-z0-9-_]+$/i);
+    const verifiedWithModififedTags = await arweave.transactions.verify(
+      transaction
+    );
 
-        expect(transaction.id).to.match(digestRegex);
+    expect(verifiedWithModififedTags).to.be.a("boolean");
 
-        const verified = await arweave.transactions.verify(transaction)
+    expect(verifiedWithModififedTags).to.be.false;
+  });
 
-        expect(verified).to.be.a('boolean');
+  it("should get transaction info", async function() {
+    this.timeout(5000);
 
-        expect(verified).to.be.true;
+    const transactionStatus = await arweave.transactions.getStatus(
+      liveDataTxid
+    );
+    const transaction = await arweave.transactions.get(liveDataTxid);
 
-        //@ts-ignore
-        // Needs ts-ignoring as tags are readonly so chaning the tag like this isn't 
-        // normally an allowed operation, but it's a test, so...
-        transaction.tags[1].value = 'dGVzdDI';
+    expect(transactionStatus).to.be.a("number");
 
-        const verifiedWithModififedTags = await arweave.transactions.verify(transaction)
+    expect(transactionStatus).to.equal(200);
 
-        expect(verifiedWithModififedTags).to.be.a('boolean');
+    expect(transaction.get("data", { decode: true, string: true })).to.contain(
+      "<title>Releases · ArweaveTeam/arweave</title>"
+    );
 
-        expect(verifiedWithModififedTags).to.be.false;
+    expect(await arweave.transactions.verify(transaction)).to.be.true;
 
-    })
+    transaction.signature = "xxx";
 
+    const verifyResult = await (() => {
+      return new Promise(resolve => {
+        arweave.transactions.verify(transaction).catch(error => {
+          resolve(error);
+        });
+      });
+    })();
 
-    it('should get transaction info', async function () {
+    expect(verifyResult)
+      .to.be.an.instanceOf(Error)
+      .with.property("message")
+      .and.match(/^.*invalid transaction signature.*$/i);
+  });
 
-        this.timeout(5000);
+  it("should post transactions", async function() {
+    this.timeout(5000);
 
-        const transactionStatus = await arweave.transactions.getStatus(liveDataTxid);
-        const transaction = await arweave.transactions.get(liveDataTxid);
+    const wallet = await arweave.wallets.generate();
 
-        expect(transactionStatus).to.be.a('number');
+    const transaction = await arweave.createTransaction(
+      { data: "test" },
+      wallet
+    );
 
-        expect(transactionStatus).to.equal(200);
+    const unsignedResponse = await arweave.transactions.post(transaction);
 
-        expect(transaction.get('data', { decode: true, string: true })).to.contain('<title>Releases · ArweaveTeam/arweave</title>');
+    expect(unsignedResponse.status).to.be.a("number");
 
-        expect(await arweave.transactions.verify(transaction)).to.be.true;
+    // Unsigned transactions shouldn't be accepted (current implementation returns 500)
+    expect(unsignedResponse.status).to.equal(500);
 
-        transaction.signature = 'xxx';
+    await arweave.transactions.sign(transaction, wallet);
 
-        const verifyResult = await (() => {
-            return new Promise((resolve) => {
-                arweave.transactions.verify(transaction).catch(error => {
-                    resolve(error);
-                })
-            })
-        })();
+    const signedResponse = await arweave.transactions.post(transaction);
 
-        expect(verifyResult).to.be.an.instanceOf(Error).with.property('message').and.match(/^.*invalid transaction signature.*$/i)
+    expect(signedResponse.status).to.be.a("number");
 
-    })
+    expect(signedResponse.status).to.not.equal(500);
+  });
 
-    it('should post transactions', async function () {
+  it("should find transactions", async function() {
+    const results = await arweave.transactions.search(
+      "Silo-Name",
+      "BmjRGIsemI77+eQb4zX8"
+    );
 
-        this.timeout(5000);
+    expect(results)
+      .to.be.an("array")
+      .which.contains("Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE");
+  });
+});
 
-        const wallet = await arweave.wallets.generate();
+describe("Encryption", function() {
+  it("should encrypt and decrypt using key round trip", async function() {
+    const text = "some data to encrypt";
 
-        const transaction = await arweave.createTransaction({ data: 'test' }, wallet);
+    const data = Buffer.from(text);
 
-        const unsignedResponse = await arweave.transactions.post(transaction);
+    const key = crypto.randomBytes(32);
 
-        expect(unsignedResponse.status).to.be.a('number');
+    const encrypted = await arweave.crypto.encrypt(data, key);
 
-        // Unsigned transactions shouldn't be accepted (current implementation returns 500)
-        expect(unsignedResponse.status).to.equal(500);
+    expect(encrypted).to.have.lengthOf(48);
 
-        await arweave.transactions.sign(transaction, wallet);
+    const decrypted = await arweave.crypto.decrypt(encrypted, key);
 
-        const signedResponse = await arweave.transactions.post(transaction);
+    expect(decrypted.toString()).to.equal(data.toString());
+    expect(decrypted.toString()).to.equal(text);
+  });
 
-        expect(signedResponse.status).to.be.a('number');
+  it("should encrypt and decrypt using passphrase round trip", async function() {
+    const text = "some data to encrypt";
 
-        expect(signedResponse.status).to.not.equal(500);
+    const data = Buffer.from(text);
 
-    })
+    const key = "super-secret-password";
 
-    it('should find transactions', async function () {
+    const encrypted = await arweave.crypto.encrypt(data, key);
 
-        const results = await arweave.transactions.search('Silo-Name', 'BmjRGIsemI77+eQb4zX8');
+    expect(encrypted).to.have.lengthOf(48);
 
-        expect(results).to.be.an('array').which.contains('Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE')
-    })
+    const decrypted = await arweave.crypto.decrypt(encrypted, key);
 
-})
+    expect(decrypted.toString()).to.equal(data.toString());
 
-describe('Encryption', function () {
-    it('should encrypt and decrypt using key round trip', async function () {
-
-        const text = 'some data to encrypt';
-
-        const data = Buffer.from(text);
-
-        const key = crypto.randomBytes(32);
-
-        const encrypted = await arweave.crypto.encrypt(data, key);
-
-        expect(encrypted).to.have.lengthOf(48);
-
-        const decrypted = await arweave.crypto.decrypt(encrypted, key);
-
-        expect(decrypted.toString()).to.equal(data.toString());
-        expect(decrypted.toString()).to.equal(text);
-
-    })
-
-    it('should encrypt and decrypt using passphrase round trip', async function () {
-
-        const text = 'some data to encrypt';
-
-        const data = Buffer.from(text);
-
-        const key = 'super-secret-password';
-
-        const encrypted = await arweave.crypto.encrypt(data, key);
-
-        expect(encrypted).to.have.lengthOf(48);
-
-        const decrypted = await arweave.crypto.decrypt(encrypted, key);
-
-        expect(decrypted.toString()).to.equal(data.toString());
-
-        expect(decrypted.toString()).to.equal(text);
-
-    })
-})
+    expect(decrypted.toString()).to.equal(text);
+  });
+});
