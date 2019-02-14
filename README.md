@@ -1,4 +1,7 @@
-arweave-js
+Arweave JS
+
+Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave network and uploading data ot the permaweb, it works in latest browsers and Node JS.
+
 
 
 ## Installation
@@ -125,7 +128,17 @@ arweave.wallets.getLastTransactionID('1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKl
 
 ### Transactions
 
+Transactions are the building blocks of the Arweave permaweb, they can send [AR](https://docs.arweave.org/developers/server/http-api#ar-and-winston) betwen wallet addresses, or store data on the arweave network.
+
+The create transaction methods simple create and return an unsigned transaction object, you must sign the transaction and submit it separeately using the transactions.sign and transactions.submit methods.
+
+**Modifying a transaction object after signing it will invalidate the signature**, this will cause it to be rejected by the network if submitted in that state. Transaction prices are based on the size of the data field, so modifying the data field after a transaction has been created isn't recommended as you'll need to manually update the price.
+
+The transaction ID is a hash of the transaction signature, so a transaction ID can't be known until its contents are finalised and it has been signed.
+
 #### Create a data transaction
+
+Data transactions are used to store data on the Arweave permaweb, they can contain HTML data and be serverd like webpages or they can contain any arbitrary data.
 
 ```js
 let key = await arweave.wallets.generate();
@@ -144,14 +157,13 @@ let transactionB = arweave.createTransaction({
 console.log(transactionA);
 // Transaction {
 //   last_tx: '',
-//   owner:
-//    'wgfbaaSXJ8dszMabPo-...',
+//   owner: 'wgfbaaSXJ8dszMabPo-...',
 //   tags: [],
 //   target: '',
 //   quantity: '0',
 //   data: 'eyJhIjoxfQ',
 //   reward: '321879995',
-  signature: '' }
+//   signature: '' }
 ```
 
 #### Create a wallet to wallet transaction
@@ -168,11 +180,91 @@ let transaction = arweave.createTransaction({
 console.log(transaction);
 // Transaction {
 //   last_tx: '',
-//   owner:
-//    '14fXfoRDMFS5yTpUT7ODzj...',
+//   owner: '14fXfoRDMFS5yTpUT7ODzj...',
 //   tags: [],
 //   target: '1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY',
 //   quantity: '10500000000000',
 //   data: '',
 //   reward: '2503211
+//   signature: '' }
+```
+
+#### Add tags to a transaction
+
+Metadata can be added to transactions through tags, these are simple key/value attributes that can be used to document the contents of a transaction or provide related data.
+
+ARQL uses tags when searching for transactions.
+
+The `Content-Type` is a reserved tag and is used to set the data content type. For example, a transaction with HTML data and a content type tag of `text/html` will be served as a HTML page and render correctly in browsers,
+if the content type is set to `text/plain` then it will be served as a plain text document and not render in browsers.
+
+```js
+let key = await arweave.wallets.generate();
+
+let transaction = await arweave.createTransaction({
+    data: '<html><head><meta charset="UTF-8"><title>Hello world!</title></head><body></body></html>',
+}, key);
+
+transaction.addTag('Content-Type', 'text/html');
+transaction.addTag('key2', 'value2');
+
+console.log(transaction);
+// Transaction {
+//   last_tx: '',
+//   owner: 's8zPWNlBMiJFLcvpH98QxnI6FoPar3vCK3RdT...',
+//   tags: [
+//       Tag { name: 'Q29udGVudC1UeXBl', value: 'dGV4dC9odG1s' },
+//       Tag { name: 'a2V5Mg', value: 'dmFsdWUy' }
+//   ],
+//   target: '',
+//   quantity: '0',
+//   data: 'PGh0bWw-PGhlYWQ-PG1ldGEgY2hh...',
+//   reward: '329989175',
+//   signature: '' }
+```
+
+#### Sign a transaction
+
+```js
+let key = await arweave.wallets.generate();
+
+let transaction = await arweave.createTransaction({
+    target: '1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY',
+    quantity: arweave.ar.arToWinston('10.5')
+}, key);
+
+await arweave.transactions.sign(transaction, key);
+
+console.log(transaction);
+// Signature and id fields are now populated
+// Transaction {
+//   last_tx: '',
+//   owner: '2xu89EaA5zENRRsbOh4OscMcy...',
+//   tags: [],
+//   target: '1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY',
+//   quantity: '10500000000000',
+//   data: '',
+//   reward: '250321179212',
+//   signature: 'AbFjlpEHTN6_SKWsUSMAzalImOVxNm86Z8hoTZcItkYBJLx...'
+//   id: 'iHVHijWvKbIa0ZA9IbuKtOxJdNO9qyey6CIH324zQWI' 
+```
+
+#### Submit a transaction
+
+```js
+let key = await arweave.wallets.generate();
+
+let transaction = await arweave.createTransaction({
+    target: '1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY',
+    quantity: arweave.ar.arToWinston('10.5')
+}, key);
+
+await arweave.transactions.sign(transaction, key);
+
+const response = await arweave.transactions.post(transaction);
+
+console.log(response.status);
+// 200
+
+// HTTP response codes (200 - ok, 400 - invalid transaction, 500 - error)
 ```
