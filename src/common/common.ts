@@ -90,7 +90,10 @@ export default class Arweave {
     }
 
     if (attributes.reward == undefined) {
-      const length = ((data: string | Uint8Array): number => {
+      const length = ((data?: string | Uint8Array): number => {
+        if (data == undefined) {
+          return 0;
+        }
         if (typeof data == "string") {
           return data.length;
         }
