@@ -57,7 +57,6 @@ The default port for nodes is `1984`.
 
 A live list of public arweave nodes and IP adddresses can be found on this [peer explorer](http://arweave.net/bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U).
 
-
 ### Initialisation options
 ```js
 const arweave = Arweave.init({
@@ -73,14 +72,16 @@ const arweave = Arweave.init({
 
 ### Wallets and Keys
 
-#### Create a new wallet and JWK
+#### Create a new wallet and private key
 
-Here you can generate a new [JWK](https://docs.arweave.org/developers/server/http-api#key-format), these are private keys so don't expose them or make them public. Make sure they're secured as they can't be recovered if lost.
+Here you can generate a new wallet address and private key ([JWK](https://docs.arweave.org/developers/server/http-api#key-format)), don't expose private keys or make them public as anyone with the key can use the corresponding wallet.
 
-Once AR has been sent to the address for a new wallet, the JWK can then be used to sign outgoing transactions.
+Make sure they're stored securely as they can never be recovered if lost.
+
+Once AR has been sent to the address for a new wallet, the key can then be used to sign outgoing transactions.
 ```js
-arweave.wallets.generate().then((jwk) => {
-    console.log(jwk);
+arweave.wallets.generate().then((key) => {
+    console.log(key);
     // {
     //     "kty": "RSA",
     //     "n": "3WquzP5IVTIsv3XYJjfw5L-t4X34WoWHwOuxb9V8w...",
@@ -251,6 +252,8 @@ console.log(transaction);
 
 #### Submit a transaction
 
+Once a transaction is submitted to the network it'll be broadcast around all nodes and mined into a block.
+
 ```js
 let key = await arweave.wallets.generate();
 
@@ -267,4 +270,72 @@ console.log(response.status);
 // 200
 
 // HTTP response codes (200 - ok, 400 - invalid transaction, 500 - error)
+```
+
+#### Get a transaction status
+
+```js
+arweave.transactions.getStatus('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(status => {
+    console.log(status);
+    // 200
+})
+```
+
+#### Get a transaction
+
+Fetch a transaction from the connected arweave node. The data and tags are base64 encoded, these can be decoded using the built in helper methods.
+
+```js
+const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(transaction => {
+  console.log(transaction);
+  // Transaction {
+  //   last_tx: 'cO5gl_d5ARnaoBtu2Vas8skgLg-6KnC9gH8duWP7Ll8',
+  //   owner: 'pJjRtSRLpHUVAKCtWC9pjajI_VEpiPEEAHX0k...',
+  //   tags: [
+  //       Tag { name: 'Q29udGVudC1UeXBl', value: 'dGV4dC9odG1s' },
+  //       Tag { name: 'VXNlci1BZ2VudA', value: 'QXJ3ZWF2ZURlcGxveS8xLjEuMA' }
+  //   ],
+  //   target: '',
+  //   quantity: '0',
+  //   data: 'CjwhRE9DVFlQRSBodG1sPgo8aHRtbCBsYW5nPSJlbiI...',
+  //   reward: '1577006493',
+  //   signature: 'NLiRQSci56KVNk-x86eLT1TyF1ST8pzE...',
+  //   id: 'bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U' }
+  // })
+});
+```
+
+#### Decode data and tags from transactions
+
+```js
+const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(transaction => {
+
+  // Use the get method to get a specific transaction field.
+  console.log(transaction.get('signature'));
+  // NLiRQSci56KVNk-x86eLT1TyF1ST8pzE-s7jdCJbW-V...
+
+  console.log(transaction.get('data'));
+  //CjwhRE9DVFlQRSBodG1sPgo8aHRtbCBsYW5nPSJlbiI-C...
+
+  // Get the data base64 decoded as a Uint8Array byte array.
+  console.log(transaction.get('data', {decode: true}));
+  //Uint8Array[10,60,33,68,79,67,84,89,80,69...
+
+  // Get the data base64 decoded as a string.
+  console.log(transaction.get('data', {decode: true, string: true}));
+  //<!DOCTYPE html>
+  //<html lang="en">
+  //<head>
+  //    <meta charset="UTF-8">
+  //    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  //    <title>ARWEAVE / PEER EXPLORER</title>
+
+  transaction.get('tags').forEach(tag => {
+    let key = tag.get('name', {decode: true, string: true});
+    let value = tag.get('value', {decode: true, string: true});
+    console.log(`${key} : ${value}`);
+  });
+  // Content-Type : text/html
+  // User-Agent : ArweaveDeploy/1.1.0
+});
 ```
