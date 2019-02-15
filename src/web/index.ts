@@ -1,6 +1,8 @@
-import { Arweave } from "./arweave/arweave";
-import { ApiConfig } from "./arweave/lib/api";
-import { WebCryptoDriver } from "./arweave/lib/crypto/webcrypto-driver";
+import { Arweave } from "./common";
+import { ApiConfig } from "./lib/api";
+import { WebCryptoDriver } from "./lib/crypto/webcrypto-driver";
+
+export * from "./common";
 
 interface GlobalArweave {
   init(apiConfig: ApiConfig): Arweave;
