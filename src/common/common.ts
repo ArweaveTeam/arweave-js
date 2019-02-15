@@ -26,7 +26,7 @@ export interface CreateTransactionInterface {
   reward: string;
 }
 
-export class Arweave {
+export default class Arweave {
   public api: Api;
 
   public wallets: Wallets;
@@ -42,6 +42,8 @@ export class Arweave {
   public crypto: CryptoInterface;
 
   public utils: ArweaveUtils;
+
+  public static init: (apiConfig: ApiConfig) => Arweave;
 
   constructor(config: Config) {
     this.crypto = config.crypto;

@@ -1,31 +1,21 @@
-import { Arweave } from "./common";
+import Arweave from "./common";
 import { ApiConfig } from "./lib/api";
 import { WebCryptoDriver } from "./lib/crypto/webcrypto-driver";
 
-export * from "./common";
-
-interface GlobalArweave {
-  init(apiConfig: ApiConfig): Arweave;
-}
-
 declare global {
   interface Window {
-    Arweave: GlobalArweave;
+    Arweave: typeof Arweave;
   }
 }
 
-window.Arweave = {
-  init(apiConfig: ApiConfig): Arweave {
-    return new Arweave({
-      api: apiConfig,
-      crypto: new WebCryptoDriver()
-    });
-  }
-};
-
-export function init(apiConfig: ApiConfig = {}): Arweave {
+Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
   return new Arweave({
     api: apiConfig,
     crypto: new WebCryptoDriver()
   });
-}
+};
+
+window.Arweave = Arweave;
+
+export * from "./common";
+export default Arweave;
