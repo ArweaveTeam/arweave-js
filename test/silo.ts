@@ -1,7 +1,7 @@
 import * as chai from "chai";
-import { SiloResource } from "../src/common/arweave/silo";
-import { Arweave } from "../src/common/arweave/arweave";
-import { NodeCryptoDriver } from "../src/common/arweave/lib/crypto/node-driver";
+import { SiloResource } from "../src/common/silo";
+import Arweave from "../src/common/common";
+import { NodeCryptoDriver } from "../src/common/lib/crypto/node-driver";
 
 const expect = chai.expect;
 
