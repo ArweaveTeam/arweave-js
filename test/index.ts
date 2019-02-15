@@ -1,13 +1,13 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
-import { Api } from "../src/common/arweave/lib/api";
-import { NodeCryptoDriver } from "../src/common/arweave/lib/crypto/node-driver";
-import { Transaction } from "../src/common/arweave/lib/transaction";
-import { Network } from "../src/common/arweave/network";
-import { SiloResource, Silo } from "../src/common/arweave/silo";
-import { Transactions } from "../src/common/arweave/transactions";
-import { Wallets } from "../src/common/arweave/wallets";
-import { Arweave } from "../src/common/arweave/arweave";
+import { Api } from "../src/common/lib/api";
+import { NodeCryptoDriver } from "../src/common/lib/crypto/node-driver";
+import { Transaction } from "../src/common/lib/transaction";
+import { Network } from "../src/common/network";
+import { SiloResource, Silo } from "../src/common/silo";
+import { Transactions } from "../src/common/transactions";
+import { Wallets } from "../src/common/wallets";
+import Arweave from "../src/common/common";
 
 const expect = chai.expect;
 
