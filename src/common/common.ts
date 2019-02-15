@@ -15,8 +15,6 @@ export interface Config<T = object> {
 }
 
 export interface CreateTransactionInterface {
-  [key: string]: any;
-
   last_tx: string;
   owner: string;
   tags: Tag[];
