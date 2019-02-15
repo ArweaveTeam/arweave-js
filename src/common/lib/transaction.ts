@@ -47,8 +47,6 @@ export class Tag extends BaseObject {
 }
 
 export interface TransactionInterface {
-  [key: string]: any;
-
   id: string;
   last_tx: string;
   owner: string;
@@ -61,8 +59,6 @@ export interface TransactionInterface {
 }
 
 export class Transaction extends BaseObject implements TransactionInterface {
-  [key: string]: any;
-
   public id: string;
   public readonly last_tx: string = "";
   public readonly owner: string = "";
