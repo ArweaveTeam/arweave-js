@@ -11,18 +11,10 @@ export interface TransactionConfirmedData {
   block_height: number;
   number_of_confirmations: number;
 }
-export interface TransactionConfirmedResponse {
-  status: 200;
-  confirmed: TransactionConfirmedData;
-}
-
-export interface TransactionStatusGenericResponse {
+export interface TransactionStatusResponse {
   status: number;
+  confirmed: TransactionConfirmedData | null;
 }
-
-declare type TransactionStatusResponse =
-  | TransactionConfirmedResponse
-  | TransactionStatusGenericResponse;
 
 export class Transactions {
   private api: Api;
@@ -109,7 +101,8 @@ export class Transactions {
         };
       }
       return {
-        status: response.status
+        status: response.status,
+        confirmed: null
       };
     });
   }
