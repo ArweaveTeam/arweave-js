@@ -9,7 +9,6 @@
     "bundles"
   ],
   "scripts": {
-    "install": "bin/install-git-hooks",
     "compile:node": "tsc --declaration -project tsconfig.node.json",
     "compile:web": "tsc --declaration -project tsconfig.web.json",
     "bundle:web": "npx webpack --config-name web",
