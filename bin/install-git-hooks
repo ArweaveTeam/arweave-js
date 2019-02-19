@@ -1,6 +1,8 @@
 #!/bin/bash -e
 GIT_DIR="$(git rev-parse --git-dir)"
-PRE_COMMIT_HOOK="$GIT_DIR/hooks/pre-commit"
+HOOKS_DIR="$GIT_DIR/hooks"
+[[ -d "$HOOKS_DIR" ]] || exit 0
+PRE_COMMIT_HOOK="$HOOKS_DIR/pre-commit"
 cat > "$PRE_COMMIT_HOOK" <<'EOF'
 #!/bin/bash
 npm run prettier:check
