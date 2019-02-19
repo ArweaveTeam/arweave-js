@@ -9,7 +9,7 @@ export interface ApiConfig<T = object> {
   logger?: Function;
 }
 
-export class Api {
+export default class Api {
   public readonly METHOD_GET = "GET";
   public readonly METHOD_POST = "POST";
 

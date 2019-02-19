@@ -1,4 +1,4 @@
-import { ArweaveUtils } from "./utils";
+import ArweaveUtils from "./utils";
 
 class BaseObject {
   [key: string]: any;
@@ -58,7 +58,8 @@ export interface TransactionInterface {
   signature: string;
 }
 
-export class Transaction extends BaseObject implements TransactionInterface {
+export default class Transaction extends BaseObject
+  implements TransactionInterface {
   public id: string;
   public readonly last_tx: string = "";
   public readonly owner: string = "";

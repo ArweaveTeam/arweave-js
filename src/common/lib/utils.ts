@@ -1,6 +1,6 @@
 import * as B64js from "base64-js";
 
-export class ArweaveUtils {
+export default class Utils {
   public static concatBuffers(
     buffers: Uint8Array[] | ArrayBuffer[]
   ): Uint8Array {
@@ -25,7 +25,7 @@ export class ArweaveUtils {
   }
 
   public static b64UrlToString(b64UrlString: string): string {
-    let buffer = ArweaveUtils.b64UrlToBuffer(b64UrlString);
+    let buffer = Utils.b64UrlToBuffer(b64UrlString);
 
     // TextEncoder will be available in browsers, but not in node
     if (typeof TextDecoder == "undefined") {
@@ -56,13 +56,11 @@ export class ArweaveUtils {
   }
 
   public static stringToB64Url(string: string): string {
-    return ArweaveUtils.bufferTob64Url(ArweaveUtils.stringToBuffer(string));
+    return Utils.bufferTob64Url(Utils.stringToBuffer(string));
   }
 
   public static b64UrlToBuffer(b64UrlString: string): Uint8Array {
-    return new Uint8Array(
-      B64js.toByteArray(ArweaveUtils.b64UrlDecode(b64UrlString))
-    );
+    return new Uint8Array(B64js.toByteArray(Utils.b64UrlDecode(b64UrlString)));
   }
 
   public static bufferTob64(buffer: any): string {
@@ -70,7 +68,7 @@ export class ArweaveUtils {
   }
 
   public static bufferTob64Url(buffer: any): string {
-    return ArweaveUtils.b64UrlEncode(ArweaveUtils.bufferTob64(buffer));
+    return Utils.b64UrlEncode(Utils.bufferTob64(buffer));
   }
 
   public static b64UrlEncode(b64UrlString: string): string {

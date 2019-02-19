@@ -1,10 +1,10 @@
-import { Api } from "./lib/api";
-import { CryptoInterface } from "./lib/crypto/crypto-interface";
-import { Transactions } from "./transactions";
-import { ArweaveUtils } from "./lib/utils";
-import { Transaction } from "./lib/transaction";
+import Api from "./lib/api";
+import CryptoInterface from "./lib/crypto/crypto-interface";
+import Transactions from "./transactions";
+import ArweaveUtils from "./lib/utils";
+import Transaction from "./lib/transaction";
 
-export class Silo {
+export default class Silo {
   private api: Api;
 
   private crypto: CryptoInterface;

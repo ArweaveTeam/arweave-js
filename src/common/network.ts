@@ -1,4 +1,4 @@
-import { Api } from "./lib/api";
+import Api from "./lib/api";
 
 export interface NetworkInfoInterface {
   hosnetworkt: string;
@@ -14,7 +14,7 @@ export interface NetworkInfoInterface {
 
 export interface PeerList extends Array<string> {}
 
-export class Network {
+export default class Network {
   private api: Api;
 
   constructor(api: Api) {

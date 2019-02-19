@@ -1,8 +1,8 @@
 import { JWKInterface, JWKPublicInterface } from "../wallet";
-import { CryptoInterface } from "./crypto-interface";
-import { ArweaveUtils } from "../utils";
+import CryptoInterface from "./crypto-interface";
+import ArweaveUtils from "../utils";
 
-export class WebCryptoDriver implements CryptoInterface {
+export default class WebCryptoDriver implements CryptoInterface {
   public readonly keyLength = 4096;
   public readonly publicExponent = 0x10001;
   public readonly hashAlgorithm = "sha256";

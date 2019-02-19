@@ -1,5 +1,5 @@
 import Arweave from "../src/common/common";
-import { NodeCryptoDriver } from "../src/common/lib/crypto/node-driver";
+import NodeCryptoDriver from "../src/common/lib/crypto/node-driver";
 
 export function arweaveInstance() {
   return new Arweave({
