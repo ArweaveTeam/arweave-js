@@ -6,11 +6,23 @@ import { ArweaveUtils } from "./lib/utils";
 import { JWKInterface } from "./lib/wallet";
 import { AxiosResponse } from "axios";
 
-export interface TransactionStatus {
+export interface TransactionConfirmedData {
   block_indep_hash: string;
   block_height: number;
   number_of_confirmations: number;
 }
+export interface TransactionConfirmedResponse {
+  status: 200;
+  confirmed: TransactionConfirmedData;
+}
+
+export interface TransactionStatusGenericResponse {
+  status: number;
+}
+
+declare type TransactionStatusResponse =
+  | TransactionConfirmedResponse
+  | TransactionStatusGenericResponse;
 
 export class Transactions {
   private api: Api;
@@ -88,9 +100,17 @@ export class Transactions {
       });
   }
 
-  public getStatus(id: string): Promise<TransactionStatus> {
+  public getStatus(id: string): Promise<TransactionStatusResponse> {
     return this.api.get(`tx/${id}/status`).then(response => {
-      return response.data;
+      if (response.status == 200) {
+        return {
+          status: 200,
+          confirmed: response.data
+        };
+      }
+      return {
+        status: response.status
+      };
     });
   }
 
