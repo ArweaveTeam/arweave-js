@@ -1,10 +1,10 @@
 import * as chai from "chai";
-import { Api } from "../src/common/lib/api";
-import { NodeCryptoDriver } from "../src/common/lib/crypto/node-driver";
-import { Network } from "../src/common/network";
-import { Silo } from "../src/common/silo";
-import { Transactions } from "../src/common/transactions";
-import { Wallets } from "../src/common/wallets";
+import Api from "../src/common/lib/api";
+import NodeCryptoDriver from "../src/common/lib/crypto/node-driver";
+import Network from "../src/common/network";
+import Silo from "../src/common/silo";
+import Transactions from "../src/common/transactions";
+import Wallets from "../src/common/wallets";
 
 import { arweaveInstance } from "./_arweave";
 

@@ -1,8 +1,8 @@
-import { Api } from "./lib/api";
-import { CryptoInterface } from "./lib/crypto/crypto-interface";
-import { ArweaveError, ArweaveErrorType } from "./lib/error";
-import { Transaction } from "./lib/transaction";
-import { ArweaveUtils } from "./lib/utils";
+import Api from "./lib/api";
+import CryptoInterface from "./lib/crypto/crypto-interface";
+import ArweaveError, { ArweaveErrorType } from "./lib/error";
+import Transaction from "./lib/transaction";
+import ArweaveUtils from "./lib/utils";
 import { JWKInterface } from "./lib/wallet";
 import { AxiosResponse } from "axios";
 
@@ -12,7 +12,7 @@ export interface TransactionStatus {
   number_of_confirmations: number;
 }
 
-export class Transactions {
+export default class Transactions {
   private api: Api;
 
   private crypto: CryptoInterface;

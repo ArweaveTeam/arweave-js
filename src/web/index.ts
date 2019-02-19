@@ -1,6 +1,6 @@
 import Arweave from "./common";
 import { ApiConfig } from "./lib/api";
-import { WebCryptoDriver } from "./lib/crypto/webcrypto-driver";
+import WebCryptoDriver from "./lib/crypto/webcrypto-driver";
 
 declare global {
   interface Window {

@@ -1,6 +1,6 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
-import { Transaction } from "../src/common/lib/transaction";
+import Transaction from "../src/common/lib/transaction";
 import { arweaveInstance } from "./_arweave";
 
 const expect = chai.expect;

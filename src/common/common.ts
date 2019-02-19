@@ -1,13 +1,13 @@
-import { Ar } from "./ar";
-import { Api, ApiConfig } from "./lib/api";
-import { CryptoInterface } from "./lib/crypto/crypto-interface";
-import { Network } from "./network";
-import { Transactions } from "./transactions";
-import { Wallets } from "./wallets";
-import { TransactionInterface, Transaction, Tag } from "./lib/transaction";
+import Ar from "./ar";
+import Api, { ApiConfig } from "./lib/api";
+import CryptoInterface from "./lib/crypto/crypto-interface";
+import Network from "./network";
+import Transactions from "./transactions";
+import Wallets from "./wallets";
+import Transaction, { TransactionInterface, Tag } from "./lib/transaction";
 import { JWKInterface } from "./lib/wallet";
-import { ArweaveUtils } from "./lib/utils";
-import { Silo } from "./silo";
+import ArweaveUtils from "./lib/utils";
+import Silo from "./silo";
 
 export interface Config<T = object> {
   api: ApiConfig;

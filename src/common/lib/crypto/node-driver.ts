@@ -1,12 +1,12 @@
 import { JWKInterface } from "../wallet";
-import { CryptoInterface } from "./crypto-interface";
+import CryptoInterface from "./crypto-interface";
 
 import { pemTojwk, jwkTopem } from "./pem";
 
 import * as crypto from "crypto";
 import * as constants from "constants";
 
-export class NodeCryptoDriver implements CryptoInterface {
+export default class NodeCryptoDriver implements CryptoInterface {
   public readonly keyLength = 4096;
   public readonly publicExponent = 0x10001;
   public readonly hashAlgorithm = "sha256";
