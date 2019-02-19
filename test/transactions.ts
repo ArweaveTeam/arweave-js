@@ -2,6 +2,7 @@ import * as chai from "chai";
 import * as crypto from "crypto";
 import { Transaction } from "../src/common/lib/transaction";
 import { arweaveInstance } from "./_arweave";
+import { TransactionConfirmedResponse } from "../src/common/transactions";
 
 const expect = chai.expect;
 
@@ -142,15 +143,25 @@ describe("Transactions", function() {
 
     expect(transactionStatus).to.be.a("object");
 
-    expect(Object.keys(transactionStatus)).to.contain.members([
+    expect(
+      Object.keys((<TransactionConfirmedResponse>transactionStatus).confirmed)
+    ).to.contain.members([
       "block_indep_hash",
       "block_height",
       "number_of_confirmations"
     ]);
 
-    expect(transactionStatus.block_indep_hash).to.be.a("string");
-    expect(transactionStatus.block_height).to.be.a("number");
-    expect(transactionStatus.number_of_confirmations).to.be.a("number");
+    expect(
+      (<TransactionConfirmedResponse>transactionStatus).confirmed
+        .block_indep_hash
+    ).to.be.a("string");
+    expect(
+      (<TransactionConfirmedResponse>transactionStatus).confirmed.block_height
+    ).to.be.a("number");
+    expect(
+      (<TransactionConfirmedResponse>transactionStatus).confirmed
+        .number_of_confirmations
+    ).to.be.a("number");
 
     expect(transaction.get("data", { decode: true, string: true })).to.contain(
       "<title>ARWEAVE / PEER EXPLORER</title>"
