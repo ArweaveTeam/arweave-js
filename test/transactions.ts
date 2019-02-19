@@ -8,7 +8,7 @@ const expect = chai.expect;
 const arweave = arweaveInstance();
 
 const digestRegex = /^[a-z0-9-_]{43}$/i;
-const liveDataTxid = "Ie-fxxzdBweiA0N1ZbzUqXhNI310uDUmaBc3ajlV6YY";
+const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
 
 describe("Transactions", function() {
   it("should create and sign data transactions", async function() {
@@ -140,12 +140,20 @@ describe("Transactions", function() {
     );
     const transaction = await arweave.transactions.get(liveDataTxid);
 
-    expect(transactionStatus).to.be.a("number");
+    expect(transactionStatus).to.be.a("object");
 
-    expect(transactionStatus).to.equal(200);
+    expect(Object.keys(transactionStatus)).to.contain.members([
+      "block_indep_hash",
+      "block_height",
+      "number_of_confirmations"
+    ]);
+
+    expect(transactionStatus.block_indep_hash).to.be.a("string");
+    expect(transactionStatus.block_height).to.be.a("number");
+    expect(transactionStatus.number_of_confirmations).to.be.a("number");
 
     expect(transaction.get("data", { decode: true, string: true })).to.contain(
-      "<title>Releases · ArweaveTeam/arweave</title>"
+      "<title>ARWEAVE / PEER EXPLORER</title>"
     );
 
     expect(await arweave.transactions.verify(transaction)).to.be.true;

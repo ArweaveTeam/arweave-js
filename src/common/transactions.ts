@@ -1,11 +1,16 @@
 import { Api } from "./lib/api";
 import { CryptoInterface } from "./lib/crypto/crypto-interface";
 import { ArweaveError, ArweaveErrorType } from "./lib/error";
-import { Transaction, Tag, TransactionInterface } from "./lib/transaction";
+import { Transaction } from "./lib/transaction";
 import { ArweaveUtils } from "./lib/utils";
 import { JWKInterface } from "./lib/wallet";
-import { Wallets } from "./wallets";
 import { AxiosResponse } from "axios";
+
+export interface TransactionStatus {
+  block_indep_hash: string;
+  block_height: number;
+  number_of_confirmations: number;
+}
 
 export class Transactions {
   private api: Api;
@@ -83,9 +88,9 @@ export class Transactions {
       });
   }
 
-  public getStatus(id: string): Promise<number> {
-    return this.api.get(`tx/${id}/id`).then(response => {
-      return response.status;
+  public getStatus(id: string): Promise<TransactionStatus> {
+    return this.api.get(`tx/${id}/status`).then(response => {
+      return response.data;
     });
   }
 
