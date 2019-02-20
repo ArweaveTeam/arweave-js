@@ -6,7 +6,7 @@ import Transactions from "./transactions";
 import Wallets from "./wallets";
 import Transaction, { TransactionInterface, Tag } from "./lib/transaction";
 import { JWKInterface } from "./lib/wallet";
-import ArweaveUtils from "./lib/utils";
+import * as ArweaveUtils from "./lib/utils";
 import Silo from "./silo";
 
 export interface Config<T = object> {
@@ -39,7 +39,7 @@ export default class Arweave {
 
   public crypto: CryptoInterface;
 
-  public utils: ArweaveUtils;
+  public utils: typeof ArweaveUtils;
 
   public static init: (apiConfig: ApiConfig) => Arweave;
 
