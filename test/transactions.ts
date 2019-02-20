@@ -177,32 +177,6 @@ describe("Transactions", function() {
       .and.match(/^.*invalid transaction signature.*$/i);
   });
 
-  it("should post transactions", async function() {
-    this.timeout(5000);
-
-    const wallet = await arweave.wallets.generate();
-
-    const transaction = await arweave.createTransaction(
-      { data: "test" },
-      wallet
-    );
-
-    const unsignedResponse = await arweave.transactions.post(transaction);
-
-    expect(unsignedResponse.status).to.be.a("number");
-
-    // Unsigned transactions shouldn't be accepted (current implementation returns 500)
-    expect(unsignedResponse.status).to.equal(500);
-
-    await arweave.transactions.sign(transaction, wallet);
-
-    const signedResponse = await arweave.transactions.post(transaction);
-
-    expect(signedResponse.status).to.be.a("number");
-
-    expect(signedResponse.status).to.not.equal(500);
-  });
-
   it("should find transactions", async function() {
     const results = await arweave.transactions.search(
       "Silo-Name",
