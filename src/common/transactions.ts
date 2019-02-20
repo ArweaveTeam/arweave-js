@@ -2,7 +2,7 @@ import Api from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
 import ArweaveError, { ArweaveErrorType } from "./lib/error";
 import Transaction from "./lib/transaction";
-import ArweaveUtils from "./lib/utils";
+import * as ArweaveUtils from "./lib/utils";
 import { JWKInterface } from "./lib/wallet";
 import { AxiosResponse } from "axios";
 

@@ -1,7 +1,7 @@
 import Api from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
 import Transactions from "./transactions";
-import ArweaveUtils from "./lib/utils";
+import * as ArweaveUtils from "./lib/utils";
 import Transaction from "./lib/transaction";
 
 export default class Silo {

@@ -1,4 +1,4 @@
-import ArweaveUtils from "./utils";
+import * as ArweaveUtils from "./utils";
 
 class BaseObject {
   [key: string]: any;
