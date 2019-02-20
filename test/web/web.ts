@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
-import { ArweaveUtils } from "../../web/lib/utils";
-import { Transaction } from "../../web/lib/transaction";
+import ArweaveUtils from "../../web/lib/utils";
+import Transaction from "../../web/lib/transaction";
 
 const expect = chai.expect;
 
