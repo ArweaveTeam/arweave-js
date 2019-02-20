@@ -12,11 +12,13 @@ function hex2b64url(str: string): string {
   return urlize(Buffer.from(str, "hex").toString("base64"));
 }
 
-var RSAPublicKey = asn.define("RSAPublicKey", function() {
+var RSAPublicKey = asn.define("RSAPublicKey", function(this: any) {
   this.seq().obj(this.key("n").int(), this.key("e").int());
 });
 
-var AlgorithmIdentifier = asn.define("AlgorithmIdentifier", function() {
+var AlgorithmIdentifier = asn.define("AlgorithmIdentifier", function(
+  this: any
+) {
   this.seq().obj(
     this.key("algorithm").objid(),
     this.key("parameters")
@@ -25,21 +27,21 @@ var AlgorithmIdentifier = asn.define("AlgorithmIdentifier", function() {
   );
 });
 
-var PublicKeyInfo = asn.define("PublicKeyInfo", function() {
+var PublicKeyInfo = asn.define("PublicKeyInfo", function(this: any) {
   this.seq().obj(
     this.key("algorithm").use(AlgorithmIdentifier),
     this.key("publicKey").bitstr()
   );
 });
 
-var Version = asn.define("Version", function() {
+var Version = asn.define("Version", function(this: any) {
   this.int({
     0: "two-prime",
     1: "multi"
   });
 });
 
-var OtherPrimeInfos = asn.define("OtherPrimeInfos", function() {
+var OtherPrimeInfos = asn.define("OtherPrimeInfos", function(this: any) {
   this.seq().obj(
     this.key("ri").int(),
     this.key("di").int(),
@@ -47,7 +49,7 @@ var OtherPrimeInfos = asn.define("OtherPrimeInfos", function() {
   );
 });
 
-var RSAPrivateKey = asn.define("RSAPrivateKey", function() {
+var RSAPrivateKey = asn.define("RSAPrivateKey", function(this: any) {
   this.seq().obj(
     this.key("version").use(Version),
     this.key("n").int(),
@@ -64,7 +66,7 @@ var RSAPrivateKey = asn.define("RSAPrivateKey", function() {
   );
 });
 
-var PrivateKeyInfo = asn.define("PrivateKeyInfo", function() {
+var PrivateKeyInfo = asn.define("PrivateKeyInfo", function(this: any) {
   this.seq().obj(
     this.key("version").use(Version),
     this.key("algorithm").use(AlgorithmIdentifier),
@@ -194,7 +196,7 @@ export function jwkTopem(json: any): any {
   }
   var body = data
     .toString("base64")
-    .match(/.{1,64}/g)
+    .match(/.{1,64}/g)!
     .join("\n");
   return header + body + footer;
 }
