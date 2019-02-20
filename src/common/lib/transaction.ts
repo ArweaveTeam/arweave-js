@@ -60,7 +60,7 @@ export interface TransactionInterface {
 
 export default class Transaction extends BaseObject
   implements TransactionInterface {
-  public id: string;
+  public id: string = "";
   public readonly last_tx: string = "";
   public readonly owner: string = "";
   public readonly tags: Tag[] = [];
@@ -70,7 +70,7 @@ export default class Transaction extends BaseObject
   public readonly reward: string = "0";
   public signature: string = "";
 
-  public constructor(attributes?: Partial<TransactionInterface>) {
+  public constructor(attributes: Partial<TransactionInterface> = {}) {
     super();
     Object.assign(this, attributes);
 

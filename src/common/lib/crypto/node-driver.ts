@@ -22,14 +22,12 @@ export default class NodeCryptoDriver implements CryptoInterface {
     return new Promise((resolve, reject) => {
       crypto.generateKeyPair(
         "rsa",
-        {
+        <crypto.RSAKeyPairOptions<"pem", "pem">>{
           modulusLength: this.keyLength,
           publicExponent: this.publicExponent,
           privateKeyEncoding: {
             type: "pkcs1",
-            format: "pem",
-            cipher: null,
-            passphrase: null
+            format: "pem"
           },
           publicKeyEncoding: { type: "pkcs1", format: "pem" }
         },

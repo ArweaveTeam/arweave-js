@@ -61,7 +61,7 @@ export default class Arweave {
   public getConfig(): Config {
     return {
       api: this.api.getConfig(),
-      crypto: null
+      crypto: null!
     };
   }
 
@@ -105,7 +105,7 @@ export default class Arweave {
 
       transaction.reward = await this.transactions.getPrice(
         length,
-        transaction.target ? transaction.target : null
+        transaction.target
       );
     }
 

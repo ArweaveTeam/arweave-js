@@ -141,16 +141,17 @@ describe("Transactions", function() {
     const transaction = await arweave.transactions.get(liveDataTxid);
 
     expect(transactionStatus).to.be.a("object");
+    expect(transactionStatus.confirmed).to.be.a("object");
 
-    expect(Object.keys(transactionStatus.confirmed)).to.contain.members([
+    expect(Object.keys(transactionStatus.confirmed!)).to.contain.members([
       "block_indep_hash",
       "block_height",
       "number_of_confirmations"
     ]);
 
-    expect(transactionStatus.confirmed.block_indep_hash).to.be.a("string");
-    expect(transactionStatus.confirmed.block_height).to.be.a("number");
-    expect(transactionStatus.confirmed.number_of_confirmations).to.be.a(
+    expect(transactionStatus.confirmed!.block_indep_hash).to.be.a("string");
+    expect(transactionStatus.confirmed!.block_height).to.be.a("number");
+    expect(transactionStatus.confirmed!.number_of_confirmations).to.be.a(
       "number"
     );
 

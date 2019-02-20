@@ -13,7 +13,7 @@ export default class Api {
   public readonly METHOD_GET = "GET";
   public readonly METHOD_POST = "POST";
 
-  public config: ApiConfig;
+  public config!: ApiConfig;
 
   constructor(config: ApiConfig) {
     this.applyConfig(config);
@@ -83,12 +83,12 @@ export default class Api {
 
     if (this.config.logging) {
       instance.interceptors.request.use(request => {
-        this.config.logger(`Requesting: ${request.baseURL}/${request.url}`);
+        this.config.logger!(`Requesting: ${request.baseURL}/${request.url}`);
         return request;
       });
 
       instance.interceptors.response.use(response => {
-        this.config.logger(
+        this.config.logger!(
           `Response:   ${response.config.url} - ${response.status}`
         );
         return response;
