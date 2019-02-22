@@ -1,0 +1,85 @@
+import * as chai from "chai";
+import { arweaveInstance } from "./_arweave";
+
+const expect = chai.expect;
+
+const arweave = arweaveInstance();
+
+const digestRegex = /^[a-z0-9-_]{43}$/i;
+const liveAddressBalance = "498557055636";
+const liveAddress = "9_666Wkk2GzL0LGd3xhb0jY7HqNy71BaV4sULQlJsBQ";
+const liveTxid = "CE-1SFiXqWUEu0aSTebE6LC0-5JBAc3IAehYGwdF5iI";
+
+describe("Wallets and keys", function() {
+  it("should generate valid JWKs", async function() {
+    this.timeout(5000);
+
+    const walletA = await arweave.wallets.generate();
+    const walletB = await arweave.wallets.generate();
+
+    expect(walletA).to.be.an("object", "New wallet is not an object");
+
+    expect(walletA).to.have.all.keys(
+      "kty",
+      "n",
+      "e",
+      "d",
+      "p",
+      "q",
+      "dp",
+      "dq",
+      "qi"
+    );
+
+    expect(walletA.kty).to.equal("RSA");
+
+    expect(walletA.e).to.equal("AQAB");
+
+    expect(walletA.n).to.match(/^[a-z0-9-_]{683}$/i);
+
+    expect(walletA.d).to.match(/^[a-z0-9-_]{683}$/i);
+
+    const addressA = await arweave.wallets.jwkToAddress(walletA);
+    const addressB = await arweave.wallets.jwkToAddress(walletB);
+
+    expect(addressA).to.be.a("string");
+
+    expect(addressA).to.match(digestRegex);
+
+    expect(addressB).to.match(digestRegex);
+
+    expect(addressA).to.not.equal(addressB);
+  });
+
+  it("should get wallet info", async function() {
+    this.timeout(5000);
+
+    const wallet = await arweave.wallets.generate();
+
+    const address = await arweave.wallets.jwkToAddress(wallet);
+
+    const balance = await arweave.wallets.getBalance(address);
+
+    const lastTx = await arweave.wallets.getLastTransactionID(address);
+
+    expect(balance).to.be.a("string");
+
+    expect(balance).to.equal("0");
+
+    expect(lastTx).to.be.a("string");
+
+    expect(lastTx).to.equal("");
+
+    const balanceB = await arweave.wallets.getBalance(liveAddress);
+
+    const lastTxB = await arweave.wallets.getLastTransactionID(liveAddress);
+
+    expect(balanceB).to.be.a("string");
+
+    expect(balanceB).to.equal(liveAddressBalance);
+
+    expect(lastTxB).to.be.a("string");
+
+    expect(lastTxB).to.equal(liveTxid);
+  });
+});

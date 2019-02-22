@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 
-export class Ar {
+export default class Ar {
   /**
    * Method to take a string value and return a bignumber object.
    *

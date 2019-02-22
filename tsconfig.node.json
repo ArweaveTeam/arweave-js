@@ -2,7 +2,7 @@
     "compilerOptions": {
         "outDir": "./dist/node/",
         "sourceMap": true,
-        "noImplicitAny": true,
+        "strict": true,
         "target": "es2017",
         "moduleResolution": "node",
         "module": "commonjs",

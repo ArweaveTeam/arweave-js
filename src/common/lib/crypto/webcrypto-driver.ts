@@ -1,12 +1,12 @@
 import { JWKInterface, JWKPublicInterface } from "../wallet";
-import { CryptoInterface } from "./crypto-interface";
-import { ArweaveUtils } from "../utils";
+import CryptoInterface from "./crypto-interface";
+import * as ArweaveUtils from "../utils";
 
-export class WebCryptoDriver implements CryptoInterface {
+export default class WebCryptoDriver implements CryptoInterface {
   public readonly keyLength = 4096;
   public readonly publicExponent = 0x10001;
   public readonly hashAlgorithm = "sha256";
-  public readonly driver?: SubtleCrypto;
+  public readonly driver: SubtleCrypto;
 
   constructor() {
     if (!this.detectWebCrypto()) {
@@ -33,9 +33,9 @@ export class WebCryptoDriver implements CryptoInterface {
     let jwk = await this.driver.exportKey("jwk", cryptoKey.privateKey);
 
     return {
-      kty: jwk.kty,
-      e: jwk.e,
-      n: jwk.n,
+      kty: jwk.kty!,
+      e: jwk.e!,
+      n: jwk.n!,
       d: jwk.d,
       p: jwk.p,
       q: jwk.q,

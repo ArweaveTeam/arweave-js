@@ -1,4 +1,4 @@
-import { ArweaveUtils } from "./utils";
+import * as ArweaveUtils from "./utils";
 
 class BaseObject {
   [key: string]: any;
@@ -47,8 +47,6 @@ export class Tag extends BaseObject {
 }
 
 export interface TransactionInterface {
-  [key: string]: any;
-
   id: string;
   last_tx: string;
   owner: string;
@@ -60,10 +58,9 @@ export interface TransactionInterface {
   signature: string;
 }
 
-export class Transaction extends BaseObject implements TransactionInterface {
-  [key: string]: any;
-
-  public id: string;
+export default class Transaction extends BaseObject
+  implements TransactionInterface {
+  public id: string = "";
   public readonly last_tx: string = "";
   public readonly owner: string = "";
   public readonly tags: Tag[] = [];
@@ -73,7 +70,7 @@ export class Transaction extends BaseObject implements TransactionInterface {
   public readonly reward: string = "0";
   public signature: string = "";
 
-  public constructor(attributes?: Partial<TransactionInterface>) {
+  public constructor(attributes: Partial<TransactionInterface> = {}) {
     super();
     Object.assign(this, attributes);
 

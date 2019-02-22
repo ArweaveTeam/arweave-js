@@ -1,9 +1,9 @@
-import { Api } from "./lib/api";
-import { CryptoInterface } from "./lib/crypto/crypto-interface";
+import Api from "./lib/api";
+import CryptoInterface from "./lib/crypto/crypto-interface";
 import { JWKInterface } from "./lib/wallet";
-import { ArweaveUtils } from "./lib/utils";
+import * as ArweaveUtils from "./lib/utils";
 
-export class Wallets {
+export default class Wallets {
   private api: Api;
 
   private crypto: CryptoInterface;

@@ -1,7 +1,6 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
-import { ArweaveUtils } from "../../web/arweave/lib/utils";
-import { Transaction } from "../../web/arweave/lib/transaction";
+import { bufferToString, stringToBuffer } from "../../src/common/lib/utils";
 
 const expect = chai.expect;
 
@@ -20,7 +19,7 @@ const liveAddressBalance = "498557055636";
 const liveAddress = "9_666Wkk2GzL0LGd3xhb0jY7HqNy71BaV4sULQlJsBQ";
 const liveTxid = "CE-1SFiXqWUEu0aSTebE6LC0-5JBAc3IAehYGwdF5iI";
 
-const liveDataTxid = "Ie-fxxzdBweiA0N1ZbzUqXhNI310uDUmaBc3ajlV6YY";
+const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
 
 describe("Initialization", function() {
   it("should have components", function() {
@@ -202,14 +201,24 @@ describe("Transactions", function() {
     );
     const transaction = await arweave.transactions.get(liveDataTxid);
 
-    expect(transactionStatus).to.be.a("number");
+    expect(transactionStatus).to.be.a("object");
+    expect(transactionStatus.confirmed).to.be.a("object");
 
-    expect(transactionStatus).to.equal(200);
+    expect(Object.keys(transactionStatus.confirmed!)).to.contain.members([
+      "block_indep_hash",
+      "block_height",
+      "number_of_confirmations"
+    ]);
 
-    expect(transaction.get("data", { decode: true, string: true })).to.contain(
-      "<title>Releases · ArweaveTeam/arweave</title>"
+    expect(transactionStatus.confirmed!.block_indep_hash).to.be.a("string");
+    expect(transactionStatus.confirmed!.block_height).to.be.a("number");
+    expect(transactionStatus.confirmed!.number_of_confirmations).to.be.a(
+      "number"
     );
 
+    expect(transaction.get("data", { decode: true, string: true })).to.contain(
+      "<title>ARWEAVE / PEER EXPLORER</title>"
+    );
     expect(await arweave.transactions.verify(transaction)).to.be.true;
 
     transaction.signature = "xxx";
@@ -226,32 +235,6 @@ describe("Transactions", function() {
       .to.be.an.instanceOf(Error)
       .with.property("message")
       .and.match(/^.*invalid transaction signature.*$/i);
-  });
-
-  it("should post transactions", async function() {
-    this.timeout(5000);
-
-    const wallet = await arweave.wallets.generate();
-
-    const transaction = await arweave.createTransaction(
-      { data: "test" },
-      wallet
-    );
-
-    const unsignedResponse = await arweave.transactions.post(transaction);
-
-    expect(unsignedResponse.status).to.be.a("number");
-
-    // Unsigned transactions shouldn't be accepted (current implementation returns 500)
-    expect(unsignedResponse.status).to.equal(500);
-
-    await arweave.transactions.sign(transaction, wallet);
-
-    const signedResponse = await arweave.transactions.post(transaction);
-
-    expect(signedResponse.status).to.be.a("number");
-
-    expect(signedResponse.status).to.not.equal(500);
   });
 
   it("should find transactions", async function() {
@@ -274,7 +257,7 @@ describe("Encryption", function() {
 
     const text = "some data to encrypt";
 
-    const data = ArweaveUtils.stringToBuffer(text);
+    const data = stringToBuffer(text);
 
     const key = crypto.randomBytes(32);
 
@@ -284,7 +267,7 @@ describe("Encryption", function() {
 
     const decrypted = await arweave.crypto.decrypt(encrypted, key);
 
-    expect(ArweaveUtils.bufferToString(decrypted)).to.equal(text);
+    expect(bufferToString(decrypted)).to.equal(text);
   });
 
   it("should encrypt and decrypt using passphrase round trip", async function() {
@@ -292,7 +275,7 @@ describe("Encryption", function() {
 
     const text = "some data to encrypt";
 
-    const data = ArweaveUtils.stringToBuffer(text);
+    const data = stringToBuffer(text);
 
     const key = "super-secret-password";
 
@@ -302,7 +285,7 @@ describe("Encryption", function() {
 
     const decrypted = await arweave.crypto.decrypt(encrypted, key);
 
-    expect(ArweaveUtils.bufferToString(decrypted)).to.equal(text);
+    expect(bufferToString(decrypted)).to.equal(text);
   });
 });
 
@@ -341,7 +324,7 @@ describe("Silo Web", function() {
       "thing.1"
     );
 
-    expect(ArweaveUtils.bufferToString(decrypted))
+    expect(bufferToString(decrypted))
       .to.be.a("string")
       .and.contain("<title>Hello world!</title>");
   });
@@ -368,7 +351,7 @@ describe("Silo Web", function() {
       "my-silo-ref.1"
     );
 
-    expect(ArweaveUtils.bufferToString(decrypted))
+    expect(bufferToString(decrypted))
       .to.be.a("string")
       .and.equal("test data");
   });

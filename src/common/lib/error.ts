@@ -7,16 +7,13 @@ export const enum ArweaveErrorType {
   TX_INVALID = "TX_INVALID"
 }
 
-export class ArweaveError extends Error {
+export default class ArweaveError extends Error {
   public readonly type: ArweaveErrorType;
-  public readonly response: AxiosResponse;
+  public readonly response?: AxiosResponse;
 
   constructor(
     type: ArweaveErrorType,
-    optional?: {
-      message?: string;
-      response?: AxiosResponse;
-    }
+    optional: { message?: string; response?: AxiosResponse } = {}
   ) {
     if (optional.message) {
       super(optional.message);

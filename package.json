@@ -22,7 +22,8 @@
     "clean": "npm run clean:dist && npm run clean:package && npm  run clean:bundle",
     "prepare": "npm run clean && npm run build",
     "test": "mocha --require ts-node/register test/*.ts",
-    "test:web": "npm run bundle:web && npx webpack --config-name web-tests && open test/web/web.html"
+    "test:web": "npm run bundle:web && npx webpack --config-name web-tests && open test/web/web.html",
+    "prettier:check": "prettier --check 'src/**/*.ts' 'test/**/*.ts'"
   },
   "repository": {
     "type": "git",

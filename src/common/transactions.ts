@@ -1,13 +1,22 @@
-import { Api } from "./lib/api";
-import { CryptoInterface } from "./lib/crypto/crypto-interface";
-import { ArweaveError, ArweaveErrorType } from "./lib/error";
-import { Transaction, Tag, TransactionInterface } from "./lib/transaction";
-import { ArweaveUtils } from "./lib/utils";
+import Api from "./lib/api";
+import CryptoInterface from "./lib/crypto/crypto-interface";
+import ArweaveError, { ArweaveErrorType } from "./lib/error";
+import Transaction from "./lib/transaction";
+import * as ArweaveUtils from "./lib/utils";
 import { JWKInterface } from "./lib/wallet";
-import { Wallets } from "./wallets";
 import { AxiosResponse } from "axios";
 
-export class Transactions {
+export interface TransactionConfirmedData {
+  block_indep_hash: string;
+  block_height: number;
+  number_of_confirmations: number;
+}
+export interface TransactionStatusResponse {
+  status: number;
+  confirmed: TransactionConfirmedData | null;
+}
+
+export default class Transactions {
   private api: Api;
 
   private crypto: CryptoInterface;
@@ -83,9 +92,18 @@ export class Transactions {
       });
   }
 
-  public getStatus(id: string): Promise<number> {
-    return this.api.get(`tx/${id}/id`).then(response => {
-      return response.status;
+  public getStatus(id: string): Promise<TransactionStatusResponse> {
+    return this.api.get(`tx/${id}/status`).then(response => {
+      if (response.status == 200) {
+        return {
+          status: 200,
+          confirmed: response.data
+        };
+      }
+      return {
+        status: response.status,
+        confirmed: null
+      };
     });
   }
 

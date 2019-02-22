@@ -1,11 +1,12 @@
 import { JWKInterface } from "../wallet";
-import { CryptoInterface } from "./crypto-interface";
+import CryptoInterface from "./crypto-interface";
 
 import { pemTojwk, jwkTopem } from "./pem";
 
-const crypto = require("crypto");
+import * as crypto from "crypto";
+import * as constants from "constants";
 
-export class NodeCryptoDriver implements CryptoInterface {
+export default class NodeCryptoDriver implements CryptoInterface {
   public readonly keyLength = 4096;
   public readonly publicExponent = 0x10001;
   public readonly hashAlgorithm = "sha256";
@@ -21,17 +22,14 @@ export class NodeCryptoDriver implements CryptoInterface {
     return new Promise((resolve, reject) => {
       crypto.generateKeyPair(
         "rsa",
-        {
+        <crypto.RSAKeyPairOptions<"pem", "pem">>{
           modulusLength: this.keyLength,
           publicExponent: this.publicExponent,
           privateKeyEncoding: {
             type: "pkcs1",
             format: "pem"
           },
-          publicKeyEncoding: {
-            type: "pkcs1",
-            format: "pem"
-          }
+          publicKeyEncoding: { type: "pkcs1", format: "pem" }
         },
         (err: any, publicKey: string, privateKey: string) => {
           if (err) {
@@ -51,7 +49,7 @@ export class NodeCryptoDriver implements CryptoInterface {
           .update(data)
           .sign({
             key: this.jwkToPem(jwk),
-            padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+            padding: constants.RSA_PKCS1_PSS_PADDING,
             saltLength: 0
           })
       );
@@ -79,7 +77,7 @@ export class NodeCryptoDriver implements CryptoInterface {
           .verify(
             {
               key: pem,
-              padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+              padding: constants.RSA_PKCS1_PSS_PADDING,
               saltLength: 0
             },
             signature

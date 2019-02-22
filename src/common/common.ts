@@ -1,13 +1,13 @@
-import { Ar } from "./ar";
-import { Api, ApiConfig } from "./lib/api";
-import { CryptoInterface } from "./lib/crypto/crypto-interface";
-import { Network } from "./network";
-import { Transactions } from "./transactions";
-import { Wallets } from "./wallets";
-import { TransactionInterface, Transaction, Tag } from "./lib/transaction";
+import Ar from "./ar";
+import Api, { ApiConfig } from "./lib/api";
+import CryptoInterface from "./lib/crypto/crypto-interface";
+import Network from "./network";
+import Transactions from "./transactions";
+import Wallets from "./wallets";
+import Transaction, { TransactionInterface, Tag } from "./lib/transaction";
 import { JWKInterface } from "./lib/wallet";
-import { ArweaveUtils } from "./lib/utils";
-import { Silo } from "./silo";
+import * as ArweaveUtils from "./lib/utils";
+import Silo from "./silo";
 
 export interface Config<T = object> {
   api: ApiConfig;
@@ -15,8 +15,6 @@ export interface Config<T = object> {
 }
 
 export interface CreateTransactionInterface {
-  [key: string]: any;
-
   last_tx: string;
   owner: string;
   tags: Tag[];
@@ -26,7 +24,7 @@ export interface CreateTransactionInterface {
   reward: string;
 }
 
-export class Arweave {
+export default class Arweave {
   public api: Api;
 
   public wallets: Wallets;
@@ -41,7 +39,9 @@ export class Arweave {
 
   public crypto: CryptoInterface;
 
-  public utils: ArweaveUtils;
+  public utils: typeof ArweaveUtils;
+
+  public static init: (apiConfig: ApiConfig) => Arweave;
 
   constructor(config: Config) {
     this.crypto = config.crypto;
@@ -61,7 +61,7 @@ export class Arweave {
   public getConfig(): Config {
     return {
       api: this.api.getConfig(),
-      crypto: null
+      crypto: null!
     };
   }
 
@@ -90,7 +90,10 @@ export class Arweave {
     }
 
     if (attributes.reward == undefined) {
-      const length = ((data: string | Uint8Array): number => {
+      const length = ((data?: string | Uint8Array): number => {
+        if (data == undefined) {
+          return 0;
+        }
         if (typeof data == "string") {
           return data.length;
         }
@@ -102,7 +105,7 @@ export class Arweave {
 
       transaction.reward = await this.transactions.getPrice(
         length,
-        transaction.target ? transaction.target : null
+        transaction.target
       );
     }
 
