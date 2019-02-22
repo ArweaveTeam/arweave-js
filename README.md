@@ -2,15 +2,38 @@ Arweave JS
 
 Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave network and uploading data ot the permaweb, it works in latest browsers and Node JS.
 
-
+- [Installation](#installation)
+  - [NPM](#npm)
+  - [Bundles](#bundles)
+- [Initialisation](#initialisation)
+  - [NPM Node](#npm-node)
+  - [NPM Web](#npm-web)
+  - [Web Bundles](#web-bundles)
+  - [Initialisation options](#initialisation-options)
+- [Usage](#usage)
+  - [Wallets and Keys](#wallets-and-keys)
+    - [Create a new wallet and private key](#create-a-new-wallet-and-private-key)
+    - [Get the wallet address for a private key](#get-the-wallet-address-for-a-private-key)
+    - [Get a wallet balance](#get-a-wallet-balance)
+    - [Get the last transaction ID from a wallet](#get-the-last-transaction-id-from-a-wallet)
+  - [Transactions](#transactions)
+    - [Create a data transaction](#create-a-data-transaction)
+    - [Create a wallet to wallet transaction](#create-a-wallet-to-wallet-transaction)
+    - [Add tags to a transaction](#add-tags-to-a-transaction)
+    - [Sign a transaction](#sign-a-transaction)
+    - [Submit a transaction](#submit-a-transaction)
+    - [Get a transaction status](#get-a-transaction-status)
+    - [Get a transaction](#get-a-transaction)
+    - [Decode data and tags from transactions](#decode-data-and-tags-from-transactions)
 
 ## Installation
-NPM
+### NPM
 ```bash
 npm install --save arweave
 ```
 
-Single bundle file (web only - use the NPM method if using Node)
+### Bundles
+Single bundle file (web only - use the NPM method if using Node).
 
 ```html
 <!-- Latest -->
@@ -29,28 +52,46 @@ Single bundle file (web only - use the NPM method if using Node)
 
 ## Initialisation
 
-NPM Node
+### NPM Node
 ```js
 const Arweave = require('arweave/node');
+
+const instance = Arweave.init({
+    host: '127.0.0.1',
+    port: 1984
+});
 ```
+
+### NPM Web
 ```js
+import Arweave from 'arweave/web';
+
 const arweave = Arweave.init({
     host: '127.0.0.1',
     port: 1984
 });
 ```
 
-NPM Web
+### Web Bundles
 ```js
-import * as Arweave from 'arweave/web';
-```
-
-
-```js
-const arweave = Arweave.init({
-    host: '127.0.0.1',
-    port: 1984
-});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello world</title>
+    <script src="https://unpkg.com/arweave/bundles/web.bundle.js"></script>
+    <script>
+    const arweave = Arweave.init({
+        host: '127.0.0.1',
+        port: 1984
+    });
+    arweave.network.getInfo().then(console.log);
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
 ```
 
 The default port for nodes is `1984`.
@@ -59,13 +100,13 @@ A live list of public arweave nodes and IP adddresses can be found on this [peer
 
 ### Initialisation options
 ```js
-const arweave = Arweave.init({
-    host: 'arweave.net',
-    port: 80,
-    protocol: 'https',
-    timeout: 20000,
-    logging: false,
-});
+{
+    host: 'arweave.net',// Hostname or IP address for a Arweave node
+    port: 80,           // Port, defaults to 1984
+    protocol: 'https',  // Network protocol http or https, defaults to http
+    timeout: 20000,     // Network request timeouts in milliseconds
+    logging: false,     // Enable network request logging
+}
 ```
 
 ## Usage
@@ -129,9 +170,9 @@ arweave.wallets.getLastTransactionID('1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKl
 
 ### Transactions
 
-Transactions are the building blocks of the Arweave permaweb, they can send [AR](https://docs.arweave.org/developers/server/http-api#ar-and-winston) betwen wallet addresses, or store data on the arweave network.
+Transactions are the building blocks of the Arweave permaweb, they can send [AR](https://docs.arweave.org/developers/server/http-api#ar-and-winston) betwen wallet addresses, or store data on the Arweave network.
 
-The create transaction methods simple create and return an unsigned transaction object, you must sign the transaction and submit it separeately using the transactions.sign and transactions.submit methods.
+The create transaction methods simply creates and returns an unsigned transaction object, you must sign the transaction and submit it separeately using the `transactions.sign` and `transactions.submit` methods.
 
 **Modifying a transaction object after signing it will invalidate the signature**, this will cause it to be rejected by the network if submitted in that state. Transaction prices are based on the size of the data field, so modifying the data field after a transaction has been created isn't recommended as you'll need to manually update the price.
 
