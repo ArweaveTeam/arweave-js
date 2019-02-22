@@ -59,8 +59,12 @@ export default class Wallets {
   }
 
   public async jwkToAddress(jwk: JWKInterface): Promise<string> {
+    return this.ownerToAddress(jwk.n);
+  }
+
+  public async ownerToAddress(owner: string): Promise<string> {
     return ArweaveUtils.bufferTob64Url(
-      await this.crypto.hash(ArweaveUtils.b64UrlToBuffer(jwk.n))
+      await this.crypto.hash(ArweaveUtils.b64UrlToBuffer(owner))
     );
   }
 }

@@ -82,4 +82,24 @@ describe("Wallets and keys", function() {
 
     expect(lastTxB).to.equal(liveTxid);
   });
+
+  it("Should resolve JWK to address", async function() {
+    const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+
+    const address = await arweave.wallets.jwkToAddress(jwk);
+
+    expect(address)
+      .to.be.a("string")
+      .and.equal("fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw");
+  });
+
+  it("Should resolve public key to address", async function() {
+    const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+
+    const address = await arweave.wallets.ownerToAddress(jwk.n);
+
+    expect(address)
+      .to.be.a("string")
+      .and.equal("fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw");
+  });
 });
