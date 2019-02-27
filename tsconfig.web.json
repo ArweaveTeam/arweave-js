@@ -9,6 +9,9 @@
         "rootDirs": [
             "src/common",
             "src/web"
+        ],
+        "typeRoots": [
+            "node_modules/@types"
         ]
     },
     "include": [
