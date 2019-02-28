@@ -9,7 +9,7 @@ import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
 import Silo from "./silo";
 
-export interface Config<T = object> {
+export interface Config {
   api: ApiConfig;
   crypto: CryptoInterface;
 }

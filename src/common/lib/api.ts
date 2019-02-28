@@ -1,6 +1,6 @@
 import Axios, { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios";
 
-export interface ApiConfig<T = object> {
+export interface ApiConfig {
   host?: string;
   protocol?: string;
   port?: string | number;
