@@ -110,7 +110,7 @@ export default class Transactions {
   public async sign(
     transaction: Transaction,
     jwk: JWKInterface
-  ): Promise<Transaction> {
+  ): Promise<void> {
     let dataToSign = transaction.getSignatureData();
 
     let rawSignature = await this.crypto.sign(jwk, dataToSign);
@@ -121,8 +121,6 @@ export default class Transactions {
       signature: ArweaveUtils.bufferTob64Url(rawSignature),
       id: ArweaveUtils.bufferTob64Url(id)
     });
-
-    return transaction;
   }
 
   public async verify(transaction: Transaction): Promise<boolean> {
