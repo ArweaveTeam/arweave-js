@@ -9,5 +9,4 @@ Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
   });
 };
 
-export * from "./common";
-export default Arweave;
+export = Arweave;
