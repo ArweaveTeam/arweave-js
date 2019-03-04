@@ -6,11 +6,11 @@ describe("Node distribution", function() {
   it("should initilize from compiled node dist", async function() {
     const dist = require("../node");
 
-    expect(dist).to.be.a("object");
+    expect(dist).to.be.a("function");
 
-    expect(dist.default.init).to.be.a("function");
+    expect(dist.init).to.be.a("function");
 
-    const instance = dist.default.init({ host: "arweave.net", logging: false });
+    const instance = dist.init({ host: "arweave.net", logging: false });
 
     expect(instance.api.constructor.name).to.equal("Api");
 
