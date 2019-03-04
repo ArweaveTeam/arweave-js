@@ -28,10 +28,13 @@ export default class Api {
   }
 
   private mergeDefaults(config: ApiConfig): ApiConfig {
+    const protocol = config.protocol || "http";
+    const port = config.port || protocol === "https" ? 443 : 80;
+
     return {
       host: config.host || "127.0.0.1",
-      protocol: config.protocol || "http",
-      port: config.port || 80,
+      protocol,
+      port,
       timeout: config.timeout || 20000,
       logging: config.logging || false,
       logger: config.logger || console.log
