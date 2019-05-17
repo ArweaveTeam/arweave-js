@@ -356,3 +356,27 @@ describe("Silo Web", function() {
       .and.equal("test data");
   });
 });
+
+describe("ArQL", function() {
+  it("should return a list of results", async function() {
+    const plainTextTransactions = await arweave.arql({
+      op: "equals",
+      expr1: "Content-Type",
+      expr2: "text/plain"
+    });
+
+    expect(plainTextTransactions).to.be.an("array");
+    expect(plainTextTransactions.length).to.be.greaterThan(0);
+  });
+
+  it("should return an empty list when no results are found", async function() {
+    const plainTextTransactions = await arweave.arql({
+      op: "equals",
+      expr1: "from",
+      expr2: "hnRI7JoN2vpv__w90o4MC_ybE9fse6SUemwQeY8hFxM"
+    });
+
+    expect(plainTextTransactions).to.be.an("array");
+    expect(plainTextTransactions.length).to.equal(0);
+  });
+});
