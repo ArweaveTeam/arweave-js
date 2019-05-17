@@ -26,6 +26,7 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
       - [Get a transaction status](#get-a-transaction-status)
       - [Get a transaction](#get-a-transaction)
       - [Decode data and tags from transactions](#decode-data-and-tags-from-transactions)
+    - [ArQL](#arql)
 
 ## Installation
 ### NPM
@@ -380,4 +381,44 @@ const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hm
   // Content-Type : text/html
   // User-Agent : ArweaveDeploy/1.1.0
 });
+```
+
+### ArQL
+
+#### Get a list of transaction IDs matching the giver query
+
+ArQL allows you to search for transactions by tags or by wallet. Searching by wallet is done by using the special tag `from`. The allowed operators are `and`, `or`, and `equals` which all accept exactly two expressions. Therefore, to `and` three or more expressions together, you will need to nest `and` expressions. The same goes for `or`.
+
+`arweave.arql` takes the ArQL query as a JavaScript object and returns the matching transaction IDs as an array or strings.
+
+```javascript
+const txids = arweave.arql({
+  op: "and",
+  expr1: {
+    op: "equals",
+    expr1: "from",
+    expr2: "hnRI7JoN2vpv__w90o4MC_ybE9fse6SUemwQeY8hFxM"
+  },
+  expr2: {
+    op: "or",
+    expr1: {
+      op: "equals",
+      expr1: "type",
+      expr2: "post"
+    },
+    expr2: {
+      op: "equals",
+      expr1: "type",
+      expr2: "comment"
+    }
+  }
+})
+
+console.log(txids)
+// [
+//   'TwS2G8mi5JGypMZO_EWtHKvrJkB76hXmWN3ROCjkLBc',
+//   'urdjQI4iKo7l8xQ0A55G7bOM3oi4QdGAd7MeVE_ru5c',
+//   '_CD8p7z3uFJCB03OCMU7R80FTQ3ZRf8O2UGhNxoUaOg',
+//   ...
+// ]
 ```
