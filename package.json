@@ -1,6 +1,6 @@
 {
   "name": "arweave",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "description": "Arweave JS client library",
   "main": "index.js",
   "files": [
