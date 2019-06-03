@@ -64,11 +64,11 @@ export function b64UrlToBuffer(b64UrlString: string): Uint8Array {
   return new Uint8Array(B64js.toByteArray(b64UrlDecode(b64UrlString)));
 }
 
-export function bufferTob64(buffer: any): string {
+export function bufferTob64(buffer: Uint8Array): string {
   return B64js.fromByteArray(new Uint8Array(buffer));
 }
 
-export function bufferTob64Url(buffer: any): string {
+export function bufferTob64Url(buffer: Uint8Array): string {
   return b64UrlEncode(bufferTob64(buffer));
 }
 
