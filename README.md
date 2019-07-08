@@ -146,8 +146,8 @@ arweave.wallets.jwkToAddress(jwk).then((address) => {
 )};
 ```
 
-#### Get a wallet balance
-Get the balance of a wallet, all amounts by default are returned in [winston](https://docs.arweave.org/developers/server/http-api#ar-and-winston).
+#### Get an address balance
+Get the balance of a wallet address, all amounts by default are returned in [winston](https://docs.arweave.org/developers/server/http-api#ar-and-winston).
 ```js
 arweave.wallets.getBalance('1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY').then((balance) => {
     let winston = balance;
