@@ -6,7 +6,7 @@ import Silo from "../src/common/silo";
 import Transactions from "../src/common/transactions";
 import Wallets from "../src/common/wallets";
 
-import { arweaveInstance } from "./_arweave";
+import { arweaveInstance, initInstance } from "./_arweave";
 
 const expect = chai.expect;
 
@@ -25,6 +25,20 @@ describe("Initialization", function() {
     expect(arweave.crypto).to.be.an.instanceOf(NodeCryptoDriver);
 
     expect(arweave.silo).to.be.an.instanceOf(Silo);
+  });
+
+  it("should handle default ports", function() {
+    expect(initInstance({ port: 1234 }).api.config.port).to.equal(1234);
+    expect(initInstance({ protocol: "http" }).api.config.port).to.equal(80);
+    expect(initInstance({ protocol: "https" }).api.config.port).to.equal(443);
+    expect(initInstance({}).api.config.port).to.equal(80);
+  });
+
+  it("should handle the default host", function() {
+    expect(initInstance({}).api.config.host).to.equal("127.0.0.1");
+    expect(
+      initInstance({ host: "specific-host.example" }).api.config.host
+    ).to.equal("specific-host.example");
   });
 });
 

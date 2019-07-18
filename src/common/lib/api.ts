@@ -29,7 +29,7 @@ export default class Api {
 
   private mergeDefaults(config: ApiConfig): ApiConfig {
     const protocol = config.protocol || "http";
-    const port = config.port || protocol === "https" ? 443 : 80;
+    const port = config.port || (protocol === "https" ? 443 : 80);
 
     return {
       host: config.host || "127.0.0.1",
