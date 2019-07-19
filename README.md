@@ -143,7 +143,7 @@ arweave.wallets.generate().then((key) => {
 arweave.wallets.jwkToAddress(jwk).then((address) => {
     console.log(address);
     //1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY
-)};
+});
 ```
 
 #### Get an address balance
