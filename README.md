@@ -129,11 +129,6 @@ arweave.wallets.generate().then((key) => {
     //     "kty": "RSA",
     //     "n": "3WquzP5IVTIsv3XYJjfw5L-t4X34WoWHwOuxb9V8w...",
     //     "e": ...
-
-    arweave.wallets.jwkToAddress(jwk).then((address) => {
-        console.log(address);
-        // 1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY
-    )};
 });
 ```
 
