@@ -46,7 +46,7 @@ export default class Api {
     url: string,
     fetchConfig: Object
   ): <Promise<Response>> {
-    return this.fetch(`${this.config.protocol}:\/\/${this.config.host}:${this.config.port}/${url}`, fetchConfig)
+    return this.fetch(`${this.config.protocol}:\/\/${this.config.host}:${this.config.port}/${url}`, fetchConfig);
   }
 
   /*
@@ -60,7 +60,19 @@ export default class Api {
     config?: Object
   ): Promise<Response> {
     try {
-      return await this.doFetch(endpoint, config)
+      return await this.doFetch(endpoint, config);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async get(
+    endpoint: string,
+    config?: Object
+  ): Promise<Any> {
+    try {
+      const res = await this.get(endpoint, config);
+      return await res.json();
     } catch (error) {
       throw error;
     }
@@ -72,8 +84,8 @@ export default class Api {
     config?: Object
   ): Promise<Response> {
     try {
-      config.body = typeof body === 'object' ? JSON.stringify(body) : body
-      config.method = 'POST'
+      config.body = typeof body === 'object' ? JSON.stringify(body) : body;
+      config.method = 'POST';
       return await this.doFetch(endpoint, config)
     } catch (error) {
       if (error.response && error.response.status) {
