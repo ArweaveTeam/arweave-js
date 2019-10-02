@@ -16,7 +16,7 @@ export default class Api {
   public config!: ApiConfig;
 
   constructor(config: ApiConfig, fetch) {
-    this.fetch = fetch
+    this.fetch = fetch;
     this.applyConfig(config);
   }
 
@@ -86,7 +86,7 @@ export default class Api {
     try {
       config.body = typeof body === 'object' ? JSON.stringify(body) : body;
       config.method = 'POST';
-      return await this.doFetch(endpoint, config)
+      return await this.doFetch(endpoint, config);
     } catch (error) {
       if (error.response && error.response.status) {
         return error.response;
