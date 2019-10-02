@@ -1,6 +1,7 @@
 import Arweave from "./common";
 import { ApiConfig } from "./lib/api";
 import WebCryptoDriver from "./lib/crypto/webcrypto-driver";
+import Fetch from "./lib/api/browser-fetch";
 
 declare global {
   interface Window {
@@ -11,7 +12,8 @@ declare global {
 Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
   return new Arweave({
     api: apiConfig,
-    crypto: new WebCryptoDriver()
+    crypto: new WebCryptoDriver(),
+    fetch: Fetch
   });
 };
 

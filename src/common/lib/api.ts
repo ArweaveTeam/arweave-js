@@ -15,7 +15,8 @@ export default class Api {
 
   public config!: ApiConfig;
 
-  constructor(config: ApiConfig) {
+  constructor(config: ApiConfig, fetch) {
+    this.fetch = fetch
     this.applyConfig(config);
   }
 
@@ -76,7 +77,7 @@ export default class Api {
    * Get an AxiosInstance with the base configuration setup to fire off
    * a request to the network.
    */
-  public request(): AxiosInstance {
+  /* public request(): AxiosInstance {
     let instance = Axios.create({
       baseURL: `${this.config.protocol}://${this.config.host}:${
         this.config.port
@@ -99,5 +100,5 @@ export default class Api {
     }
 
     return instance;
-  }
+  } */
 }

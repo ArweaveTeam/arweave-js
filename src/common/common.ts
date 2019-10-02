@@ -12,6 +12,7 @@ import Silo from "./silo";
 export interface Config {
   api: ApiConfig;
   crypto: CryptoInterface;
+  fetch;
 }
 
 export interface CreateTransactionInterface {
@@ -46,7 +47,7 @@ export default class Arweave {
   constructor(config: Config) {
     this.crypto = config.crypto;
 
-    this.api = new Api(config.api);
+    this.api = new Api(config.api, config.fetch);
     this.wallets = new Wallets(this.api, config.crypto);
 
     this.transactions = new Transactions(this.api, config.crypto);
@@ -61,7 +62,8 @@ export default class Arweave {
   public getConfig(): Config {
     return {
       api: this.api.getConfig(),
-      crypto: null!
+      crypto: null!,
+      fetch: null!
     };
   }
 
