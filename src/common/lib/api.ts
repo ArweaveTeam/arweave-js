@@ -42,17 +42,26 @@ export default class Api {
     };
   }
 
+  private doFetch(
+    url: string,
+    fetchConfig: Object
+  ): <Promise<Response>> {
+    return this.fetch(`${this.config.protocol}:\/\/${this.config.host}:${this.config.port}/${url}`, fetchConfig)
+  }
+
+  /*
+  baseURL: `${this.config.protocol}://${this.config.host}:${
+    this.config.port
+  }`,
+  timeout: this.config.timeout*/
+
   public async get(
     endpoint: string,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse> {
+    config?: Object
+  ): Promise<Response> {
     try {
-      return await this.request().get(endpoint, config);
+      return await this.doFetch(endpoint, config)
     } catch (error) {
-      if (error.response && error.response.status) {
-        return error.response;
-      }
-
       throw error;
     }
   }
@@ -60,10 +69,12 @@ export default class Api {
   public async post(
     endpoint: string,
     body: Buffer | string | object,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse> {
+    config?: Object
+  ): Promise<Response> {
     try {
-      return await this.request().post(endpoint, body, config);
+      config.body = typeof body === 'object' ? JSON.stringify(body) : body
+      config.method = 'POST'
+      return await this.doFetch(endpoint, config)
     } catch (error) {
       if (error.response && error.response.status) {
         return error.response;
@@ -72,33 +83,4 @@ export default class Api {
       throw error;
     }
   }
-
-  /**
-   * Get an AxiosInstance with the base configuration setup to fire off
-   * a request to the network.
-   */
-  /* public request(): AxiosInstance {
-    let instance = Axios.create({
-      baseURL: `${this.config.protocol}://${this.config.host}:${
-        this.config.port
-      }`,
-      timeout: this.config.timeout
-    });
-
-    if (this.config.logging) {
-      instance.interceptors.request.use(request => {
-        this.config.logger!(`Requesting: ${request.baseURL}/${request.url}`);
-        return request;
-      });
-
-      instance.interceptors.response.use(response => {
-        this.config.logger!(
-          `Response:   ${response.config.url} - ${response.status}`
-        );
-        return response;
-      });
-    }
-
-    return instance;
-  } */
 }

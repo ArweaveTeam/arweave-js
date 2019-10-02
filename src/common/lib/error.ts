@@ -1,5 +1,3 @@
-import { AxiosResponse } from "axios";
-
 export const enum ArweaveErrorType {
   TX_PENDING = "TX_PENDING",
   TX_NOT_FOUND = "TX_NOT_FOUND",
@@ -9,11 +7,11 @@ export const enum ArweaveErrorType {
 
 export default class ArweaveError extends Error {
   public readonly type: ArweaveErrorType;
-  public readonly response?: AxiosResponse;
+  public readonly response?: Response;
 
   constructor(
     type: ArweaveErrorType,
-    optional: { message?: string; response?: AxiosResponse } = {}
+    optional: { message?: string; response?: Response } = {}
   ) {
     if (optional.message) {
       super(optional.message);

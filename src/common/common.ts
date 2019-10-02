@@ -12,7 +12,7 @@ import Silo from "./silo";
 export interface Config {
   api: ApiConfig;
   crypto: CryptoInterface;
-  fetch;
+  fetch: fetch;
 }
 
 export interface CreateTransactionInterface {
