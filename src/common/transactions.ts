@@ -1,7 +1,7 @@
 import Api from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
 import ArweaveError, { ArweaveErrorType } from "./lib/error";
-import Transaction from "./lib/transaction";
+import Transaction, {Tag} from "./lib/transaction";
 import * as ArweaveUtils from "./lib/utils";
 import { JWKInterface } from "./lib/wallet";
 import { AxiosResponse } from "axios";
@@ -104,6 +104,22 @@ export default class Transactions {
         status: response.status,
         confirmed: null
       };
+    });
+  }
+
+  public getData(id: string, options?: { decode?: boolean; }): Promise<string | Uint8Array> {
+    return this.api.get(`tx/${id}/data`).then(response => {
+      if (response.status === 200) {
+        const data = response.data;
+
+        if (options && options.decode == true) {
+          return ArweaveUtils.b64UrlToString(data);
+        }
+
+        return data;
+      }
+
+      return null;
     });
   }
 
