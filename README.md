@@ -25,6 +25,7 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
       - [Submit a transaction](#submit-a-transaction)
       - [Get a transaction status](#get-a-transaction-status)
       - [Get a transaction](#get-a-transaction)
+      - [Get transaction data](#get-transaction-data)
       - [Decode data and tags from transactions](#decode-data-and-tags-from-transactions)
     - [ArQL](#arql)
 
@@ -345,6 +346,24 @@ const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hm
   //   signature: 'NLiRQSci56KVNk-x86eLT1TyF1ST8pzE...',
   //   id: 'bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U' }
   // })
+});
+```
+
+#### Get transaction data
+
+You can get the transaction data from a transaction ID without having to get the entire transaction
+
+```js
+// Raw transaction data
+arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(data => {
+  console.log(data);
+  // CjwhRE9DVFlQRSBodG1sPgo...
+});
+
+// Decoded transaction data
+arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U', true).then(data => {
+  console.log(data);
+  // <!DOCTYPE HTML>...
 });
 ```
 
