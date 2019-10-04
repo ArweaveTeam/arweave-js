@@ -181,7 +181,7 @@ describe("Transactions", function() {
     const txRawData = await arweave.transactions.getData(liveDataTxid);
     expect(txRawData).to.be.a('string').which.contain('CjwhRE9DVFlQRSBodG1sPgo');
 
-    const txDecodedData = await arweave.transactions.getData(liveDataTxid, {decode: true});
+    const txDecodedData = await arweave.transactions.getData(liveDataTxid, true);
     expect(txDecodedData).to.be.a('string').which.contain('<title>ARWEAVE / PEER EXPLORER</title>');
   });
 
