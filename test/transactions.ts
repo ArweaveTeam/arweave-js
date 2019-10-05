@@ -181,8 +181,11 @@ describe("Transactions", function() {
     const txRawData = await arweave.transactions.getData(liveDataTxid);
     expect(txRawData).to.be.a('string').which.contain('CjwhRE9DVFlQRSBodG1sPgo');
 
-    const txDecodedData = await arweave.transactions.getData(liveDataTxid, true);
-    expect(txDecodedData).to.be.a('string').which.contain('<title>ARWEAVE / PEER EXPLORER</title>');
+    const txDecodeData = await arweave.transactions.getData(liveDataTxid, {decode: true});
+    expect(txDecodeData).to.be.a('Uint8Array').to.contain([10, 60, 33, 68]);
+
+    const txDecodeStringData = await arweave.transactions.getData(liveDataTxid, {decode: true, string: true});
+    expect(txDecodeStringData).to.be.a('string').which.contain('<title>ARWEAVE / PEER EXPLORER</title>');
   });
 
   it("should find transactions", async function() {

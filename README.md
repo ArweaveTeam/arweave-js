@@ -354,14 +354,20 @@ const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hm
 You can get the transaction data from a transaction ID without having to get the entire transaction
 
 ```js
-// Raw transaction data
+// Get the base64url encoded string
 arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(data => {
   console.log(data);
   // CjwhRE9DVFlQRSBodG1sPgo...
 });
 
-// Decoded transaction data
-arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U', true).then(data => {
+// Get the data decoded to a Uint8Array for binary data
+getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U', {decode: true}).then(data => {
+  console.log(data);
+  // Uint8Array [10, 60, 33, 68, ...]
+});
+
+// Get the data decode as string data
+arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U', {decode: true, string: true}).then(data => {
   console.log(data);
   // <!DOCTYPE HTML>...
 });
