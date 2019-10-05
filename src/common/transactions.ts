@@ -107,7 +107,7 @@ export default class Transactions {
     });
   }
 
-  public getData(id: string, decode: boolean = false): Promise<string | Uint8Array> {
+  public getData(id: string, decode: boolean = false): Promise<string> {
     return this.api.get(`tx/${id}/data`).then(response => {
       if (response.status === 200) {
         const data = response.data;
