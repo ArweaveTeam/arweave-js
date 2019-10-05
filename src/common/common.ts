@@ -89,6 +89,11 @@ export default class Arweave {
       transaction.last_tx = await this.wallets.getLastTransactionID(from);
     }
 
+    // Convert js string to bytes before reward calc.
+    if (typeof attributes.data === 'string') {
+      attributes.data = ArweaveUtils.stringToBuffer(attributes.data);
+    }
+
     if (attributes.reward == undefined) {
       const length = ((data?: string | Uint8Array): number => {
         if (data == undefined) {
