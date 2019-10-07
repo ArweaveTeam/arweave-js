@@ -89,25 +89,16 @@ export default class Arweave {
       transaction.last_tx = await this.wallets.getLastTransactionID(from);
     }
 
-    // Convert js string to bytes before reward calc.
     if (typeof attributes.data === 'string') {
       attributes.data = ArweaveUtils.stringToBuffer(attributes.data);
     }
 
-    if (attributes.reward == undefined) {
-      const length = ((data?: string | Uint8Array): number => {
-        if (data == undefined) {
-          return 0;
-        }
-        if (typeof data == "string") {
-          return data.length;
-        }
-        if (data instanceof Uint8Array) {
-          return data.byteLength;
-        }
-        throw new Error("Expected data to be a string or Uint8Array");
-      })(attributes.data);
+    if (attributes.data && !(attributes.data instanceof Uint8Array) ) {
+      throw new Error('Expected data to be a string or Uint8Array');
+    }
 
+    if (attributes.reward == undefined) {
+      const length = attributes.data ? attributes.data.byteLength : 0;
       transaction.reward = await this.transactions.getPrice(
         length,
         transaction.target
@@ -115,12 +106,7 @@ export default class Arweave {
     }
 
     if (attributes.data) {
-      if (typeof attributes.data == "string") {
-        transaction.data = ArweaveUtils.stringToB64Url(attributes.data);
-      }
-      if (attributes.data instanceof Uint8Array) {
-        transaction.data = ArweaveUtils.bufferTob64Url(attributes.data);
-      }
+      transaction.data = ArweaveUtils.bufferTob64Url(attributes.data);
     }
 
     return new Transaction(transaction as TransactionInterface);
