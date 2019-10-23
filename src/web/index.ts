@@ -9,7 +9,6 @@ declare global {
 }
 
 Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
-
   function getDefaultConfig(): {
     protocol: string;
     host: string;
@@ -40,7 +39,7 @@ Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
     };
   }
 
-  const defaultConfig  = getDefaultConfig();
+  const defaultConfig = getDefaultConfig();
 
   const protocol = apiConfig.protocol || defaultConfig.protocol;
   const host = apiConfig.host || defaultConfig.host;
