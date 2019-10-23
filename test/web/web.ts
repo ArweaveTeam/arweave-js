@@ -9,7 +9,7 @@ let globals = <any>global;
 // globals.window = { Arweave: {} };
 
 //@ts-ignore
-const arweave = window.Arweave.init({ host: "arweave.net", logging: false });
+const arweave = window.Arweave.init({ host: 'arweave.net', protocol: 'https',logging: false });
 
 //@ts-ignore
 window.arweave = arweave;
