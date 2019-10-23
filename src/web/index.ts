@@ -9,20 +9,20 @@ declare global {
 }
 
 Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
-
-  function protocolToDefaultPort(protocol: string){
-    if (protocol == 'http') {
+  function protocolToDefaultPort(protocol: string) {
+    if (protocol == "http") {
       return 80;
     }
-    if (protocol == 'https') {
+    if (protocol == "https") {
       return 443;
     }
   }
 
-  const protocol = apiConfig.protocol || window.location.protocol.replace(':', '');
+  const protocol =
+    apiConfig.protocol || window.location.protocol.replace(":", "");
   const host = apiConfig.host || window.location.hostname;
   const port = apiConfig.port || protocolToDefaultPort(protocol);
-  
+
   return new Arweave({
     api: {
       ...apiConfig,
