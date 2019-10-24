@@ -89,12 +89,12 @@ export default class Arweave {
       transaction.last_tx = await this.wallets.getLastTransactionID(from);
     }
 
-    if (typeof attributes.data === 'string') {
+    if (typeof attributes.data === "string") {
       attributes.data = ArweaveUtils.stringToBuffer(attributes.data);
     }
 
-    if (attributes.data && !(attributes.data instanceof Uint8Array) ) {
-      throw new Error('Expected data to be a string or Uint8Array');
+    if (attributes.data && !(attributes.data instanceof Uint8Array)) {
+      throw new Error("Expected data to be a string or Uint8Array");
     }
 
     if (attributes.reward == undefined) {
