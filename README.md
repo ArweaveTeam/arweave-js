@@ -61,7 +61,8 @@ const Arweave = require('arweave/node');
 
 const instance = Arweave.init({
     host: '127.0.0.1',
-    port: 1984
+    port: 1984,
+    protocol: 'http'
 });
 ```
 
@@ -69,9 +70,14 @@ const instance = Arweave.init({
 ```js
 import Arweave from 'arweave/web';
 
+// Since v1.5.1 you're now able to call the init function for the web version without options. The current path will be used by default, recommended.
+const arweave = Arweave.init();
+
+// OR
 const arweave = Arweave.init({
     host: '127.0.0.1',
-    port: 1984
+    port: 1984,
+    protocol: 'http'
 });
 ```
 
@@ -86,7 +92,8 @@ const arweave = Arweave.init({
     <script>
     const arweave = Arweave.init({
         host: '127.0.0.1',
-        port: 1984
+        port: 1984,
+        protocol: 'http'
     });
     arweave.network.getInfo().then(console.log);
     </script>
