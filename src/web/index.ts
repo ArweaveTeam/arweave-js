@@ -14,9 +14,21 @@ Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
     host: string;
     port: number;
   } {
+
+    const defaults = {
+      host: "arweave.net",
+      port: 443,
+      protocol: "https"
+    };
+
+    if (!window || !window.location || !window.location.protocol || !window.location.hostname) {
+      return defaults;
+    }
+
     // window.location.protocol has a trailing colon (http:, https:, file: etc)
     const currentProtocol = window.location.protocol.replace(":", "");
     const currentHost = window.location.hostname;
+    const currentPort = window.location.port ? parseInt(window.location.port) : (currentProtocol == "https" ? 443 : 80);
 
     const isLocal =
       ["localhost", "127.0.0.1"].includes(currentHost) ||
@@ -25,16 +37,12 @@ Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
     // If we're running in what looks like a local dev environment
     // then default to using arweave.net
     if (isLocal) {
-      return {
-        host: "arweave.net",
-        port: 443,
-        protocol: "https"
-      };
+      return defaults;
     }
 
     return {
       host: currentHost,
-      port: currentProtocol == "https" ? 443 : 80,
+      port: currentPort,
       protocol: currentProtocol
     };
   }
