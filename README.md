@@ -15,7 +15,7 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
     - [Wallets and Keys](#wallets-and-keys)
       - [Create a new wallet and private key](#create-a-new-wallet-and-private-key)
       - [Get the wallet address for a private key](#get-the-wallet-address-for-a-private-key)
-      - [Get a wallet balance](#get-a-wallet-balance)
+      - [Get an address balance](##get-an-address-balance)
       - [Get the last transaction ID from a wallet](#get-the-last-transaction-id-from-a-wallet)
     - [Transactions](#transactions)
       - [Create a data transaction](#create-a-data-transaction)
