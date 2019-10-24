@@ -107,6 +107,26 @@ export default class Transactions {
     });
   }
 
+  public getData(id: string, options?: {decode?: boolean, string?: boolean}): Promise<string | Uint8Array> {
+    return this.api.get(`tx/${id}/data`).then(response => {
+      if (response.status === 200) {
+        const data = response.data;
+
+        if (options && options.decode == true) {
+          if (options && options.string) {
+            return ArweaveUtils.b64UrlToString(data);
+          }
+
+          return ArweaveUtils.b64UrlToBuffer(data);
+        }
+
+        return data;
+      }
+
+      return null;
+    });
+  }
+
   public async sign(
     transaction: Transaction,
     jwk: JWKInterface

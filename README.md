@@ -25,6 +25,7 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
       - [Submit a transaction](#submit-a-transaction)
       - [Get a transaction status](#get-a-transaction-status)
       - [Get a transaction](#get-a-transaction)
+      - [Get transaction data](#get-transaction-data)
       - [Decode data and tags from transactions](#decode-data-and-tags-from-transactions)
     - [ArQL](#arql)
 
@@ -340,6 +341,30 @@ const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hm
   //   signature: 'NLiRQSci56KVNk-x86eLT1TyF1ST8pzE...',
   //   id: 'bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U' }
   // })
+});
+```
+
+#### Get transaction data
+
+You can get the transaction data from a transaction ID without having to get the entire transaction
+
+```js
+// Get the base64url encoded string
+arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(data => {
+  console.log(data);
+  // CjwhRE9DVFlQRSBodG1sPgo...
+});
+
+// Get the data decoded to a Uint8Array for binary data
+getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U', {decode: true}).then(data => {
+  console.log(data);
+  // Uint8Array [10, 60, 33, 68, ...]
+});
+
+// Get the data decode as string data
+arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U', {decode: true, string: true}).then(data => {
+  console.log(data);
+  // <!DOCTYPE HTML>...
 });
 ```
 
