@@ -73,7 +73,7 @@ import Arweave from 'arweave/web';
 // Since v1.5.1 you're now able to call the init function for the web version without options. The current path will be used by default, recommended.
 const arweave = Arweave.init();
 
-// OR
+// Or manually specify a host
 const arweave = Arweave.init({
     host: '127.0.0.1',
     port: 1984,
@@ -90,11 +90,7 @@ const arweave = Arweave.init({
     <title>Hello world</title>
     <script src="https://unpkg.com/arweave/bundles/web.bundle.js"></script>
     <script>
-    const arweave = Arweave.init({
-        host: '127.0.0.1',
-        port: 1984,
-        protocol: 'http'
-    });
+    const arweave = Arweave.init();
     arweave.network.getInfo().then(console.log);
     </script>
 </head>
@@ -104,16 +100,12 @@ const arweave = Arweave.init({
 </html>
 ```
 
-The default port for nodes is `1984`.
-
-A live list of public arweave nodes and IP adddresses can be found on this [peer explorer](http://arweave.net/bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U).
-
 ### Initialisation options
 ```js
 {
-    host: 'arweave.net',// Hostname or IP address for a Arweave node
-    port: 443,           // Port, defaults to 1984
-    protocol: 'https',  // Network protocol http or https, defaults to http
+    host: 'arweave.net',// Hostname or IP address for a Arweave host
+    port: 443,          // Port
+    protocol: 'https',  // Network protocol http or https
     timeout: 20000,     // Network request timeouts in milliseconds
     logging: false,     // Enable network request logging
 }
@@ -137,11 +129,6 @@ arweave.wallets.generate().then((key) => {
     //     "kty": "RSA",
     //     "n": "3WquzP5IVTIsv3XYJjfw5L-t4X34WoWHwOuxb9V8w...",
     //     "e": ...
-
-    arweave.wallets.jwkToAddress(jwk).then((address) => {
-        console.log(address);
-        // 1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY
-    )};
 });
 ```
 
@@ -417,14 +404,14 @@ const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hm
 
 ### ArQL
 
-#### Get a list of transaction IDs matching the giver query
+ArQL allows you to search for transactions by tags or by wallet address.
 
-ArQL allows you to search for transactions by tags or by wallet. Searching by wallet is done by using the special tag `from`. The allowed operators are `and`, `or`, and `equals` which all accept exactly two expressions. Therefore, to `and` three or more expressions together, you will need to nest `and` expressions. The same goes for `or`.
+  The allowed operators are `and`, `or`, and `equals` which all accept exactly two expressions. Therefore, to `and` three or more expressions together, you will need to nest `and` expressions. The same goes for `or`. Searching by wallet is done by using the special tag `from`.
 
-`arweave.arql` takes the ArQL query as a JavaScript object and returns the matching transaction IDs as an array or strings.
+`arweave.arql` takes the ArQL query as an object and returns the matching transaction IDs as an array of strings.
 
-```javascript
-const txids = arweave.arql({
+```js
+const txids = await arweave.arql({
   op: "and",
   expr1: {
     op: "equals",
@@ -454,3 +441,8 @@ console.log(txids)
 //   ...
 // ]
 ```
+
+There are a number of community produced helper packages for building ArQL queries.
+
+ - https://www.npmjs.com/package/arlang
+ - https://www.npmjs.com/package/arql-ops
