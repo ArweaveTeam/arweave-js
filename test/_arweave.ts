@@ -9,7 +9,12 @@ export function initInstance(config: ApiConfig) {
   });
 }
 
-const defaultInstance = initInstance({ host: "arweave.net", logging: false });
+const defaultInstance = initInstance({
+  host: "arweave.net",
+  protocol: "https",
+  port: 443,
+  logging: false
+});
 
 export function arweaveInstance() {
   return defaultInstance;

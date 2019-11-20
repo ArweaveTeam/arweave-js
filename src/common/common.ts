@@ -86,7 +86,7 @@ export default class Arweave {
     }
 
     if (attributes.last_tx == undefined) {
-      transaction.last_tx = await this.wallets.getLastTransactionID(from);
+      transaction.last_tx = await this.transactions.getTransactionAnchor();
     }
 
     if (typeof attributes.data === "string") {
@@ -142,7 +142,7 @@ export default class Arweave {
     }
 
     if (attributes.last_tx == undefined) {
-      transaction.last_tx = await this.wallets.getLastTransactionID(from);
+      transaction.last_tx = await this.transactions.getTransactionAnchor();
     }
 
     const siloResource = await this.silo.parseUri(siloUri);

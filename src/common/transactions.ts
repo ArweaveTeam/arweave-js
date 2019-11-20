@@ -26,6 +26,12 @@ export default class Transactions {
     this.crypto = crypto;
   }
 
+  public getTransactionAnchor(): Promise<string> {
+    return this.api.get(`tx_anchor`).then(response => {
+      return response.data;
+    });
+  }
+
   public getPrice(byteSize: number, targetAddress?: string): Promise<string> {
     let endpoint = targetAddress
       ? `price/${byteSize}/${targetAddress}`

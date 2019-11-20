@@ -12,7 +12,7 @@ const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
 
 describe("Transactions", function() {
   it("should create and sign data transactions", async function() {
-    this.timeout(5000);
+    this.timeout(10000);
 
     const wallet = await arweave.wallets.generate();
 
@@ -29,7 +29,7 @@ describe("Transactions", function() {
 
     expect(transaction.data).to.equal("dGVzdA");
 
-    expect(transaction.last_tx).to.equal("");
+    expect(transaction.last_tx).to.match(/^[a-z0-9-_]{64}$/i);
 
     expect(transaction.reward).to.match(/^[0-9]+$/);
 
@@ -60,7 +60,7 @@ describe("Transactions", function() {
   });
 
   it("should create and sign ar transactions", async function() {
-    this.timeout(5000);
+    this.timeout(10000);
 
     const wallet = await arweave.wallets.generate();
 
@@ -102,7 +102,7 @@ describe("Transactions", function() {
       Buffer.from(transaction.get("data", { decode: true, string: false }))
     ).to.deep.equal(data);
 
-    expect(transaction.last_tx).to.equal("");
+    expect(transaction.last_tx).to.match(/^[a-z0-9-_]{64}$/i);
 
     expect(transaction.reward).to.match(/^[0-9]+$/);
 
@@ -132,7 +132,7 @@ describe("Transactions", function() {
     expect(verifiedWithModififedTags).to.be.false;
   });
 
-  it.skip("should get transaction info", async function() {
+  it("should get transaction info", async function() {
     this.timeout(5000);
 
     const transactionStatus = await arweave.transactions.getStatus(
@@ -177,7 +177,7 @@ describe("Transactions", function() {
       .and.match(/^.*invalid transaction signature.*$/i);
   });
 
-  it.skip("should get transaction data", async function() {
+  it("should get transaction data", async function() {
     const txRawData = await arweave.transactions.getData(liveDataTxid);
     expect(txRawData)
       .to.be.a("string")
@@ -199,7 +199,7 @@ describe("Transactions", function() {
       .which.contain("<title>ARWEAVE / PEER EXPLORER</title>");
   });
 
-  it.skip("should find transactions", async function() {
+  it("should find transactions", async function() {
     const results = await arweave.transactions.search(
       "Silo-Name",
       "BmjRGIsemI77+eQb4zX8"
