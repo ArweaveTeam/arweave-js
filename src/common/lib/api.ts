@@ -81,7 +81,8 @@ export default class Api {
       baseURL: `${this.config.protocol}://${this.config.host}:${
         this.config.port
       }`,
-      timeout: this.config.timeout
+      timeout: this.config.timeout,
+      maxContentLength: 1024 * 1024 * 512
     });
 
     if (this.config.logging) {
