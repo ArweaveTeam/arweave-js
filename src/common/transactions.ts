@@ -140,7 +140,7 @@ export default class Transactions {
     transaction: Transaction,
     jwk: JWKInterface
   ): Promise<void> {
-    let dataToSign = transaction.getSignatureData();
+    let dataToSign = await transaction.getSignatureData();
 
     let rawSignature = await this.crypto.sign(jwk, dataToSign);
 
@@ -153,7 +153,7 @@ export default class Transactions {
   }
 
   public async verify(transaction: Transaction): Promise<boolean> {
-    const signaturePayload = transaction.getSignatureData();
+    const signaturePayload = await transaction.getSignatureData();
 
     /**
      * The transaction ID should be a SHA-256 hash of the raw signature bytes, so this needs

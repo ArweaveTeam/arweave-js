@@ -209,4 +209,31 @@ describe("Transactions", function() {
       .to.be.an("array")
       .which.contains("Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE");
   });
+
+  it("should support format=2 transaction signing", async function() {
+    const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+    const unsignedV2TxFixture = require("./fixtures/unsigned_v2_tx.json");
+    const signedV2TxFixture = require("./fixtures/signed_v2_tx.json");
+
+    const data = arweave.utils.b64UrlToBuffer(unsignedV2TxFixture.data);
+    const expectedSignature = signedV2TxFixture.signature;
+    const expectedDataRoot = signedV2TxFixture.data_root;
+
+    const tx = await arweave.createTransaction(
+      {
+        format: 2,
+        last_tx: "",
+        data,
+        reward: arweave.ar.arToWinston("100")
+      },
+      jwk
+    );
+    await arweave.transactions.sign(tx, jwk);
+
+    let dataRoot = arweave.utils.bufferTob64Url(
+      tx.get("data_root", { decode: true, string: false })
+    );
+    expect(dataRoot).to.equal(expectedDataRoot);
+    expect(tx.signature).to.equal(expectedSignature);
+  });
 });

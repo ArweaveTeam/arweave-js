@@ -1,4 +1,5 @@
 import * as ArweaveUtils from "./utils";
+import deepHash from "./deepHash";
 
 class BaseObject {
   [key: string]: any;
@@ -47,6 +48,7 @@ export class Tag extends BaseObject {
 }
 
 export interface TransactionInterface {
+  format: number;
   id: string;
   last_tx: string;
   owner: string;
@@ -60,6 +62,7 @@ export interface TransactionInterface {
 
 export default class Transaction extends BaseObject
   implements TransactionInterface {
+  public readonly format: number = 1;
   public id: string = "";
   public readonly last_tx: string = "";
   public readonly owner: string = "";
@@ -67,6 +70,8 @@ export default class Transaction extends BaseObject
   public readonly target: string = "";
   public readonly quantity: string = "0";
   public readonly data: string = "";
+  public readonly data_size?: string;
+  public readonly data_root?: string;
   public readonly reward: string = "0";
   public signature: string = "";
 
@@ -94,6 +99,7 @@ export default class Transaction extends BaseObject
 
   public toJSON() {
     return {
+      format: this.format,
       id: this.id,
       last_tx: this.last_tx,
       owner: this.owner,
@@ -101,6 +107,8 @@ export default class Transaction extends BaseObject
       target: this.target,
       quantity: this.quantity,
       data: this.data,
+      ...(this.data_size && { data_size: this.data_size }),
+      ...(this.data_root && { data_root: this.data_root }),
       reward: this.reward,
       signature: this.signature
     };
@@ -111,23 +119,45 @@ export default class Transaction extends BaseObject
     this.id = id;
   }
 
-  public getSignatureData(): Uint8Array {
-    let tagString = this.tags.reduce((accumulator: string, tag: Tag) => {
-      return (
-        accumulator +
-        tag.get("name", { decode: true, string: true }) +
-        tag.get("value", { decode: true, string: true })
-      );
-    }, "");
+  public async getSignatureData(): Promise<Uint8Array> {
+    switch (this.format) {
+      case 1:
+        let tagString = this.tags.reduce((accumulator: string, tag: Tag) => {
+          return (
+            accumulator +
+            tag.get("name", { decode: true, string: true }) +
+            tag.get("value", { decode: true, string: true })
+          );
+        }, "");
 
-    return ArweaveUtils.concatBuffers([
-      this.get("owner", { decode: true, string: false }),
-      this.get("target", { decode: true, string: false }),
-      this.get("data", { decode: true, string: false }),
-      ArweaveUtils.stringToBuffer(this.quantity),
-      ArweaveUtils.stringToBuffer(this.reward),
-      this.get("last_tx", { decode: true, string: false }),
-      ArweaveUtils.stringToBuffer(tagString)
-    ]);
+        return ArweaveUtils.concatBuffers([
+          this.get("owner", { decode: true, string: false }),
+          this.get("target", { decode: true, string: false }),
+          this.get("data", { decode: true, string: false }),
+          ArweaveUtils.stringToBuffer(this.quantity),
+          ArweaveUtils.stringToBuffer(this.reward),
+          this.get("last_tx", { decode: true, string: false }),
+          ArweaveUtils.stringToBuffer(tagString)
+        ]);
+      case 2:
+        const tagList: [Uint8Array, Uint8Array][] = this.tags.map(tag => [
+          tag.get("name", { decode: true, string: false }),
+          tag.get("value", { decode: true, string: false })
+        ]);
+
+        return await deepHash([
+          ArweaveUtils.stringToBuffer(this.format.toString()),
+          this.get("owner", { decode: true, string: false }),
+          this.get("target", { decode: true, string: false }),
+          ArweaveUtils.stringToBuffer(this.quantity),
+          ArweaveUtils.stringToBuffer(this.reward),
+          this.get("last_tx", { decode: true, string: false }),
+          tagList,
+          ArweaveUtils.stringToBuffer(this.data_size!),
+          this.get("data_root", { decode: true, string: false })
+        ]);
+      default:
+        throw new Error(`Unexpected transaction format: ${this.format}`);
+    }
   }
 }
