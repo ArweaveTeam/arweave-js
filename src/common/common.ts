@@ -37,25 +37,31 @@ export default class Arweave {
 
   public silo: Silo;
 
-  public crypto: CryptoInterface;
-
-  public utils: typeof ArweaveUtils;
-
   public static init: (apiConfig: ApiConfig) => Arweave;
 
-  constructor(config: Config) {
-    this.crypto = config.crypto;
+  public static crypto: CryptoInterface;
 
-    this.api = new Api(config.api);
-    this.wallets = new Wallets(this.api, config.crypto);
+  public static utils = ArweaveUtils;
 
-    this.transactions = new Transactions(this.api, config.crypto);
+  constructor(apiConfig: ApiConfig) {
+    this.api = new Api(apiConfig);
+    this.wallets = new Wallets(this.api, Arweave.crypto);
+
+    this.transactions = new Transactions(this.api, Arweave.crypto);
     this.silo = new Silo(this.api, this.crypto, this.transactions);
 
     this.network = new Network(this.api);
     this.ar = new Ar();
+  }
 
-    this.utils = ArweaveUtils;
+  /** @deprecated */
+  public get crypto(): CryptoInterface {
+    return Arweave.crypto;
+  }
+
+  /** @deprecated */
+  public get utils(): typeof ArweaveUtils {
+    return Arweave.utils;
   }
 
   public getConfig(): Config {
