@@ -23,7 +23,8 @@
     "prepare": "npm run clean && npm run build",
     "test": "mocha --require ts-node/register test/*.ts",
     "test:web": "npm run bundle:web && npx webpack --config-name web-tests && open test/web/web.html",
-    "prettier:check": "prettier --check 'src/**/*.ts' 'test/**/*.ts'"
+    "prettier:check": "prettier --check 'src/**/*.ts' 'test/**/*.ts'",
+    "prettier:write": "prettier --write 'src/**/*.ts' 'test/**/*.ts'"
   },
   "repository": {
     "type": "git",
