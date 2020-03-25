@@ -15,7 +15,7 @@ interface HashNode {
 }
 
 const CHUNK_SIZE = 32 * 1024;
-const NOTE_SIZE = 8;
+const NOTE_SIZE = 32;
 
 export async function computeRootHash(data: Uint8Array): Promise<Uint8Array> {
   let taggedChunks: TaggedChunk[] = [];
