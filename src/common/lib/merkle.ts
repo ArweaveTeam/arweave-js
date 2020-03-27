@@ -14,7 +14,7 @@ interface HashNode {
   readonly max: number;
 }
 
-const CHUNK_SIZE = 32 * 1024;
+const CHUNK_SIZE = 256 * 1024;
 const NOTE_SIZE = 32;
 
 export async function computeRootHash(data: Uint8Array): Promise<Uint8Array> {
