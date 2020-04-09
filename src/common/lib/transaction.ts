@@ -58,11 +58,14 @@ export interface TransactionInterface {
   data: string;
   reward: string;
   signature: string;
+  data_size: string;
+  data_root: string;
+  data_tree: string[];
 }
 
 export default class Transaction extends BaseObject
   implements TransactionInterface {
-  public readonly format: number = 1;
+  public readonly format: number = 2;
   public id: string = "";
   public readonly last_tx: string = "";
   public readonly owner: string = "";
@@ -70,8 +73,9 @@ export default class Transaction extends BaseObject
   public readonly target: string = "";
   public readonly quantity: string = "0";
   public readonly data: string = "";
-  public readonly data_size?: string;
-  public readonly data_root?: string;
+  public readonly data_size: string = "0";
+  public readonly data_root: string = "";
+  public readonly data_tree: string[] = [];
   public readonly reward: string = "0";
   public signature: string = "";
 
@@ -107,10 +111,11 @@ export default class Transaction extends BaseObject
       target: this.target,
       quantity: this.quantity,
       data: this.data,
-      ...(this.data_size && { data_size: this.data_size }),
-      ...(this.data_root && { data_root: this.data_root }),
+      data_size: this.data_size,
+      data_root: this.data_root,
+      data_tree: this.data_tree,
       reward: this.reward,
-      signature: this.signature
+      signature: this.signature,
     };
   }
 
@@ -137,12 +142,12 @@ export default class Transaction extends BaseObject
           ArweaveUtils.stringToBuffer(this.quantity),
           ArweaveUtils.stringToBuffer(this.reward),
           this.get("last_tx", { decode: true, string: false }),
-          ArweaveUtils.stringToBuffer(tagString)
+          ArweaveUtils.stringToBuffer(tagString),
         ]);
       case 2:
-        const tagList: [Uint8Array, Uint8Array][] = this.tags.map(tag => [
+        const tagList: [Uint8Array, Uint8Array][] = this.tags.map((tag) => [
           tag.get("name", { decode: true, string: false }),
-          tag.get("value", { decode: true, string: false })
+          tag.get("value", { decode: true, string: false }),
         ]);
 
         return await deepHash([
@@ -154,7 +159,7 @@ export default class Transaction extends BaseObject
           this.get("last_tx", { decode: true, string: false }),
           tagList,
           ArweaveUtils.stringToBuffer(this.data_size!),
-          this.get("data_root", { decode: true, string: false })
+          this.get("data_root", { decode: true, string: false }),
         ]);
       default:
         throw new Error(`Unexpected transaction format: ${this.format}`);

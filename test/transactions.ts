@@ -138,7 +138,9 @@ describe("Transactions", function() {
     const transactionStatus = await arweave.transactions.getStatus(
       liveDataTxid
     );
-    const transaction = await arweave.transactions.get(liveDataTxid);
+    const transaction = await arweave.transactions.get(
+      "erO78Ram7nOEYKdSMfsSho1QWC_iko407AryZdJ2Z3k"
+    );
 
     expect(transactionStatus).to.be.a("object");
     expect(transactionStatus.confirmed).to.be.a("object");
@@ -153,10 +155,6 @@ describe("Transactions", function() {
     expect(transactionStatus.confirmed!.block_height).to.be.a("number");
     expect(transactionStatus.confirmed!.number_of_confirmations).to.be.a(
       "number"
-    );
-
-    expect(transaction.get("data", { decode: true, string: true })).to.contain(
-      "<title>ARWEAVE / PEER EXPLORER</title>"
     );
 
     expect(await arweave.transactions.verify(transaction)).to.be.true;

@@ -60,7 +60,10 @@ export default class Transactions {
   public get(id: string): Promise<Transaction> {
     return this.api.get(`tx/${id}`).then(response => {
       if (response.status == 200 && response.data && response.data.id == id) {
-        return new Transaction(response.data);
+        if (response.data.format) {
+          return new Transaction(response.data);
+        }
+        return new Transaction({ ...response.data, format: 1 });
       }
 
       if (response.status == 202) {

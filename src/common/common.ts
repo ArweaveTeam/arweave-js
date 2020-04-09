@@ -116,12 +116,9 @@ export default class Arweave {
     }
 
     if (attributes.data) {
-      if (attributes.format === 2) {
-        const rootHash = await Merkle.computeRootHash(attributes.data);
-        transaction.data_size = attributes.data.byteLength.toString();
-        transaction.data_root = ArweaveUtils.bufferTob64Url(rootHash);
-      }
-
+      const rootHash = await Merkle.computeRootHash(attributes.data);
+      transaction.data_size = attributes.data.byteLength.toString();
+      transaction.data_root = ArweaveUtils.bufferTob64Url(rootHash);
       transaction.data = ArweaveUtils.bufferTob64Url(attributes.data);
     }
 
