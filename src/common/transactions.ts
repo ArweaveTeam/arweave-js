@@ -74,20 +74,19 @@ export default class Transactions {
       });
     }
 
-      if (response.status == 202) {
-        throw new ArweaveError(ArweaveErrorType.TX_PENDING);
-      }
+    if (response.status == 202) {
+      throw new ArweaveError(ArweaveErrorType.TX_PENDING);
+    }
 
-      if (response.status == 404) {
-        throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
-      }
+    if (response.status == 404) {
+      throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
+    }
 
-      if (response.status == 410) {
-        throw new ArweaveError(ArweaveErrorType.TX_FAILED);
-      }
+    if (response.status == 410) {
+      throw new ArweaveError(ArweaveErrorType.TX_FAILED);
+    }
 
-      throw new ArweaveError(ArweaveErrorType.TX_INVALID);
-    });
+    throw new ArweaveError(ArweaveErrorType.TX_INVALID);
   }
 
   public fromRaw(attributes: object): Transaction {
