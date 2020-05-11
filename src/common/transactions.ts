@@ -57,29 +57,36 @@ export default class Transactions {
       });
   }
 
-  public get(id: string): Promise<Transaction> {
-    return this.api.get(`tx/${id}`).then(response => {
-      if (response.status == 200 && response.data && response.data.id == id) {
-        if (response.data.format) {
-          return new Transaction(response.data);
-        }
-        return new Transaction({ ...response.data, format: 1 });
-      }
+  public async get(id: string): Promise<Transaction> {
+    const response = await this.api.get(`tx/${id}`);
 
-      if (response.status == 202) {
-        throw new ArweaveError(ArweaveErrorType.TX_PENDING);
+    if (response.status == 200) {
+      if (response.data.format >= 2 && response.data.data_size > 0) {
+        const data = await this.getData(id);
+        return new Transaction({
+          ...response.data,
+          data,
+        });
       }
+      return new Transaction({
+        ...response.data,
+        format: response.data.format || 1,
+      });
+    }
 
-      if (response.status == 404) {
-        throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
-      }
+    if (response.status == 202) {
+      throw new ArweaveError(ArweaveErrorType.TX_PENDING);
+    }
 
-      if (response.status == 410) {
-        throw new ArweaveError(ArweaveErrorType.TX_FAILED);
-      }
+    if (response.status == 404) {
+      throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
+    }
 
-      throw new ArweaveError(ArweaveErrorType.TX_INVALID);
-    });
+    if (response.status == 410) {
+      throw new ArweaveError(ArweaveErrorType.TX_FAILED);
+    }
+
+    throw new ArweaveError(ArweaveErrorType.TX_INVALID);
   }
 
   public fromRaw(attributes: object): Transaction {
