@@ -85,6 +85,10 @@ export default class Arweave {
 
     Object.assign(transaction, attributes);
 
+    if(!attributes.data?.length) {
+      attributes.data = undefined;
+    }
+
     if (!attributes.data && !(attributes.target && attributes.quantity)) {
       throw new Error(
         `A new Arweave transaction must have a 'data' value, or 'target' and 'quantity' values.`
