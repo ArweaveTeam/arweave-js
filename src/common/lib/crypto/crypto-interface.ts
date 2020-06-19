@@ -15,5 +15,5 @@ export default interface CryptoInterface {
 
   decrypt(encrypted: Uint8Array, key: string | Uint8Array): Promise<Uint8Array>;
 
-  hash(data: Uint8Array): Promise<Uint8Array>;
+  hash(data: Uint8Array, algorithm?: string): Promise<Uint8Array>;
 }

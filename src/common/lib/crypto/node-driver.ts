@@ -86,11 +86,14 @@ export default class NodeCryptoDriver implements CryptoInterface {
     });
   }
 
-  public hash(data: Buffer): Promise<Uint8Array> {
+  public hash(
+    data: Uint8Array,
+    algorithm: string = "SHA-256"
+  ): Promise<Uint8Array> {
     return new Promise((resolve, reject) => {
       resolve(
         crypto
-          .createHash(this.hashAlgorithm)
+          .createHash(this.parseHashAlgorithm(algorithm))
           .update(data)
           .digest()
       );
@@ -183,5 +186,16 @@ export default class NodeCryptoDriver implements CryptoInterface {
   private pemToJWK(pem: string): JWKInterface {
     let jwk = pemTojwk(pem);
     return jwk;
+  }
+
+  private parseHashAlgorithm(algorithm: string): string {
+    switch (algorithm) {
+      case "SHA-256":
+        return "sha256";
+      case "SHA-384":
+        return "sha384";
+      default:
+        throw new Error(`Algorithm not supported: ${algorithm}`);
+    }
   }
 }

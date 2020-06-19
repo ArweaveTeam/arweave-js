@@ -12,7 +12,7 @@ const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
 
 describe("Transactions", function() {
   it("should create and sign data transactions", async function() {
-    this.timeout(5000);
+    this.timeout(10000);
 
     const wallet = await arweave.wallets.generate();
 
@@ -29,7 +29,7 @@ describe("Transactions", function() {
 
     expect(transaction.data).to.equal("dGVzdA");
 
-    expect(transaction.last_tx).to.equal("");
+    expect(transaction.last_tx).to.match(/^[a-z0-9-_]{64}$/i);
 
     expect(transaction.reward).to.match(/^[0-9]+$/);
 
@@ -60,7 +60,7 @@ describe("Transactions", function() {
   });
 
   it("should create and sign ar transactions", async function() {
-    this.timeout(5000);
+    this.timeout(10000);
 
     const wallet = await arweave.wallets.generate();
 
@@ -102,7 +102,7 @@ describe("Transactions", function() {
       Buffer.from(transaction.get("data", { decode: true, string: false }))
     ).to.deep.equal(data);
 
-    expect(transaction.last_tx).to.equal("");
+    expect(transaction.last_tx).to.match(/^[a-z0-9-_]{64}$/i);
 
     expect(transaction.reward).to.match(/^[0-9]+$/);
 
@@ -132,13 +132,15 @@ describe("Transactions", function() {
     expect(verifiedWithModififedTags).to.be.false;
   });
 
-  it.skip("should get transaction info", async function() {
+  it("should get transaction info", async function() {
     this.timeout(5000);
 
     const transactionStatus = await arweave.transactions.getStatus(
       liveDataTxid
     );
-    const transaction = await arweave.transactions.get(liveDataTxid);
+    const transaction = await arweave.transactions.get(
+      "erO78Ram7nOEYKdSMfsSho1QWC_iko407AryZdJ2Z3k"
+    );
 
     expect(transactionStatus).to.be.a("object");
     expect(transactionStatus.confirmed).to.be.a("object");
@@ -153,10 +155,6 @@ describe("Transactions", function() {
     expect(transactionStatus.confirmed!.block_height).to.be.a("number");
     expect(transactionStatus.confirmed!.number_of_confirmations).to.be.a(
       "number"
-    );
-
-    expect(transaction.get("data", { decode: true, string: true })).to.contain(
-      "<title>ARWEAVE / PEER EXPLORER</title>"
     );
 
     expect(await arweave.transactions.verify(transaction)).to.be.true;
@@ -177,7 +175,7 @@ describe("Transactions", function() {
       .and.match(/^.*invalid transaction signature.*$/i);
   });
 
-  it.skip("should get transaction data", async function() {
+  it("should get transaction data", async function() {
     const txRawData = await arweave.transactions.getData(liveDataTxid);
     expect(txRawData)
       .to.be.a("string")
@@ -199,7 +197,7 @@ describe("Transactions", function() {
       .which.contain("<title>ARWEAVE / PEER EXPLORER</title>");
   });
 
-  it.skip("should find transactions", async function() {
+  it("should find transactions", async function() {
     const results = await arweave.transactions.search(
       "Silo-Name",
       "BmjRGIsemI77+eQb4zX8"
@@ -208,5 +206,32 @@ describe("Transactions", function() {
     expect(results)
       .to.be.an("array")
       .which.contains("Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE");
+  });
+
+  it("should support format=2 transaction signing", async function() {
+    const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+    const unsignedV2TxFixture = require("./fixtures/unsigned_v2_tx.json");
+    const signedV2TxFixture = require("./fixtures/signed_v2_tx.json");
+
+    const data = arweave.utils.b64UrlToBuffer(unsignedV2TxFixture.data);
+    const expectedSignature = signedV2TxFixture.signature;
+    const expectedDataRoot = signedV2TxFixture.data_root;
+
+    const tx = await arweave.createTransaction(
+      {
+        format: 2,
+        last_tx: "",
+        data,
+        reward: arweave.ar.arToWinston("100")
+      },
+      jwk
+    );
+    await arweave.transactions.sign(tx, jwk);
+
+    let dataRoot = arweave.utils.bufferTob64Url(
+      tx.get("data_root", { decode: true, string: false })
+    );
+    expect(dataRoot).to.equal(expectedDataRoot);
+    expect(tx.signature).to.equal(expectedSignature);
   });
 });

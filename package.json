@@ -1,6 +1,6 @@
 {
   "name": "arweave",
-  "version": "1.5.3",
+  "version": "1.7.1",
   "description": "Arweave JS client library",
   "main": "index.js",
   "files": [
@@ -23,7 +23,8 @@
     "prepare": "npm run clean && npm run build",
     "test": "mocha --require ts-node/register test/*.ts",
     "test:web": "npm run bundle:web && npx webpack --config-name web-tests && open test/web/web.html",
-    "prettier:check": "prettier --check 'src/**/*.ts' 'test/**/*.ts'"
+    "prettier:check": "prettier --check 'src/**/*.ts' 'test/**/*.ts'",
+    "prettier:write": "prettier --write 'src/**/*.ts' 'test/**/*.ts'"
   },
   "repository": {
     "type": "git",
@@ -61,7 +62,7 @@
     "typescript": "^3.4.5",
     "webpack": "^4.32.1",
     "webpack-bundle-analyzer": "^3.3.2",
-    "webpack-cli": "^3.3.2"
+    "webpack-cli": "^3.3.11"
   },
   "targets": {
     "chrome": "70",

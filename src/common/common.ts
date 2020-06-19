@@ -5,6 +5,7 @@ import Network from "./network";
 import Transactions from "./transactions";
 import Wallets from "./wallets";
 import Transaction, { TransactionInterface, Tag } from "./lib/transaction";
+import * as Merkle from "./lib/merkle";
 import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
 import Silo from "./silo";
@@ -15,12 +16,15 @@ export interface Config {
 }
 
 export interface CreateTransactionInterface {
+  format: number;
   last_tx: string;
   owner: string;
   tags: Tag[];
   target: string;
   quantity: string;
   data: string | Uint8Array;
+  data_size: string;
+  data_root?: string;
   reward: string;
 }
 
@@ -37,25 +41,31 @@ export default class Arweave {
 
   public silo: Silo;
 
-  public crypto: CryptoInterface;
-
-  public utils: typeof ArweaveUtils;
-
   public static init: (apiConfig: ApiConfig) => Arweave;
 
-  constructor(config: Config) {
-    this.crypto = config.crypto;
+  public static crypto: CryptoInterface;
 
-    this.api = new Api(config.api);
-    this.wallets = new Wallets(this.api, config.crypto);
+  public static utils = ArweaveUtils;
 
-    this.transactions = new Transactions(this.api, config.crypto);
+  constructor(apiConfig: ApiConfig) {
+    this.api = new Api(apiConfig);
+    this.wallets = new Wallets(this.api, Arweave.crypto);
+
+    this.transactions = new Transactions(this.api, Arweave.crypto);
     this.silo = new Silo(this.api, this.crypto, this.transactions);
 
     this.network = new Network(this.api);
     this.ar = new Ar();
+  }
 
-    this.utils = ArweaveUtils;
+  /** @deprecated */
+  public get crypto(): CryptoInterface {
+    return Arweave.crypto;
+  }
+
+  /** @deprecated */
+  public get utils(): typeof ArweaveUtils {
+    return Arweave.utils;
   }
 
   public getConfig(): Config {
@@ -86,7 +96,7 @@ export default class Arweave {
     }
 
     if (attributes.last_tx == undefined) {
-      transaction.last_tx = await this.wallets.getLastTransactionID(from);
+      transaction.last_tx = await this.transactions.getTransactionAnchor();
     }
 
     if (typeof attributes.data === "string") {
@@ -106,6 +116,9 @@ export default class Arweave {
     }
 
     if (attributes.data) {
+      const rootHash = await Merkle.computeRootHash(attributes.data);
+      transaction.data_size = attributes.data.byteLength.toString();
+      transaction.data_root = ArweaveUtils.bufferTob64Url(rootHash);
       transaction.data = ArweaveUtils.bufferTob64Url(attributes.data);
     }
 
@@ -142,7 +155,7 @@ export default class Arweave {
     }
 
     if (attributes.last_tx == undefined) {
-      transaction.last_tx = await this.wallets.getLastTransactionID(from);
+      transaction.last_tx = await this.transactions.getTransactionAnchor();
     }
 
     const siloResource = await this.silo.parseUri(siloUri);
