@@ -95,7 +95,7 @@ const arweave = Arweave.init({
     </script>
 </head>
 <body>
-    
+
 </body>
 </html>
 ```
@@ -185,12 +185,12 @@ let key = await arweave.wallets.generate();
 // Plain text
 let transactionA = arweave.createTransaction({
     data: '<html><head><meta charset="UTF-8"><title>Hello world!</title></head><body></body></html>'
-}, jwk);
+}, key);
 
 // Buffer
 let transactionB = arweave.createTransaction({
     data: Buffer.from('Some data', 'utf8')
-}, jwk);
+}, key);
 
 
 console.log(transactionA);
@@ -220,7 +220,7 @@ let key = await arweave.wallets.generate();
 let transaction = arweave.createTransaction({
     target: '1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY',
     quantity: arweave.ar.arToWinston('10.5')
-}, jwk);
+}, key);
 
 console.log(transaction);
 // Transaction {
