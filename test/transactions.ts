@@ -138,7 +138,9 @@ describe("Transactions", function() {
     const transactionStatus = await arweave.transactions.getStatus(
       liveDataTxid
     );
-    const transaction = await arweave.transactions.get(liveDataTxid);
+    const transaction = await arweave.transactions.get(
+      "erO78Ram7nOEYKdSMfsSho1QWC_iko407AryZdJ2Z3k"
+    );
 
     expect(transactionStatus).to.be.a("object");
     expect(transactionStatus.confirmed).to.be.a("object");
@@ -153,10 +155,6 @@ describe("Transactions", function() {
     expect(transactionStatus.confirmed!.block_height).to.be.a("number");
     expect(transactionStatus.confirmed!.number_of_confirmations).to.be.a(
       "number"
-    );
-
-    expect(transaction.get("data", { decode: true, string: true })).to.contain(
-      "<title>ARWEAVE / PEER EXPLORER</title>"
     );
 
     expect(await arweave.transactions.verify(transaction)).to.be.true;
@@ -208,5 +206,32 @@ describe("Transactions", function() {
     expect(results)
       .to.be.an("array")
       .which.contains("Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE");
+  });
+
+  it("should support format=2 transaction signing", async function() {
+    const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+    const unsignedV2TxFixture = require("./fixtures/unsigned_v2_tx.json");
+    const signedV2TxFixture = require("./fixtures/signed_v2_tx.json");
+
+    const data = arweave.utils.b64UrlToBuffer(unsignedV2TxFixture.data);
+    const expectedSignature = signedV2TxFixture.signature;
+    const expectedDataRoot = signedV2TxFixture.data_root;
+
+    const tx = await arweave.createTransaction(
+      {
+        format: 2,
+        last_tx: "",
+        data,
+        reward: arweave.ar.arToWinston("100")
+      },
+      jwk
+    );
+    await arweave.transactions.sign(tx, jwk);
+
+    let dataRoot = arweave.utils.bufferTob64Url(
+      tx.get("data_root", { decode: true, string: false })
+    );
+    expect(dataRoot).to.equal(expectedDataRoot);
+    expect(tx.signature).to.equal(expectedSignature);
   });
 });

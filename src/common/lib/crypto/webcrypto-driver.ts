@@ -58,8 +58,11 @@ export default class WebCryptoDriver implements CryptoInterface {
     return new Uint8Array(signature);
   }
 
-  public async hash(data: Uint8Array): Promise<Uint8Array> {
-    let digest = await this.driver.digest("SHA-256", data);
+  public async hash(
+    data: Uint8Array,
+    algorithm: string = "SHA-256"
+  ): Promise<Uint8Array> {
+    let digest = await this.driver.digest(algorithm, data);
 
     return new Uint8Array(digest);
   }

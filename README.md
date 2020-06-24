@@ -195,14 +195,20 @@ let transactionB = arweave.createTransaction({
 
 console.log(transactionA);
 // Transaction {
-//   last_tx: '',
-//   owner: 'wgfbaaSXJ8dszMabPo-...',
+//   format: 2,
+//   id: 'ReUohI9tEmXQ6EN9H9IkRjY9bSdgql_OdLUCOeMEte0',
+//   last_tx: 'Tk-0c7260Ya5zjfjzl4f6-W-vRO94qiqZMAScKBcYXc68v1Pd8bYfTbKWi7pepUF',
+//   owner: 'kmM4O08BJB85RbxfQ2nkka9VNO6Czm2Tc_IGQNYCTSXRzO...',
 //   tags: [],
 //   target: '',
 //   quantity: '0',
-//   data: 'eyJhIjoxfQ',
-//   reward: '321879995',
-//   signature: '' }
+//   data: 'c29tZSBkYXRh',
+//   data_size: '9',
+//   data_root: 'qwKZUl7qWpCEmB3cpONKTYOcSmnmhb-_s8ggMTZwCU4',
+//   data_tree: [],
+//   reward: '7489274',
+//   signature: 'JYdFPblDuT95ky7_wVss3Ax9e4Qygcd_lEcB07sDPUD_wNslOk...'
+// }
 ```
 
 #### Create a wallet to wallet transaction
@@ -218,14 +224,20 @@ let transaction = arweave.createTransaction({
 
 console.log(transaction);
 // Transaction {
-//   last_tx: '',
-//   owner: '14fXfoRDMFS5yTpUT7ODzj...',
+//   format: 2,
+//   id: 'v-n7hAc7cubeXSClh0beaOs1RjYFagyvpl2TkUOfbRg',
+//   last_tx: 'Tk-0c7260Ya5zjfjzl4f6-W-vRO94qiqZMAScKBcYXc68v1Pd8bYfTbKWi7pepUF',
+//   owner: 'kmM4O08BJB85RbxfQ2nkka9VNO6Czm2Tc_IGQNYCTSXRzOc6W9b...',
 //   tags: [],
 //   target: '1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY',
 //   quantity: '10500000000000',
 //   data: '',
-//   reward: '2503211
-//   signature: '' }
+//   data_size: '0',
+//   data_root: '',
+//   data_tree: [],
+//   reward: '7468335',
+//   signature: 'DnUOYbRSkhI4ZXg5fpYDCwPv8yvM5toAneSx4Jlg0zjIocqPs8giPP...'
+// }
 ```
 
 #### Add tags to a transaction
@@ -249,17 +261,23 @@ transaction.addTag('key2', 'value2');
 
 console.log(transaction);
 // Transaction {
-//   last_tx: '',
-//   owner: 's8zPWNlBMiJFLcvpH98QxnI6FoPar3vCK3RdT...',
+//   format: 2,
+//   id: 'dUaZG84fJpiPQTt4J1VMBGvAr2ugyevFf0zmdkC1Ch4',
+//   last_tx: 'Tk-0c7260Ya5zjfjzl4f6-W-vRO94qiqZMAScKBcYXc68v1Pd8bYfTbKWi7pepUF',
+//   owner: 'kmM4O08BJB85RbxfQ2nkka9VNO6Czm2Tc_IGQNYC...',
 //   tags: [
-//       Tag { name: 'Q29udGVudC1UeXBl', value: 'dGV4dC9odG1s' },
-//       Tag { name: 'a2V5Mg', value: 'dmFsdWUy' }
+//     Tag { name: 'Q29udGVudC1UeXBl', value: 'dGV4dC9odG1s' },
+//     Tag { name: 'a2V5Mg', value: 'dmFsdWUy' }
 //   ],
 //   target: '',
 //   quantity: '0',
-//   data: 'PGh0bWw-PGhlYWQ-PG1ldGEgY2hh...',
-//   reward: '329989175',
-//   signature: '' }
+//   data: 'PGh0bWw-PGhlYWQ-PG1ldGEgY2hhcnNldD0iVVRGLTgiPjx0aXRsZT5IZWxsbyB3b3JsZCE8L3RpdGxlPjwvaGVhZD48Ym9keT48L2JvZHk-PC9odG1sPg',
+//   data_size: '88',
+//   data_root: 'GQunzmbwk2_JPU7oJOmLrTMvj8v_7BJaF0weyjVn5Nc',
+//   data_tree: [],
+//   reward: '7673074',
+//   signature: 'JhioDyYS76tkfCqoRUfqvy-GW1tn3abARX0q8Fo_SRygCq...'
+// }
 ```
 
 #### Sign a transaction
@@ -275,17 +293,21 @@ let transaction = await arweave.createTransaction({
 await arweave.transactions.sign(transaction, key);
 
 console.log(transaction);
-// Signature and id fields are now populated
 // Transaction {
-//   last_tx: '',
-//   owner: '2xu89EaA5zENRRsbOh4OscMcy...',
+//   format: 2,
+//   id: 'v-n7hAc7cubeXSClh0beaOs1RjYFagyvpl2TkUOfbRg',
+//   last_tx: 'Tk-0c7260Ya5zjfjzl4f6-W-vRO94qiqZMAScKBcYXc68v1Pd8bYfTbKWi7pepUF',
+//   owner: 'kmM4O08BJB85RbxfQ2nkka9VNO6Czm2Tc_IGQNYCTSXRzOc6W9b...',
 //   tags: [],
 //   target: '1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY',
 //   quantity: '10500000000000',
 //   data: '',
-//   reward: '250321179212',
-//   signature: 'AbFjlpEHTN6_SKWsUSMAzalImOVxNm86Z8hoTZcItkYBJLx...'
-//   id: 'iHVHijWvKbIa0ZA9IbuKtOxJdNO9qyey6CIH324zQWI'
+//   data_size: '0',
+//   data_root: '',
+//   data_tree: [],
+//   reward: '7468335',
+//   signature: 'DnUOYbRSkhI4ZXg5fpYDCwPv8yvM5toAneSx4Jlg0zjIocqPs8giPP...'
+// }
 ```
 
 #### Submit a transaction
@@ -324,22 +346,28 @@ arweave.transactions.getStatus('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').th
 Fetch a transaction from the connected arweave node. The data and tags are base64 encoded, these can be decoded using the built in helper methods.
 
 ```js
-const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(transaction => {
+const transaction = arweave.transactions.get('hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8').then(transaction => {
   console.log(transaction);
-  // Transaction {
-  //   last_tx: 'cO5gl_d5ARnaoBtu2Vas8skgLg-6KnC9gH8duWP7Ll8',
-  //   owner: 'pJjRtSRLpHUVAKCtWC9pjajI_VEpiPEEAHX0k...',
-  //   tags: [
-  //       Tag { name: 'Q29udGVudC1UeXBl', value: 'dGV4dC9odG1s' },
-  //       Tag { name: 'VXNlci1BZ2VudA', value: 'QXJ3ZWF2ZURlcGxveS8xLjEuMA' }
-  //   ],
-  //   target: '',
-  //   quantity: '0',
-  //   data: 'CjwhRE9DVFlQRSBodG1sPgo8aHRtbCBsYW5nPSJlbiI...',
-  //   reward: '1577006493',
-  //   signature: 'NLiRQSci56KVNk-x86eLT1TyF1ST8pzE...',
-  //   id: 'bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U' }
-  // })
+    // Transaction {
+    //   'format': 1,
+    //   'id': 'hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8',
+    //   'last_tx': 'GW7p6NoGJ495tAoUjU5GLxIH52gqOgk5j78gQv3j0ebvldAlw6VgIUv_lrMNGI72',
+    //   'owner': 'warLaSbicZm1nx9ucf-_5i91CWgmNOcnFJfyJdloCtsbenBhLrcGH472kKTZyuEAp2lSKlZ0NFCT2r2z-0...',
+    //   'tags': [
+    //     {
+    //       'name': 'QXBwLU5hbWU',
+    //       'value': 'd2VpYm90LXNlYXJjaC13ZWlicw'
+    //     }
+    //   ],
+    //   'target': ',
+    //   'quantity': '0',
+    //   'data': 'iVBORw0KGgoAAAANSUhEUgAAArIAAADGCAYAAAAuVWN-AAAACXBIWXMAAAsSAAA...'
+    //   'data_size': '36795',
+    //   'data_tree': [],
+    //   'data_root': ',
+    //   'reward': '93077980',
+    //   'signature': 'RpohCHVl5vzGlG4R5ybeEuhs556Jv7rWOGaZCT69cpIei_j9b9sAetBlr0...'
+    // }
 });
 ```
 
