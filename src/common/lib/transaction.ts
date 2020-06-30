@@ -59,7 +59,7 @@ export interface TransactionInterface {
   reward: string;
   signature: string;
   data_size: string;
-  data_root: string;
+  data_root: string|undefined;
   data_tree: string[];
 }
 
@@ -74,7 +74,7 @@ export default class Transaction extends BaseObject
   public readonly quantity: string = "0";
   public readonly data: string = "";
   public readonly data_size: string = "0";
-  public readonly data_root: string = "";
+  public readonly data_root: string|undefined = undefined;
   public readonly data_tree: string[] = [];
   public readonly reward: string = "0";
   public signature: string = "";
