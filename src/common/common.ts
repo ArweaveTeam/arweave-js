@@ -85,7 +85,7 @@ export default class Arweave {
 
     Object.assign(transaction, attributes);
 
-    if(!attributes.data?.length) {
+    if(!attributes.data || !attributes.data.length) {
       attributes.data = undefined;
     }
 
