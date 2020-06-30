@@ -89,12 +89,6 @@ export default class Arweave {
       attributes.data = undefined;
     }
 
-    if (!attributes.data && !(attributes.target && attributes.quantity)) {
-      throw new Error(
-        `A new Arweave transaction must have a 'data' value, or 'target' and 'quantity' values.`
-      );
-    }
-
     if (attributes.owner == undefined) {
       transaction.owner = jwk.n;
     }
