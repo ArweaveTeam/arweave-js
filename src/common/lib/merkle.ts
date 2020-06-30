@@ -5,7 +5,7 @@ import Arweave from "../common";
 import { concatBuffers } from "./utils";
 import { inspect } from "util";
 
-interface Chunk {
+export interface Chunk {
   dataHash: Uint8Array;
   minByteRange: number;
   maxByteRange: number;
@@ -29,7 +29,7 @@ interface LeafNode {
   readonly maxByteRange: number;
 }
 
-type MerkelNode = BranchNode | LeafNode;
+export type MerkelNode = BranchNode | LeafNode;
 
 const CHUNK_SIZE = 256 * 1024;
 const NOTE_SIZE = 32;
@@ -103,6 +103,24 @@ export async function generateTree(data: Uint8Array): Promise<MerkelNode> {
 }
 
 /**
+ * Generates the data_root, chunks & proofs 
+ * needed for a transaction.
+ * 
+ * @param data 
+ */
+export async function generateTransactionChunks(data: Uint8Array) {
+  const chunks = await chunkData(data);
+  const leaves = await generateLeaves(chunks);
+  const root = await buildLayers(leaves);
+  const proofs = await generateProofs(root);
+  return {
+    data_root: root.id,
+    chunks,
+    proofs
+  }
+}
+
+/**
  * Starting with the bottom layer of leaf nodes, hash every second pair
  * into a new branch node, push those branch nodes onto a new layer,
  * and then recurse, building up the tree to it's root, where the
@@ -138,10 +156,13 @@ async function buildLayers(
  */
 export function generateProofs(root: MerkelNode) {
   const proofs = resolveBranchProofs(root);
+  if (!Array.isArray(proofs)) {
+    return [ proofs ]
+  }
   return arrayFlatten<Proof>(proofs);
 }
 
-interface Proof {
+export interface Proof {
   offset: number;
   proof: Uint8Array;
 }
@@ -150,7 +171,7 @@ function resolveBranchProofs(
   node: MerkelNode,
   proof: Uint8Array = new Uint8Array(),
   depth = 0
-): any {
+): Proof | Proof[] {
   if (node.type == "leaf") {
     return {
       offset: node.maxByteRange - 1,
@@ -174,6 +195,8 @@ function resolveBranchProofs(
       resolveBranchProofs(node.rightChild!, partialProof, depth + 1),
     ] as [Proof, Proof];
   }
+
+  throw new Error(`Unexpected node type`);
 }
 
 export function arrayFlatten<T = any>(input: T[]): T[] {
