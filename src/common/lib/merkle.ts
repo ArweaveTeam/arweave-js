@@ -31,7 +31,8 @@ interface LeafNode {
 
 export type MerkelNode = BranchNode | LeafNode;
 
-const CHUNK_SIZE = 256 * 1024;
+export const MAX_CHUNK_SIZE = 256 * 1024;
+export const MIN_CHUNK_SIZE = 256;
 const NOTE_SIZE = 32;
 const HASH_SIZE = 32;
 
@@ -40,14 +41,26 @@ const HASH_SIZE = 32;
  * The last chunk will be a bit smaller as it contains the remainder
  * from the chunking process.
  */
-async function chunkData(data: Uint8Array): Promise<Chunk[]> {
+export async function chunkData(data: Uint8Array): Promise<Chunk[]> {
   let chunks: Chunk[] = [];
 
   let rest = data;
   let cursor = 0;
 
-  while (rest.byteLength >= CHUNK_SIZE) {
-    const chunk = rest.slice(0, CHUNK_SIZE);
+  while (rest.byteLength >= MAX_CHUNK_SIZE) {
+
+    let chunkSize = MAX_CHUNK_SIZE; 
+    
+    // If the total bytes left will produce a chunk < MIN_CHUNK_SIZE, 
+    // then adjust the amount we put in this 2nd last chunk.
+    
+    let nextChunkSize = rest.byteLength - MAX_CHUNK_SIZE
+    if (nextChunkSize > 0 && nextChunkSize < MIN_CHUNK_SIZE) {  
+      chunkSize = Math.ceil(rest.byteLength / 2)
+      // console.log(`Last chunk will be: ${nextChunkSize} which is below ${MIN_CHUNK_SIZE}, adjusting current to ${chunkSize} with ${rest.byteLength} left.`)
+    }
+
+    const chunk = rest.slice(0, chunkSize);
     const dataHash = await Arweave.crypto.hash(chunk);
     cursor += chunk.byteLength;
     chunks.push({
@@ -55,7 +68,7 @@ async function chunkData(data: Uint8Array): Promise<Chunk[]> {
       minByteRange: cursor - chunk.byteLength,
       maxByteRange: cursor,
     });
-    rest = rest.slice(CHUNK_SIZE);
+    rest = rest.slice(chunkSize);
   }
 
   chunks.push({
@@ -104,15 +117,28 @@ export async function generateTree(data: Uint8Array): Promise<MerkelNode> {
 
 /**
  * Generates the data_root, chunks & proofs 
- * needed for a transaction.
+ * needed for a transaction. 
+ * 
+ * This also checks if the last chunk is a zero-length
+ * chunk and discards that chunk and proof if so.
+ * (we do not need to upload this zero length chunk)
  * 
  * @param data 
  */
 export async function generateTransactionChunks(data: Uint8Array) {
+  
   const chunks = await chunkData(data);
   const leaves = await generateLeaves(chunks);
   const root = await buildLayers(leaves);
   const proofs = await generateProofs(root);
+  
+  // Discard the last chunk & proof if it's zero length.
+  const lastChunk = chunks.slice(-1)[0];
+  if (lastChunk.maxByteRange - lastChunk.minByteRange === 0) {
+    chunks.splice(chunks.length-1, 1);
+    proofs.splice(proofs.length-1, 1);
+  }
+  
   return {
     data_root: root.id,
     chunks,

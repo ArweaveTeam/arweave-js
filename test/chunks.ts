@@ -5,6 +5,9 @@ import {
   generateTree,
   generateProofs,
   computeRootHash,
+  chunkData,
+  MAX_CHUNK_SIZE,
+  MIN_CHUNK_SIZE,
 } from "../src/common/lib/merkle";
 import { readFileSync } from "fs";
 import { randomBytes } from "crypto";
@@ -120,4 +123,29 @@ describe("Chunks", function() {
       false
     );
   });
+
+  it("should split multiples of MAX_CHUNK_SIZE with one extra zero-length chunk", async function() {
+    const data = randomBytes(MAX_CHUNK_SIZE * 4);
+    const chunks = await chunkData(data);
+    expect(chunks.length).to.equal(5);
+    chunks.forEach((chunk, idx) => {
+      if (idx < 4) {
+        expect(chunk.maxByteRange - chunk.minByteRange).to.equal(MAX_CHUNK_SIZE)
+      } else {
+        expect(chunk.maxByteRange - chunk.minByteRange).to.equal(0)
+      }
+    })
+  })
+
+  it("should adjust the last two chunks to avoid chunks under MIN_CHUNK_SIZE", async function() {
+    const data = randomBytes(MAX_CHUNK_SIZE + MIN_CHUNK_SIZE-1);
+    const chunks = await chunkData(data);
+    expect(chunks.length).to.equal(2);
+    const chunk0size = chunks[0].maxByteRange - chunks[0].minByteRange;
+    const chunk1size = chunks[1].maxByteRange - chunks[1].minByteRange;
+    expect(chunk0size).to.be.gt(MIN_CHUNK_SIZE);
+    expect(chunk1size).to.be.gte(MIN_CHUNK_SIZE); 
+    expect(chunk0size).to.be.equal(chunk1size + 1);
+  })
+
 });
