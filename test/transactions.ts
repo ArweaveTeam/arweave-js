@@ -27,7 +27,7 @@ describe("Transactions", function() {
 
     expect(transaction).to.be.an.instanceOf(Transaction);
 
-    expect(transaction.data).to.equal("dGVzdA");
+    expect(transaction.get('data')).to.equal("dGVzdA");
 
     expect(transaction.last_tx).to.match(/^[a-z0-9-_]{64}$/i);
 

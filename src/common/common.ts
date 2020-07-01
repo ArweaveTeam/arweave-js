@@ -5,7 +5,6 @@ import Network from "./network";
 import Transactions from "./transactions";
 import Wallets from "./wallets";
 import Transaction, { TransactionInterface, Tag } from "./lib/transaction";
-import * as Merkle from "./lib/merkle";
 import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
 import Silo from "./silo";
@@ -24,7 +23,7 @@ export interface CreateTransactionInterface {
   quantity: string;
   data: string | Uint8Array;
   data_size: string;
-  data_root?: string;
+  data_root: string;
   reward: string;
 }
 
@@ -115,12 +114,9 @@ export default class Arweave {
       );
     }
 
-    if (attributes.data) {
-      const rootHash = await Merkle.computeRootHash(attributes.data);
-      transaction.data_size = attributes.data.byteLength.toString();
-      transaction.data_root = ArweaveUtils.bufferTob64Url(rootHash);
-      transaction.data = ArweaveUtils.bufferTob64Url(attributes.data);
-    }
+    transaction.data_root = '';
+    transaction.data_size = attributes.data ? attributes.data.byteLength.toString() : '0'
+    transaction.data = attributes.data || new Uint8Array(0);
 
     return new Transaction(transaction as TransactionInterface);
   }
