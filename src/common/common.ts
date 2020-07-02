@@ -21,7 +21,7 @@ export interface CreateTransactionInterface {
   tags: Tag[];
   target: string;
   quantity: string;
-  data: string | Uint8Array;
+  data: string | Uint8Array | ArrayBuffer;
   data_size: string;
   data_root: string;
   reward: string;
@@ -102,8 +102,12 @@ export default class Arweave {
       attributes.data = ArweaveUtils.stringToBuffer(attributes.data);
     }
 
+    if (attributes.data instanceof ArrayBuffer) {
+      attributes.data = new Uint8Array(attributes.data);
+    }
+
     if (attributes.data && !(attributes.data instanceof Uint8Array)) {
-      throw new Error("Expected data to be a string or Uint8Array");
+      throw new Error("Expected data to be a string, Uint8Array or ArrayBuffer");
     }
 
     if (attributes.reward == undefined) {

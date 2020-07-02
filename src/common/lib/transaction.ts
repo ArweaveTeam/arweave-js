@@ -101,7 +101,14 @@ export default class Transaction extends BaseObject
   public constructor(attributes: Partial<TransactionInterface> = {}) {
     super();
     Object.assign(this, attributes);
-
+    
+    // If something passes in a Tx that has been toJSON'ed and back, 
+    // or where the data was filled in from /tx/data endpoint. 
+    // data will be b64url encoded, so decode it.
+    if (typeof this.data === 'string') {
+      this.data = ArweaveUtils.b64UrlToBuffer(this.data as string);
+    }
+    
     if (attributes.tags) {
       this.tags = attributes.tags.map(
         (tag: { name: string; value: string }) => {
@@ -143,6 +150,18 @@ export default class Transaction extends BaseObject
     this.id = id;
   }
 
+  public async prepareChunks(data: Uint8Array) {
+    // Note: we *do not* use `this.data`, the caller may be
+    // operating on a transaction with an zero length data field.
+    // This function computes the chunks for the data passed in and
+    // assigns the result to this transaction. It should not read the
+    // data *from* this transaction.
+    if (!this.chunks && data.byteLength > 0) {
+      this.chunks = await generateTransactionChunks(data);
+      this.data_root = ArweaveUtils.bufferTob64Url(this.chunks.data_root);         
+    }
+  }
+  
   public async getSignatureData(): Promise<Uint8Array> {
     switch (this.format) {
       case 1:
@@ -165,10 +184,7 @@ export default class Transaction extends BaseObject
         ]);
       case 2:
 
-        if (!this.chunks && this.data.byteLength > 0) {
-          this.chunks = await generateTransactionChunks(this.data);
-          this.data_root = ArweaveUtils.bufferTob64Url(this.chunks.data_root);         
-        }
+        await this.prepareChunks(this.data);
         
         const tagList: [Uint8Array, Uint8Array][] = this.tags.map((tag) => [
           tag.get("name", { decode: true, string: false }),

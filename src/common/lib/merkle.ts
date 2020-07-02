@@ -32,7 +32,7 @@ interface LeafNode {
 export type MerkelNode = BranchNode | LeafNode;
 
 export const MAX_CHUNK_SIZE = 256 * 1024;
-export const MIN_CHUNK_SIZE = 256;
+export const MIN_CHUNK_SIZE = 32 * 1024;
 const NOTE_SIZE = 32;
 const HASH_SIZE = 32;
 

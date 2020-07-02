@@ -312,7 +312,58 @@ console.log(transaction);
 
 #### Submit a transaction
 
-Once a transaction is submitted to the network it'll be broadcast around all nodes and mined into a block.
+The preferred method of submitting a data transactions is to use chunk uploading. This method will allow larger transaction sizes, resuming a transaction upload if its interrupted and give progress updates while uploading.
+
+Simple example:
+
+```js
+
+let data = fs.readFileSync('path/to/file.pdf');
+
+let transaction = await arweave.createTransaction({ data: data }, key);
+transaction.addTag('Content-Type', 'application/pdf');
+
+await arweave.transaction.sign(transaction, key);
+
+let uploader = arweave.transactions.getUploader(transaction);
+
+while (!uploader.isComplete) {
+  await uploader.uploadChunk();
+  console.log(`${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`);
+}
+```
+
+Resuming an upload from a saved uploader object:
+
+```js
+
+let data = fs.readFileSync('path/to/file.pdf'); // get the same data
+let resumeObject = JSON.parse(savedUploader); // get uploader object from where you stored it.
+
+let uploader = arweave.transactions.getUploader(resumeObject, data);
+while (!uploader.isComplete) {
+  await uploader.uploadChunk();
+}
+
+```
+
+When resuming the upload, you *must provide the same data* as the original upload. When you serialize the uploader object with `JSON.stringify()` to save it somewhere, it will not include the data.
+
+You can also resume an upload from just the transaction ID and data, once it has been mined into a block. This can be useful if you didn't save the progress somewhere but the upload got interrupted. This will re-upload all of the data from the beginning, since we don't know which parts have been uploaded:
+
+```js
+
+let data = fs.readFileSync('path/to/file.pdf'); // get the same data
+let resumeTxId = 'mytxid' // a transaction id for a mined transaction that didn't complete the upload.
+
+let uploader = arweave.transactions.getUploader(resumeTxId, data);
+while (!uploader.isComplete) {
+  await uploader.uploadChunks();
+  console.log(`${progress.pctComplete}% complete`);
+}
+```
+
+You can alternatively submit transactions using `arweave.transactions.post()` which is suitable for small transactions or token transfers:
 
 ```js
 let key = await arweave.wallets.generate();
@@ -330,6 +381,15 @@ console.log(response.status);
 // 200
 
 // HTTP response codes (200 - ok, 400 - invalid transaction, 500 - error)
+```
+
+There is also a async iterator interface to chunk uploading, but this method means you'll need to ensure you are using a transpiler and polyfill for the asyncIterator symbol for some environments. (Safari on iOS in particular).
+
+```js
+for await (const uploader of arweave.transactions.upload(tx) {
+  console.log(`${uploader.pctComplete}% Complete`);
+}
+// done.
 ```
 
 #### Get a transaction status
