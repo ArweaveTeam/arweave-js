@@ -183,12 +183,12 @@ Data transactions are used to store data on the Arweave permaweb, they can conta
 let key = await arweave.wallets.generate();
 
 // Plain text
-let transactionA = arweave.createTransaction({
+let transactionA = await arweave.createTransaction({
     data: '<html><head><meta charset="UTF-8"><title>Hello world!</title></head><body></body></html>'
 }, key);
 
 // Buffer
-let transactionB = arweave.createTransaction({
+let transactionB = await arweave.createTransaction({
     data: Buffer.from('Some data', 'utf8')
 }, key);
 
@@ -217,7 +217,7 @@ console.log(transactionA);
 let key = await arweave.wallets.generate();
 
 // Send 10.5 AR to 1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY
-let transaction = arweave.createTransaction({
+let transaction = await arweave.createTransaction({
     target: '1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY',
     quantity: arweave.ar.arToWinston('10.5')
 }, key);
