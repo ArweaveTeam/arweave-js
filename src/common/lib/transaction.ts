@@ -161,6 +161,24 @@ export default class Transaction extends BaseObject
       this.data_root = ArweaveUtils.bufferTob64Url(this.chunks.data_root);         
     }
   }
+
+  // Returns a chunk in a format suitable for posting to /chunk.
+  // Similar to `prepareChunks()` this does not operate `this.data`, 
+  // instead using the data passed in.
+  public getChunk(idx: number, data: Uint8Array) {
+    if (!this.chunks) {
+      throw new Error(`Chunks have not been prepared`);
+    }
+    const proof = this.chunks.proofs[idx];
+    const chunk = this.chunks.chunks[idx];
+    return {
+      data_root: this.data_root,
+      data_size: this.data_size,
+      data_path: ArweaveUtils.bufferTob64Url(proof.proof),
+      offset: proof.offset.toString(),
+      chunk: ArweaveUtils.bufferTob64Url(data.slice(chunk.minByteRange, chunk.maxByteRange))
+    };
+  }
   
   public async getSignatureData(): Promise<Uint8Array> {
     switch (this.format) {

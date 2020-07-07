@@ -100,7 +100,7 @@ export class TransactionUploader {
 
     // Catch network errors and turn them into objects with status -1 and an error message.
     const resp = await this.api
-      .post(`chunk`, this.getChunk(this.chunkIndex))
+      .post(`chunk`, this.transaction.getChunk(this.chunkIndex, this.data))
       .catch(e => { 
         console.error(e.message);
         return { status: -1, data: { error: e.message } }
@@ -241,16 +241,5 @@ export class TransactionUploader {
     this.txPosted = true;
   }
 
-  private getChunk(idx: number) {
-    const proof = this.transaction.chunks!.proofs[idx];
-    const chunk = this.transaction.chunks!.chunks[idx];
-
-    return {
-      data_root: this.transaction.data_root,
-      data_size: this.transaction.data_size,
-      data_path: ArweaveUtils.bufferTob64Url(proof.proof),
-      offset: proof.offset.toString(),
-      chunk: ArweaveUtils.bufferTob64Url(this.data.slice(chunk.minByteRange, chunk.maxByteRange))
-    };
-  }
+  
 }
