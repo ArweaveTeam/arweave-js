@@ -11,6 +11,7 @@ import {
 } from "../src/common/lib/merkle";
 import { readFileSync } from "fs";
 import { randomBytes } from "crypto";
+import { arweaveInstance } from "./_arweave";
 
 const expect = chai.expect;
 
@@ -24,7 +25,50 @@ const offset = 262143;
 const dataSize = 836907;
 
 describe("Chunks", function() {
+  
   const data = readFileSync("./test/rebar3");
+  
+  it("should validate all chunks from 1Mb.bin test file", async function() {
+    this.timeout(5000);
+    const data = readFileSync("./test/fixtures/1mb.bin");
+
+    const key = await arweaveInstance().wallets.generate();
+    const tx = await arweaveInstance().createTransaction({ data: data, last_tx: 'foo', reward: '1' }, key);
+    
+    await tx.prepareChunks(tx.data);
+    const tx_data_root = b64UrlToBuffer(tx.data_root);
+    const results = await Promise.all(
+      tx.chunks!.chunks.map((_, idx) => {
+        const chunk = tx.getChunk(idx, data)
+        return validatePath(tx_data_root, parseInt(chunk.offset), 0, parseInt(chunk.data_size), b64UrlToBuffer(chunk.data_path));
+      })
+    );
+    // console.log(results);
+    for (let i = 0; i < results.length;i++) {
+      expect(results[i]).to.equal(true);
+    }
+  })
+
+  it("should validate all chunks from lotsofdata.bin test file", async function() {
+    this.timeout(5000);
+    const data = readFileSync("./test/fixtures/lotsofdata.bin");
+
+    const key = await arweaveInstance().wallets.generate();
+    const tx = await arweaveInstance().createTransaction({ data: data, last_tx: 'foo', reward: '1' }, key);
+    
+    await tx.prepareChunks(tx.data);
+    const tx_data_root = b64UrlToBuffer(tx.data_root);
+    const results = await Promise.all(
+      tx.chunks!.chunks.map((_, idx) => {
+        const chunk = tx.getChunk(idx, data)
+        return validatePath(tx_data_root, parseInt(chunk.offset), 0, parseInt(chunk.data_size), b64UrlToBuffer(chunk.data_path));
+      })
+    );
+    // console.log(results);
+    for (let i = 0; i < results.length;i++) {
+      expect(results[i]).to.equal(true);
+    }
+  })
 
   it("should build a tree with a valid root", async function() {
     const rootNode = await generateTree(data);
