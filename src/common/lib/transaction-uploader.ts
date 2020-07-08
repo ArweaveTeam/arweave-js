@@ -40,6 +40,7 @@ export class TransactionUploader {
   private transaction: Transaction;
   private data: Uint8Array;
   private lastRequestTimeEnd: number = 0;
+  private totalErrors = 0; // Not serialized.
 
   public lastResponseStatus: number = 0;
   public lastResponseError: string = ''
@@ -81,13 +82,27 @@ export class TransactionUploader {
       throw new Error(`Upload is already complete`);
     }
 
-    const delay = this.lastResponseError === '' ? 0 : 
+    if (this.lastResponseError !== '') {
+      this.totalErrors++;
+    } else {
+      this.totalErrors = 0;
+    }
+    
+    // We have been trying for about an hour receiving an 
+    // error every time, so eventually bail.
+    if (this.totalErrors === 100) {
+      throw new Error(`Unable to complete upload: ${this.lastResponseStatus}: ${this.lastResponseError}`)
+    }
+
+    let delay = this.lastResponseError === '' ? 0 : 
       Math.max(
         (this.lastRequestTimeEnd + ERROR_DELAY) - Date.now(),
         ERROR_DELAY
       );
 
     if (delay > 0) {
+      // Jitter delay bcoz networks, subtract up to 30% from 40 seconds
+      delay = delay - (delay * Math.random() * 0.30)
       await new Promise(res => setTimeout(res, delay))
     }
 
@@ -128,11 +143,7 @@ export class TransactionUploader {
    * @param serialized 
    * @param data 
    */
-  public static async fromSerialized(api: Api, serialized: SerializedUploader | string, data: Uint8Array) : Promise<TransactionUploader> {
-    
-    if (typeof serialized === 'string') {
-      serialized = JSON.parse(serialized) as SerializedUploader; 
-    }
+  public static async fromSerialized(api: Api, serialized: SerializedUploader, data: Uint8Array) : Promise<TransactionUploader> {
     
     if (!serialized || typeof serialized.chunkIndex !== 'number' || typeof serialized.transaction !== 'object') {
       throw new Error(`Serialized object does not match expected format.`);
