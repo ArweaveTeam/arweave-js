@@ -1,6 +1,7 @@
 import Transaction from './transaction';
 import * as ArweaveUtils from './utils';
 import Api from './api';
+import { getError } from './error';
 
 // Maximum amount of chunks we will upload in the body.
 const MAX_CHUNKS_IN_BODY = 1;
@@ -27,11 +28,6 @@ export interface SerializedUploader {
   lastResponseError: string
 }
 
-// Safely get error from an axios response, 
-// falling back to resp.data or 'unknown' 
-// if resp.data.error is not available.
-const getError = (resp: any) => 
-  resp.data ? (resp.data.error || resp.data) : 'unknown'
 
 export class TransactionUploader {
 
