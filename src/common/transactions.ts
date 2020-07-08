@@ -197,8 +197,11 @@ export default class Transactions {
   public async post(
     transaction: Transaction | Buffer | string | object
   ): Promise<AxiosResponse> {
-    if (transaction instanceof Transaction && transaction.signature === "") {
-      throw new Error("signature required");
+    if (
+      transaction instanceof Transaction &&
+      !(await this.verify(transaction))
+    ) {
+      throw new Error("transaction verify failed");
     }
     const response = await this.api.post(`tx`, transaction);
     if (response.status !== 200) {
