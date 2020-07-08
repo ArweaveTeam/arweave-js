@@ -194,11 +194,16 @@ export default class Transactions {
     );
   }
 
-  public post(
+  public async post(
     transaction: Transaction | Buffer | string | object
   ): Promise<AxiosResponse> {
-    return this.api.post(`tx`, transaction).then(response => {
-      return response;
-    });
+    if (transaction instanceof Transaction && transaction.signature === "") {
+      throw new Error("signature required");
+    }
+    const response = await this.api.post(`tx`, transaction);
+    if (response.status !== 200) {
+      throw new Error(response.statusText);
+    }
+    return response;
   }
 }
