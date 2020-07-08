@@ -156,9 +156,19 @@ export default class Transaction extends BaseObject
     // This function computes the chunks for the data passed in and
     // assigns the result to this transaction. It should not read the
     // data *from* this transaction.
+    
     if (!this.chunks && data.byteLength > 0) {
       this.chunks = await generateTransactionChunks(data);
       this.data_root = ArweaveUtils.bufferTob64Url(this.chunks.data_root);         
+    }
+
+    if (!this.chunks && data.byteLength === 0) {
+      this.chunks = {
+        chunks: [],
+        data_root: new Uint8Array(),
+        proofs: [],
+      }
+      this.data_root = '';
     }
   }
 
