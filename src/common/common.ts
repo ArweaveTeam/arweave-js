@@ -8,6 +8,7 @@ import Transaction, { TransactionInterface, Tag } from "./lib/transaction";
 import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
 import Silo from "./silo";
+import Chunks from "./chunks";
 
 export interface Config {
   api: ApiConfig;
@@ -40,6 +41,8 @@ export default class Arweave {
 
   public silo: Silo;
 
+  public chunks: Chunks
+
   public static init: (apiConfig: ApiConfig) => Arweave;
 
   public static crypto: CryptoInterface;
@@ -55,6 +58,7 @@ export default class Arweave {
 
     this.network = new Network(this.api);
     this.ar = new Ar();
+    this.chunks = new Chunks(this.api);
   }
 
   /** @deprecated */
