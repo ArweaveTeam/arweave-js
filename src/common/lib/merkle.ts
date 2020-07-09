@@ -266,7 +266,7 @@ async function hash(data: Uint8Array | Uint8Array[]) {
   if (Array.isArray(data)) {
     data = Arweave.utils.concatBuffers(data);
   }
-
+  
   return new Uint8Array(await Arweave.crypto.hash(data));
 }
 
@@ -281,7 +281,16 @@ function intToBuffer(note: number): Uint8Array {
 }
 
 function bufferToInt(buffer: Uint8Array): number {
-  return buffer.reduce((carry, current) => (carry + current) << 8, 0) >> 8;
+  let value = 0;
+  for (var i = 0; i < buffer.length; i++) {
+    value *= 256;
+    if (buffer[i] < 0) {
+      value += 256 + buffer[i];
+    } else {
+      value += buffer[i];
+    }
+  }
+  return value;
 }
 
 export const arrayCompare = (a: Uint8Array | any[], b: Uint8Array | any[]) =>
@@ -321,7 +330,7 @@ export async function validatePath(
     if (result) {
       return { offset: rightBound - 1, leftBound: leftBound, rightBound: rightBound, chunkSize: rightBound - leftBound }
     }
-    return false 
+    return false
   }
 
   const left = path.slice(0, HASH_SIZE);
