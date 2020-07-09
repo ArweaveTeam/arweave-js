@@ -2,6 +2,7 @@ import Transaction from './transaction';
 import * as ArweaveUtils from './utils';
 import Api from './api';
 import { getError } from './error';
+import { validatePath } from './merkle';
 
 // Maximum amount of chunks we will upload in the body.
 const MAX_CHUNKS_IN_BODY = 1;
@@ -27,7 +28,6 @@ export interface SerializedUploader {
   lastResponseStatus: number
   lastResponseError: string
 }
-
 
 export class TransactionUploader {
 
@@ -109,6 +109,15 @@ export class TransactionUploader {
       return;
     }
 
+    const chunk = this.transaction.getChunk(this.chunkIndex, this.data); 
+
+    console.log(`validating chunk: ${this.chunkIndex}`);
+    const chunkOk = validatePath(this.transaction.chunks!.data_root, parseInt(chunk.offset), 0, parseInt(chunk.data_size), ArweaveUtils.b64UrlToBuffer(chunk.data_path))
+    if (!chunkOk)  {
+      throw new Error(`Unable to validate chunk ${this.chunkIndex}`);
+    }
+    console.log(`validated chunk: ${this.chunkIndex}`);
+
     // Catch network errors and turn them into objects with status -1 and an error message.
     const resp = await this.api
       .post(`chunk`, this.transaction.getChunk(this.chunkIndex, this.data))
@@ -152,7 +161,7 @@ export class TransactionUploader {
 
     // Copy the serialized upload information, and data passed in. 
     upload.chunkIndex = serialized.chunkIndex;
-    upload.lastRequestTimeEnd = serialized.lastRequestTimeEnd; 
+    upload.lastRequestTimeEnd = serialized.lastRequestTimeEnd;
     upload.lastResponseError = serialized.lastResponseError;
     upload.lastResponseStatus = serialized.lastResponseStatus; 
     upload.txPosted = serialized.txPosted;
