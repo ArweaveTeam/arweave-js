@@ -80,7 +80,7 @@ export async function chunkData(data: Uint8Array): Promise<Chunk[]> {
   return chunks;
 }
 
-async function generateLeaves(chunks: Chunk[]): Promise<LeafNode[]> {
+export async function generateLeaves(chunks: Chunk[]): Promise<LeafNode[]> {
   return Promise.all(
     chunks.map(
       async ({ dataHash, minByteRange, maxByteRange }): Promise<LeafNode> => {
@@ -152,7 +152,7 @@ export async function generateTransactionChunks(data: Uint8Array) {
  * and then recurse, building up the tree to it's root, where the
  * layer only consists of two items.
  */
-async function buildLayers(
+export async function buildLayers(
   nodes: MerkelNode[],
   level = 0
 ): Promise<MerkelNode> {
@@ -293,7 +293,7 @@ export async function validatePath(
   leftBound: number,
   rightBound: number,
   path: Uint8Array
-): Promise<boolean> {
+): Promise<false | { offset: number, leftBound: number, rightBound: number, chunkSize: number }> {
   if (rightBound <= 0) {
     return false;
   }
@@ -317,8 +317,11 @@ export async function validatePath(
       await hash(pathData),
       await hash(endOffsetBuffer),
     ]);
-
-    return arrayCompare(id, pathDataHash);
+    let result = arrayCompare(id, pathDataHash); 
+    if (result) {
+      return { offset: rightBound - 1, leftBound: leftBound, rightBound: rightBound, chunkSize: rightBound - leftBound }
+    }
+    return false 
   }
 
   const left = path.slice(0, HASH_SIZE);

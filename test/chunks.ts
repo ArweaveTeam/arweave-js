@@ -43,9 +43,8 @@ describe("Chunks", function() {
         return validatePath(tx_data_root, parseInt(chunk.offset), 0, parseInt(chunk.data_size), b64UrlToBuffer(chunk.data_path));
       })
     );
-    // console.log(results);
     for (let i = 0; i < results.length;i++) {
-      expect(results[i]).to.equal(true);
+      expect(results[i]).to.be.ok;
     }
   })
 
@@ -64,10 +63,65 @@ describe("Chunks", function() {
         return validatePath(tx_data_root, parseInt(chunk.offset), 0, parseInt(chunk.data_size), b64UrlToBuffer(chunk.data_path));
       })
     );
-    // console.log(results);
     for (let i = 0; i < results.length;i++) {
-      expect(results[i]).to.equal(true);
+      expect(results[i]).to.ok;
     }
+  })
+
+  it("should infer the end offset when validating a chunk proof", async function() {
+    this.timeout(5000);
+    const key = await arweaveInstance().wallets.generate();
+    const data = randomBytes((256 * 1024 * 3) - 128);
+    const tx = await arweaveInstance().createTransaction({ data: data, last_tx: 'foo', reward: '1' }, key);
+    await tx.prepareChunks(data);
+    const tx_data_root = b64UrlToBuffer(tx.data_root);
+    
+    const chunk1 = await tx.getChunk(1, data);
+    
+    // save the correct offset 
+    const correctEndOffset = parseInt(chunk1.offset);
+    // use a valid but different offset (this is the minimum valid offset, since the the chunk is 256*1024)
+    const validatedChunk = await validatePath(tx_data_root, correctEndOffset - (256*1024)+1, 0, parseInt(chunk1.data_size), b64UrlToBuffer(chunk1.data_path));
+    
+    if (validatedChunk) {
+      expect(validatedChunk.offset).to.equal(correctEndOffset);
+    }
+    expect(validatedChunk).to.be.ok
+  })
+
+  it("should fail to validate a chunk proof when the offset is not within the chunk", async function() {
+    this.timeout(5000);
+    const key = await arweaveInstance().wallets.generate();
+    const data = randomBytes((256 * 1024) + (256 * 50));
+    const tx = await arweaveInstance().createTransaction({ data: data, last_tx: 'foo', reward: '1' }, key);
+    await tx.prepareChunks(data);
+    const tx_data_root = b64UrlToBuffer(tx.data_root);
+    const chunk1 = await tx.getChunk(1, data);
+    
+    // offset '4' is in chunk0, not chunk1, so invalid.
+    const validatedChunk = await validatePath(tx_data_root, 4, 0, parseInt(chunk1.data_size), b64UrlToBuffer(chunk1.data_path));
+    expect(validatedChunk).to.be.equal(false);
+  })
+
+
+  it("should infer the chunk size when validating a chunk proof", async function() {
+    this.timeout(5000);
+    const key = await arweaveInstance().wallets.generate();
+    const data = randomBytes((256 * 1024 * 2) - 128);
+    const tx = await arweaveInstance().createTransaction({ data: data, last_tx: 'foo', reward: '1' }, key);
+    await tx.prepareChunks(data);
+    const tx_data_root = b64UrlToBuffer(tx.data_root);
+    const chunk1 = await tx.getChunk(1, data);
+    
+    const correctEndOffset = parseInt(chunk1.offset);
+    
+    // Give it a wrong, but valid offset. 
+    
+    const validatedChunk = await validatePath(tx_data_root, correctEndOffset - 10, 0, parseInt(chunk1.data_size), b64UrlToBuffer(chunk1.data_path));
+    if (validatedChunk) {
+      expect(validatedChunk.chunkSize).to.equal(b64UrlToBuffer(chunk1.chunk).byteLength);
+    }
+    expect(validatedChunk).to.be.ok
   })
 
   it("should build a tree with a valid root", async function() {
@@ -112,7 +166,7 @@ describe("Chunks", function() {
 
     const didValidate = await validatePath.apply(validatePath, testInput);
 
-    expect(didValidate).to.equal(true);
+    expect(didValidate).to.ok;
 
     const invalidInputA: Args = [
       rootHash,
@@ -146,7 +200,7 @@ describe("Chunks", function() {
   });
 
   it("should validate a valid data path against a valid data root", async function() {
-    expect(await validatePath(root, offset, 0, dataSize, path)).to.equal(true);
+    expect(await validatePath(root, offset, 0, dataSize, path)).to.be.ok
   });
 
   it("should reject invalid root", async function() {
@@ -184,7 +238,7 @@ describe("Chunks", function() {
   it("should adjust the last two chunks to avoid chunks under MIN_CHUNK_SIZE", async function() {
     const data = randomBytes(MAX_CHUNK_SIZE + MIN_CHUNK_SIZE-1);
     const chunks = await chunkData(data);
-    expect(chunks.length).to.equal(2);
+    expect(chunks.length).to.equal(2);  
     const chunk0size = chunks[0].maxByteRange - chunks[0].minByteRange;
     const chunk1size = chunks[1].maxByteRange - chunks[1].minByteRange;
     expect(chunk0size).to.be.gt(MIN_CHUNK_SIZE);
