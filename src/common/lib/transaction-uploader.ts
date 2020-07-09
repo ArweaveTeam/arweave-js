@@ -111,13 +111,11 @@ export class TransactionUploader {
 
     const chunk = this.transaction.getChunk(this.chunkIndex, this.data); 
 
-    console.log(`validating chunk: ${this.chunkIndex}`);
-    const chunkOk = validatePath(this.transaction.chunks!.data_root, parseInt(chunk.offset), 0, parseInt(chunk.data_size), ArweaveUtils.b64UrlToBuffer(chunk.data_path))
+    const chunkOk = await validatePath(this.transaction.chunks!.data_root, parseInt(chunk.offset), 0, parseInt(chunk.data_size), ArweaveUtils.b64UrlToBuffer(chunk.data_path))
     if (!chunkOk)  {
       throw new Error(`Unable to validate chunk ${this.chunkIndex}`);
     }
-    console.log(`validated chunk: ${this.chunkIndex}`);
-
+   
     // Catch network errors and turn them into objects with status -1 and an error message.
     const resp = await this.api
       .post(`chunk`, this.transaction.getChunk(this.chunkIndex, this.data))
