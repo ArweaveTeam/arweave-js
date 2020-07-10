@@ -8,6 +8,8 @@ import {
   chunkData,
   MAX_CHUNK_SIZE,
   MIN_CHUNK_SIZE,
+  intToBuffer,
+  bufferToInt,
 } from "../src/common/lib/merkle";
 import { readFileSync } from "fs";
 import { randomBytes } from "crypto";
@@ -66,6 +68,17 @@ describe("Chunks", function() {
     for (let i = 0; i < results.length;i++) {
       expect(results[i]).to.ok;
     }
+  })
+
+  it('should convert ints to buffers and back up to Number.MAX_SAFE_INTEGER', async function() {
+    this.timeout(20000);
+    // we cant test every number :) 
+    for (let i = 0; i < Number.MAX_SAFE_INTEGER; i = i + 123444132157) {
+      const buf  = intToBuffer(i);
+      const ret = bufferToInt(buf);
+      expect(ret).to.equal(i);
+    }
+    expect(Number.MAX_SAFE_INTEGER).to.equal(bufferToInt(intToBuffer(Number.MAX_SAFE_INTEGER)));
   })
 
   it("should infer the end offset when validating a chunk proof", async function() {

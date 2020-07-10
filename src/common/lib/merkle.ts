@@ -266,29 +266,27 @@ async function hash(data: Uint8Array | Uint8Array[]) {
   if (Array.isArray(data)) {
     data = Arweave.utils.concatBuffers(data);
   }
-  
+
   return new Uint8Array(await Arweave.crypto.hash(data));
 }
 
-function intToBuffer(note: number): Uint8Array {
+export function intToBuffer(note: number): Uint8Array {
   const buffer = new Uint8Array(NOTE_SIZE);
 
-  for (let i = NOTE_SIZE - 1; i > 0 && note > 0; i--, note = note >> 8) {
-    buffer[i] = note;
+  for (var i = buffer.length-1; i >= 0; i--) {
+    var byte = note & 0xff;
+    buffer[i] = byte;
+    note = (note - byte) / 256 ;
   }
-
+  
   return buffer;
 }
 
-function bufferToInt(buffer: Uint8Array): number {
+export function bufferToInt(buffer: Uint8Array): number {
   let value = 0;
   for (var i = 0; i < buffer.length; i++) {
     value *= 256;
-    if (buffer[i] < 0) {
-      value += 256 + buffer[i];
-    } else {
-      value += buffer[i];
-    }
+    value += buffer[i];
   }
   return value;
 }
