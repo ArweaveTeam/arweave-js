@@ -196,7 +196,7 @@ export default class Transactions {
 
   public async post(
     transaction: Transaction | Buffer | string | object,
-    onUploadProgress?: AxiosRequestConfig["onUploadProgress"]
+    config?: AxiosRequestConfig
   ): Promise<AxiosResponse> {
     if (
       transaction instanceof Transaction &&
@@ -204,9 +204,7 @@ export default class Transactions {
     ) {
       throw new Error("transaction verify failed");
     }
-    const response = await this.api.post(`tx`, transaction, {
-      onUploadProgress,
-    });
+    const response = await this.api.post(`tx`, transaction, config);
     if (response.status !== 200) {
       throw new Error(response.statusText);
     }
