@@ -4,7 +4,7 @@ import ArweaveError, { ArweaveErrorType } from "./lib/error";
 import Transaction from "./lib/transaction";
 import * as ArweaveUtils from "./lib/utils";
 import { JWKInterface } from "./lib/wallet";
-import { AxiosResponse } from "axios";
+import { AxiosResponse, AxiosRequestConfig } from "axios";
 
 export interface TransactionConfirmedData {
   block_indep_hash: string;
@@ -195,7 +195,8 @@ export default class Transactions {
   }
 
   public async post(
-    transaction: Transaction | Buffer | string | object
+    transaction: Transaction | Buffer | string | object,
+    onUploadProgress?: AxiosRequestConfig["onUploadProgress"]
   ): Promise<AxiosResponse> {
     if (
       transaction instanceof Transaction &&
@@ -203,7 +204,9 @@ export default class Transactions {
     ) {
       throw new Error("transaction verify failed");
     }
-    const response = await this.api.post(`tx`, transaction);
+    const response = await this.api.post(`tx`, transaction, {
+      onUploadProgress,
+    });
     if (response.status !== 200) {
       throw new Error(response.statusText);
     }
