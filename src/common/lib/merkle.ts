@@ -276,9 +276,9 @@ export function intToBuffer(note: number): Uint8Array {
   for (var i = buffer.length-1; i >= 0; i--) {
     var byte = note & 0xff;
     buffer[i] = byte;
-    note = (note - byte) / 256 ;
+    note = (note - byte) / 256;
   }
-  
+
   return buffer;
 }
 

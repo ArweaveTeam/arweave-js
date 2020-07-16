@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 
-const { chunkData, generateLeaves , buildLayers, generateProofs } = require('./node/lib/merkle');
+const { chunkData, generateLeaves , buildLayers, generateProofs } = require('../node/lib/merkle');
+const { calculateChunkHashes } = require('../node/lib/transaction-chunking')
+const Arweave = require('../node');
 const fs = require('fs');
+const arweave = Arweave.init({ host: 'lon-1.eu-west-1.arweave.net', port: 1984, protocol: 'http' });
+
 
 async function testIt(file) {
-  const data = fs.readFileSync(file);
+  const data = await fs.promises.open(file);
   
   const t0 = Date.now()
-  const chunks = await chunkData(data);
+  const chunks = await calculateChunkHashes(data);
   const t1 = Date.now()
   const leaves = await generateLeaves(chunks);
   const t2 = Date.now()

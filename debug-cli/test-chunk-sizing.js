@@ -14,7 +14,7 @@ async function testIt(file) {
 
   tx.chunks.chunks.forEach((chunk, idx) => {
     const size = chunk.maxByteRange - chunk.minByteRange
-    console.log(`Chunk: ${idx} - ${size} - ${(size / 1024).toFixed(3)}, ${tx.chunks.proofs[idx].offset}`);
+    console.log(`Chunk: ${idx} - (${chunk.minByteRange},${chunk.maxByteRange}) - ${size} - ${(size / 1024).toFixed(3)}, ${tx.chunks.proofs[idx].offset}`);
   })
   console.log(tx.data_root);
   console.log(tx.data_size);

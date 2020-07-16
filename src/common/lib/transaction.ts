@@ -106,7 +106,10 @@ export default class Transaction extends BaseObject
     // or where the data was filled in from /tx/data endpoint. 
     // data will be b64url encoded, so decode it.
     if (typeof this.data === 'string') {
+      // @ts-ignore
+      // console.log(`converting ${this.data.length} from base64`)
       this.data = ArweaveUtils.b64UrlToBuffer(this.data as string);
+      // console.log(`new size: ${this.data.byteLength}`);
     }
     
     if (attributes.tags) {
