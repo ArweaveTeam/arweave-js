@@ -356,7 +356,7 @@ console.log(response.status);
 
 ##### Chunked uploading advanced options
 
-You can resuming an upload from a saved uploader object, that you have persisted in storage some using `JSON.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object pass it to `getUploader()` along with the transactions data:
+You can resume an upload from a saved uploader object, that you have persisted in storage some using `JSON.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object pass it to `getUploader()` along with the transactions data:
 
 ```js
 
