@@ -3,3 +3,4 @@
 /node
 /web
 /bundles
+/debug-cli/testfiles/**/*

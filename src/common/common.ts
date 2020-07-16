@@ -5,10 +5,10 @@ import Network from "./network";
 import Transactions from "./transactions";
 import Wallets from "./wallets";
 import Transaction, { TransactionInterface, Tag } from "./lib/transaction";
-import * as Merkle from "./lib/merkle";
 import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
 import Silo from "./silo";
+import Chunks from "./chunks";
 
 export interface Config {
   api: ApiConfig;
@@ -22,9 +22,9 @@ export interface CreateTransactionInterface {
   tags: Tag[];
   target: string;
   quantity: string;
-  data: string | Uint8Array;
+  data: string | Uint8Array | ArrayBuffer;
   data_size: string;
-  data_root?: string;
+  data_root: string;
   reward: string;
 }
 
@@ -41,6 +41,8 @@ export default class Arweave {
 
   public silo: Silo;
 
+  public chunks: Chunks
+
   public static init: (apiConfig: ApiConfig) => Arweave;
 
   public static crypto: CryptoInterface;
@@ -56,6 +58,7 @@ export default class Arweave {
 
     this.network = new Network(this.api);
     this.ar = new Ar();
+    this.chunks = new Chunks(this.api);
   }
 
   /** @deprecated */
@@ -103,8 +106,12 @@ export default class Arweave {
       attributes.data = ArweaveUtils.stringToBuffer(attributes.data);
     }
 
+    if (attributes.data instanceof ArrayBuffer) {
+      attributes.data = new Uint8Array(attributes.data);
+    }
+
     if (attributes.data && !(attributes.data instanceof Uint8Array)) {
-      throw new Error("Expected data to be a string or Uint8Array");
+      throw new Error("Expected data to be a string, Uint8Array or ArrayBuffer");
     }
 
     if (attributes.reward == undefined) {
@@ -115,12 +122,9 @@ export default class Arweave {
       );
     }
 
-    if (attributes.data) {
-      const rootHash = await Merkle.computeRootHash(attributes.data);
-      transaction.data_size = attributes.data.byteLength.toString();
-      transaction.data_root = ArweaveUtils.bufferTob64Url(rootHash);
-      transaction.data = ArweaveUtils.bufferTob64Url(attributes.data);
-    }
+    transaction.data_root = '';
+    transaction.data_size = attributes.data ? attributes.data.byteLength.toString() : '0'
+    transaction.data = attributes.data || new Uint8Array(0);
 
     return new Transaction(transaction as TransactionInterface);
   }
