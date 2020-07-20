@@ -157,9 +157,7 @@ describe("Transactions", function() {
 
     expect(transaction).to.be.an("object");
 
-    expect(transaction.data).to.equal("dGVzdA");
-
-    expect(transaction.last_tx).to.equal("");
+    expect(transaction.get('data')).to.equal("dGVzdA");
 
     expect(transaction.reward).to.match(/^[0-9]+$/);
 

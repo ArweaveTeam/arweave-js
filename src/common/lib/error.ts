@@ -29,3 +29,15 @@ export default class ArweaveError extends Error {
     return this.type;
   }
 }
+
+
+type AxiosResponseLite = { status: number, statusText?: string, data: { error: string } | any }
+
+// Safely get error string 
+// from an axios response, falling back to 
+// resp.data, statusText or 'unknown'.
+export const getError = (resp: AxiosResponseLite) => 
+  resp.data ? 
+    (resp.data.error || resp.data) 
+    : 
+    (resp.statusText || 'unknown' )
