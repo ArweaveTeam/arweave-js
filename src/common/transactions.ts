@@ -5,7 +5,10 @@ import Transaction from "./lib/transaction";
 import * as ArweaveUtils from "./lib/utils";
 import { JWKInterface } from "./lib/wallet";
 import { AxiosResponse } from "axios";
-import { TransactionUploader, SerializedUploader } from "./lib/transaction-uploader";
+import {
+  TransactionUploader,
+  SerializedUploader
+} from "./lib/transaction-uploader";
 import { MAX_CHUNK_SIZE } from "./lib/merkle";
 
 export interface TransactionConfirmedData {
@@ -67,12 +70,12 @@ export default class Transactions {
         const data = await this.getData(id);
         return new Transaction({
           ...response.data,
-          data,
+          data
         });
       }
       return new Transaction({
         ...response.data,
-        format: response.data.format || 1,
+        format: response.data.format || 1
       });
     }
 
@@ -144,7 +147,7 @@ export default class Transactions {
         return data;
       }
 
-      return (options && options.decode) ? new Uint8Array(0) : '';
+      return options && options.decode ? new Uint8Array(0) : "";
     });
   }
 
@@ -196,31 +199,32 @@ export default class Transactions {
     );
   }
 
-  
   public async post(
     transaction: Transaction | Buffer | string | object
-  ): Promise<{ status: number, statusText: string, data: any }> {
-    
-    if (typeof transaction === 'string') {
-      transaction = new Transaction(JSON.parse(transaction as string))
-    }
-    else if (transaction instanceof Buffer) {
-      transaction = new Transaction(JSON.parse(transaction.toString()))
-    }
-    else if (typeof transaction === 'object'  && !(transaction instanceof Transaction)) {
+  ): Promise<{ status: number; statusText: string; data: any }> {
+    if (typeof transaction === "string") {
+      transaction = new Transaction(JSON.parse(transaction as string));
+    } else if (transaction instanceof Buffer) {
+      transaction = new Transaction(JSON.parse(transaction.toString()));
+    } else if (
+      typeof transaction === "object" &&
+      !(transaction instanceof Transaction)
+    ) {
       transaction = new Transaction(transaction);
     }
-    
+
     if (!(transaction instanceof Transaction)) {
       throw new Error(`Must be Transaction object`);
     }
 
     if (transaction.data.byteLength > 1024 * 1024 * 10) {
-      console.warn(`transactions.getUploader() or transactions.upload() is recommended for large data transactions`);
+      console.warn(
+        `transactions.getUploader() or transactions.upload() is recommended for large data transactions`
+      );
     }
-    
+
     const uploader = await this.getUploader(transaction as Transaction);
-    
+
     // Emulate existing error & return value behaviour.
     try {
       while (!uploader.isComplete) {
@@ -228,31 +232,30 @@ export default class Transactions {
       }
     } catch (e) {
       if (uploader.lastResponseStatus > 0) {
-        return { 
-          status: uploader.lastResponseStatus, 
-          statusText: uploader.lastResponseError, 
+        return {
+          status: uploader.lastResponseStatus,
+          statusText: uploader.lastResponseError,
           data: {
-            error: uploader.lastResponseError,
+            error: uploader.lastResponseError
           }
-        }
+        };
       }
-      throw (e);
+      throw e;
     }
 
     return {
       status: 200,
-      statusText: 'OK',
+      statusText: "OK",
       data: {}
-    }
-    
+    };
   }
 
   /**
    * Gets an uploader than can be used to upload a transaction chunk by chunk, giving progress
-   * and the ability to resume. 
-   * 
-   * Usage example: 
-   * 
+   * and the ability to resume.
+   *
+   * Usage example:
+   *
    * ```
    * const uploader = arweave.transactions.getUploader(transaction);
    * while (!uploader.isComplete) {
@@ -260,17 +263,19 @@ export default class Transactions {
    *   console.log(`${uploader.pctComplete}%`);
    * }
    * ```
-   * 
+   *
    * @param upload a Transaction object, a previously save progress object, or a transaction id.
    * @param data the data of the transaction. Required when resuming an upload.
    */
-  public async getUploader(upload: Transaction | SerializedUploader | string, data?: Uint8Array | ArrayBuffer) {
+  public async getUploader(
+    upload: Transaction | SerializedUploader | string,
+    data?: Uint8Array | ArrayBuffer
+  ) {
     let uploader!: TransactionUploader;
-    
+
     if (upload instanceof Transaction) {
       uploader = new TransactionUploader(this.api, upload);
     } else {
-      
       if (data instanceof ArrayBuffer) {
         data = new Uint8Array(data);
       }
@@ -279,42 +284,46 @@ export default class Transactions {
         throw new Error(`Must provide data when resuming upload`);
       }
 
-      if (typeof upload === 'string') {
-        upload = await TransactionUploader.fromTransactionId(this.api, upload); 
+      if (typeof upload === "string") {
+        upload = await TransactionUploader.fromTransactionId(this.api, upload);
       }
 
       // upload should be a serialized upload.
-      uploader = await TransactionUploader.fromSerialized(this.api, upload, data)
+      uploader = await TransactionUploader.fromSerialized(
+        this.api,
+        upload,
+        data
+      );
     }
-    
-    return uploader
+
+    return uploader;
   }
 
   /**
    * Async generator version of uploader
-   * 
-   * Usage example: 
-   * 
+   *
+   * Usage example:
+   *
    * ```
    * for await (const uploader of arweave.transactions.upload(tx)) {
    *  console.log(`${uploader.pctComplete}%`);
    * }
    * ```
-   * 
+   *
    * @param upload a Transaction object, a previously save uploader, or a transaction id.
    * @param data the data of the transaction. Required when resuming an upload.
    */
-  public async * upload(upload: Transaction | SerializedUploader | string, data?: Uint8Array) {
-  
+  public async *upload(
+    upload: Transaction | SerializedUploader | string,
+    data?: Uint8Array
+  ) {
     const uploader = await this.getUploader(upload, data);
-    
+
     while (!uploader.isComplete) {
       await uploader.uploadChunk();
       yield uploader;
     }
 
-    return uploader
+    return uploader;
   }
-
-  
 }
