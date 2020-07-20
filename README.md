@@ -326,7 +326,7 @@ transaction.addTag('Content-Type', 'application/pdf');
 
 await arweave.transaction.sign(transaction, key);
 
-let uploader = arweave.transactions.getUploader(transaction);
+let uploader = await arweave.transactions.getUploader(transaction);
 
 while (!uploader.isComplete) {
   await uploader.uploadChunk();
@@ -363,7 +363,7 @@ You can resume an upload from a saved uploader object, that you have persisted i
 let data = fs.readFileSync('path/to/file.pdf'); // get the same data
 let resumeObject = JSON.parse(savedUploader); // get uploader object from where you stored it.
 
-let uploader = arweave.transactions.getUploader(resumeObject, data);
+let uploader = await arweave.transactions.getUploader(resumeObject, data);
 while (!uploader.isComplete) {
   await uploader.uploadChunk();
 }
@@ -379,7 +379,7 @@ You can also resume an upload from just the transaction ID and data, once it has
 let data = fs.readFileSync('path/to/file.pdf'); // get the same data
 let resumeTxId = 'mytxid' // a transaction id for a mined transaction that didn't complete the upload.
 
-let uploader = arweave.transactions.getUploader(resumeTxId, data);
+let uploader = await arweave.transactions.getUploader(resumeTxId, data);
 while (!uploader.isComplete) {
   await uploader.uploadChunks();
   console.log(`${progress.pctComplete}% complete`);
