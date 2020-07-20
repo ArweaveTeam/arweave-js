@@ -3,6 +3,7 @@ import * as ArweaveUtils from './utils';
 import Api from './api';
 import { getError } from './error';
 import { validatePath } from './merkle';
+import { AxiosRequestConfig } from 'axios';
 
 // Maximum amount of chunks we will upload in the body.
 const MAX_CHUNKS_IN_BODY = 1;
@@ -45,6 +46,10 @@ export class TransactionUploader {
     return this.txPosted && this.chunkIndex === this.transaction.chunks!.chunks.length;
   }
 
+  public get size(): number {
+    return this.transaction.data.byteLength;
+  }
+
   public get totalChunks(): number {
     return this.transaction.chunks!.chunks.length;
   }
@@ -72,7 +77,7 @@ export class TransactionUploader {
    * itself and on any subsequent calls uploads the
    * next chunk until it completes.
    */
-  public async uploadChunk(): Promise<void> {
+  public async uploadChunk(onUploadProgress: AxiosRequestConfig["onUploadProgress"]): Promise<void> {
 
     if (this.isComplete) {
       throw new Error(`Upload is already complete`);
@@ -118,7 +123,9 @@ export class TransactionUploader {
    
     // Catch network errors and turn them into objects with status -1 and an error message.
     const resp = await this.api
-      .post(`chunk`, this.transaction.getChunk(this.chunkIndex, this.data))
+      .post(`chunk`, this.transaction.getChunk(this.chunkIndex, this.data), {
+        onUploadProgress,
+      })
       .catch(e => { 
         console.error(e.message);
         return { status: -1, data: { error: e.message } }

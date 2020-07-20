@@ -4,7 +4,7 @@ import ArweaveError, { ArweaveErrorType } from "./lib/error";
 import Transaction from "./lib/transaction";
 import * as ArweaveUtils from "./lib/utils";
 import { JWKInterface } from "./lib/wallet";
-import { AxiosResponse } from "axios";
+import { AxiosResponse, AxiosRequestConfig } from "axios";
 import {
   TransactionUploader,
   SerializedUploader
@@ -16,10 +16,13 @@ export interface TransactionConfirmedData {
   block_height: number;
   number_of_confirmations: number;
 }
+
 export interface TransactionStatusResponse {
   status: number;
   confirmed: TransactionConfirmedData | null;
 }
+
+export type UploadProgressFn = (loaded: number, total: number) => Promise<void> | void
 
 export default class Transactions {
   private api: Api;
@@ -199,36 +202,44 @@ export default class Transactions {
     );
   }
 
-  public async post(
-    transaction: Transaction | Buffer | string | object
-  ): Promise<{ status: number; statusText: string; data: any }> {
+  public fromTransaction(transaction: Transaction | Buffer | string | object) {
     if (typeof transaction === "string") {
-      transaction = new Transaction(JSON.parse(transaction as string));
+      return new Transaction(JSON.parse(transaction));
     } else if (transaction instanceof Buffer) {
-      transaction = new Transaction(JSON.parse(transaction.toString()));
-    } else if (
-      typeof transaction === "object" &&
-      !(transaction instanceof Transaction)
-    ) {
-      transaction = new Transaction(transaction);
+      return new Transaction(JSON.parse(transaction.toString()));
+    } else if (transaction instanceof Transaction) {
+      return transaction;
+    } else if (typeof transaction === "object") {
+      return new Transaction(transaction);
     }
+  }
+
+  public async post(
+    tx: Transaction | Buffer | string | object,
+    onUploadProgress?: UploadProgressFn,
+  ): Promise<{ status: number; statusText: string; data: any }> {
+    const transaction = this.fromTransaction(tx)
 
     if (!(transaction instanceof Transaction)) {
       throw new Error(`Must be Transaction object`);
-    }
-
-    if (transaction.data.byteLength > 1024 * 1024 * 10) {
+    } else if (transaction.data.byteLength > 1024 * 1024 * 10) {
       console.warn(
         `transactions.getUploader() or transactions.upload() is recommended for large data transactions`
       );
     }
 
-    const uploader = await this.getUploader(transaction as Transaction);
+    const uploader = await this.getUploader(transaction);
+
+    let loaded: number = 0
+    const onChunkUploadProgress = (event: any) => {
+      loaded += event.loaded
+      onUploadProgress?.(loaded, uploader.size)
+    }
 
     // Emulate existing error & return value behaviour.
     try {
       while (!uploader.isComplete) {
-        await uploader.uploadChunk();
+        await uploader.uploadChunk(onChunkUploadProgress);
       }
     } catch (e) {
       if (uploader.lastResponseStatus > 0) {
@@ -315,12 +326,20 @@ export default class Transactions {
    */
   public async *upload(
     upload: Transaction | SerializedUploader | string,
-    data?: Uint8Array
+    data?: Uint8Array,
+    onUploadProgress?: UploadProgressFn
   ) {
     const uploader = await this.getUploader(upload, data);
 
+    const total = uploader.size;
+    let loaded: number = 0
+    const onChunkUploadProgress = (event: any) => {
+      loaded += event.loaded
+      onUploadProgress?.(loaded, total)
+    }
+
     while (!uploader.isComplete) {
-      await uploader.uploadChunk();
+      await uploader.uploadChunk(onChunkUploadProgress);
       yield uploader;
     }
 
