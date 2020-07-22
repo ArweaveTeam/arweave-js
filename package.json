@@ -2,7 +2,8 @@
   "name": "arweave",
   "version": "1.8.0",
   "description": "Arweave JS client library",
-  "main": "index.js",
+  "main": "./node/index.js",
+  "browser": "./web/index.js",
   "files": [
     "node",
     "web",
