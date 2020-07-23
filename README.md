@@ -324,7 +324,7 @@ let data = fs.readFileSync('path/to/file.pdf');
 let transaction = await arweave.createTransaction({ data: data }, key);
 transaction.addTag('Content-Type', 'application/pdf');
 
-await arweave.transaction.sign(transaction, key);
+await arweave.transactions.sign(transaction, key);
 
 let uploader = await arweave.transactions.getUploader(transaction);
 
