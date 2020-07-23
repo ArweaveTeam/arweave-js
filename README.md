@@ -263,7 +263,7 @@ transaction.addTag('key2', 'value2');
 console.log(transaction);
 // Transaction {
 //   format: 2,
-//   id: 'dUaZG84fJpiPQTt4J1VMBGvAr2ugyevFf0zmdkC1Ch4',
+//   id: '',
 //   last_tx: 'Tk-0c7260Ya5zjfjzl4f6-W-vRO94qiqZMAScKBcYXc68v1Pd8bYfTbKWi7pepUF',
 //   owner: 'kmM4O08BJB85RbxfQ2nkka9VNO6Czm2Tc_IGQNYC...',
 //   tags: [
@@ -277,7 +277,7 @@ console.log(transaction);
 //   data_root: 'GQunzmbwk2_JPU7oJOmLrTMvj8v_7BJaF0weyjVn5Nc',
 //   data_tree: [],
 //   reward: '7673074',
-//   signature: 'JhioDyYS76tkfCqoRUfqvy-GW1tn3abARX0q8Fo_SRygCq...'
+//   signature: ''
 // }
 ```
 
