@@ -60,7 +60,7 @@ Single bundle file (web only - use the NPM method if using Node).
 ```js
 const Arweave = require('arweave/node');
 
-const instance = Arweave.init({
+const arweave = Arweave.init({
     host: '127.0.0.1',
     port: 1984,
     protocol: 'http'
