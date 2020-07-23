@@ -136,7 +136,7 @@ arweave.wallets.generate().then((key) => {
 #### Get the wallet address for a private key
 
 ```js
-arweave.wallets.jwkToAddress(jwk).then((address) => {
+arweave.wallets.jwkToAddress(key).then((address) => {
     console.log(address);
     //1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY
 });
