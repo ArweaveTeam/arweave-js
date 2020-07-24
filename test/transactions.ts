@@ -1,14 +1,20 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
 import Transaction from "../src/common/lib/transaction";
-import { arweaveInstance } from "./_arweave";
+import { arweaveInstance, arweaveInstanceDirectNode } from "./_arweave";
 
 const expect = chai.expect;
 
 const arweave = arweaveInstance();
+const arweaveDirectNode = arweaveInstanceDirectNode();
 
 const digestRegex = /^[a-z0-9-_]{43}$/i;
 const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
+
+// These are all identical data (test.mp4)
+// const liveDataTxidLarge = "8S0uH6EtRkJOG0b0Q2XsEBSZmbMLnxAwIlNAe_P7ZHg";
+// const liveDataTxidLarge = "P4l6aCN97rt4GoyrpG1oKq3A20B2Y24GqmMLWNZlNIk"
+const liveDataTxidLarge = "KDKSOaecDl_IM4E0_0XiApwdrElvb9TnwOzeHt65Sno"
 
 describe("Transactions", function() {
   it("should create and sign data transactions", async function() {
@@ -176,6 +182,11 @@ describe("Transactions", function() {
   });
 
   it("should get transaction data", async function() {
+    
+    // This TX is not seeded properly atm so fails a lot. 
+    // TODO: renable
+    this.skip();
+
     const txRawData = await arweave.transactions.getData(liveDataTxid);
     expect(txRawData)
       .to.be.a("string")
@@ -196,6 +207,18 @@ describe("Transactions", function() {
       .to.be.a("string")
       .which.contain("<title>ARWEAVE / PEER EXPLORER</title>");
   });
+
+  it("should get transaction data > 12MiB from a gateway", async function() {
+    this.timeout(20000);
+    const data = await arweave.transactions.getData(liveDataTxidLarge, { decode: true }) as Uint8Array;
+    expect(data.byteLength).to.equal(14166765);
+  })
+
+  it("should get transaction data > 12MiB from a node", async function() {
+    this.timeout(80000);
+    const data = await arweaveDirectNode.transactions.getData(liveDataTxidLarge, { decode: true }) as Uint8Array;
+    expect(data.byteLength).to.equal(14166765);
+  })
 
   it("should find transactions", async function() {
     const results = await arweave.transactions.search(
