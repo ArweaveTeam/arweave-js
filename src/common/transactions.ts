@@ -65,7 +65,8 @@ export default class Transactions {
     const response = await this.api.get(`tx/${id}`);
 
     if (response.status == 200) {
-      if (response.data.format >= 2 && response.data.data_size > 0) {
+      const data_size = parseInt(response.data.data_size);
+      if (response.data.format >= 2 && data_size > 0 && data_size <= 1024 * 1024 * 12) {
         const data = await this.getData(id);
         return new Transaction({
           ...response.data,
