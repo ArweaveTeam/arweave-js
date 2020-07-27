@@ -96,7 +96,7 @@ const arweave = Arweave.init({
     </script>
 </head>
 <body>
-    
+
 </body>
 </html>
 ```
@@ -184,14 +184,14 @@ Data transactions are used to store data on the Arweave permaweb, they can conta
 let key = await arweave.wallets.generate();
 
 // Plain text
-let transactionA = arweave.createTransaction({
+let transactionA = await arweave.createTransaction({
     data: '<html><head><meta charset="UTF-8"><title>Hello world!</title></head><body></body></html>'
-}, jwk);
+}, key);
 
 // Buffer
-let transactionB = arweave.createTransaction({
+let transactionB = await arweave.createTransaction({
     data: Buffer.from('Some data', 'utf8')
-}, jwk);
+}, key);
 
 
 console.log(transactionA);
@@ -218,10 +218,10 @@ console.log(transactionA);
 let key = await arweave.wallets.generate();
 
 // Send 10.5 AR to 1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY
-let transaction = arweave.createTransaction({
+let transaction = await arweave.createTransaction({
     target: '1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY',
     quantity: arweave.ar.arToWinston('10.5')
-}, jwk);
+}, key);
 
 console.log(transaction);
 // Transaction {
@@ -326,7 +326,7 @@ transaction.addTag('Content-Type', 'application/pdf');
 
 await arweave.transaction.sign(transaction, key);
 
-let uploader = arweave.transactions.getUploader(transaction);
+let uploader = await arweave.transactions.getUploader(transaction);
 
 while (!uploader.isComplete) {
   await uploader.uploadChunk();
@@ -356,14 +356,14 @@ console.log(response.status);
 
 ##### Chunked uploading advanced options
 
-You can resuming an upload from a saved uploader object, that you have persisted in storage some using `JSON.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object pass it to `getUploader()` along with the transactions data:
+You can resume an upload from a saved uploader object, that you have persisted in storage some using `JSON.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object pass it to `getUploader()` along with the transactions data:
 
 ```js
 
 let data = fs.readFileSync('path/to/file.pdf'); // get the same data
 let resumeObject = JSON.parse(savedUploader); // get uploader object from where you stored it.
 
-let uploader = arweave.transactions.getUploader(resumeObject, data);
+let uploader = await arweave.transactions.getUploader(resumeObject, data);
 while (!uploader.isComplete) {
   await uploader.uploadChunk();
 }
@@ -379,7 +379,7 @@ You can also resume an upload from just the transaction ID and data, once it has
 let data = fs.readFileSync('path/to/file.pdf'); // get the same data
 let resumeTxId = 'mytxid' // a transaction id for a mined transaction that didn't complete the upload.
 
-let uploader = arweave.transactions.getUploader(resumeTxId, data);
+let uploader = await arweave.transactions.getUploader(resumeTxId, data);
 while (!uploader.isComplete) {
   await uploader.uploadChunks();
   console.log(`${progress.pctComplete}% complete`);
