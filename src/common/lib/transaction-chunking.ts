@@ -4,7 +4,7 @@ import { MAX_CHUNK_SIZE, MIN_CHUNK_SIZE, Chunk } from "./merkle";
 import Arweave from "../common";
 import * as pMap from 'p-map';
 
-// This will be stripped out during build, as we just using types from it.
+// This will be stripped out during build, as we just using some types from it.
 import { promises } from "fs";
 
 /**
