@@ -274,11 +274,11 @@ export function intToBuffer(note: number): Uint8Array {
   const buffer = new Uint8Array(NOTE_SIZE);
 
   for (var i = buffer.length-1; i >= 0; i--) {
-    var byte = note & 0xff;
+    var byte = note % 256;
     buffer[i] = byte;
-    note = (note - byte) / 256;
+    note = (note - byte) / 256 ;
   }
-
+  
   return buffer;
 }
 

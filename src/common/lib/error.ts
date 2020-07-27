@@ -36,8 +36,31 @@ type AxiosResponseLite = { status: number, statusText?: string, data: { error: s
 // Safely get error string 
 // from an axios response, falling back to 
 // resp.data, statusText or 'unknown'.
-export const getError = (resp: AxiosResponseLite) => 
-  resp.data ? 
-    (resp.data.error || resp.data) 
+// Note: a wrongly set content-type can
+// cause what is a json response to be interepted
+// as a string or Buffer, so we handle that too.
+
+export function getError(resp: AxiosResponseLite) {
+  let data = resp.data; 
+
+  if (typeof resp.data === 'string') {
+    try { 
+      data = JSON.parse(resp.data) 
+    }
+    catch (e) {
+    }
+  }
+
+  if (resp.data instanceof ArrayBuffer || resp.data instanceof Uint8Array) {
+    try {
+      data = JSON.parse(data.toString());
+    } catch (e) {
+
+    }
+  }
+
+  return data ? 
+    (data.error || data) 
     : 
     (resp.statusText || 'unknown' )
+}

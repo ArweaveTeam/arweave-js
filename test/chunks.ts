@@ -73,7 +73,12 @@ describe("Chunks", function() {
   it('should convert ints to buffers and back up to Number.MAX_SAFE_INTEGER', async function() {
     this.timeout(20000);
     // we cant test every number :) 
-    for (let i = 0; i < Number.MAX_SAFE_INTEGER; i = i + 123444132157) {
+    for (let i = 0; i < 1024 * 1024; i++) {
+      const buf  = intToBuffer(i);
+      const ret = bufferToInt(buf);
+      expect(ret).to.equal(i);
+    }
+    for (let i = 0; i < Number.MAX_SAFE_INTEGER; i = i + 93444132157) {
       const buf  = intToBuffer(i);
       const ret = bufferToInt(buf);
       expect(ret).to.equal(i);

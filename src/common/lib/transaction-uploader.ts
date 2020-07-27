@@ -42,7 +42,7 @@ export class TransactionUploader {
   public lastResponseError: string = ''
 
   public get isComplete(): boolean {
-    return this.chunkIndex === this.transaction.chunks!.chunks.length;
+    return this.txPosted && this.chunkIndex === this.transaction.chunks!.chunks.length;
   }
 
   public get totalChunks(): number {

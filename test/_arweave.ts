@@ -18,3 +18,12 @@ const defaultInstance = initInstance({
 export function arweaveInstance() {
   return defaultInstance;
 }
+
+export function arweaveInstanceDirectNode() {
+  return initInstance({
+    host: "lon-1.eu-west-1.arweave.net",
+    protocol: "http",
+    port: 1984,
+    logging: false
+  })
+}
