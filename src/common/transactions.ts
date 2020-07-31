@@ -49,7 +49,7 @@ export default class Transactions {
            * return it as a winston string.
            * @param data
            */
-          function(data): string {
+          function(data: any): string {
             return data;
           }
         ]
@@ -204,22 +204,22 @@ export default class Transactions {
     if (typeof transaction === 'string') {
       transaction = new Transaction(JSON.parse(transaction as string))
     }
-    else if (transaction instanceof Buffer) {
+    else if (typeof (transaction as any).readInt32BE === 'function') {
       transaction = new Transaction(JSON.parse(transaction.toString()))
     }
-    else if (typeof transaction === 'object'  && !(transaction instanceof Transaction)) {
-      transaction = new Transaction(transaction);
+    else if (typeof transaction === 'object' && !(transaction instanceof Transaction)) {
+      transaction = new Transaction(transaction as object);
     }
     
     if (!(transaction instanceof Transaction)) {
       throw new Error(`Must be Transaction object`);
     }
 
-    if (transaction.data.byteLength > 1024 * 1024 * 10) {
-      console.warn(`transactions.getUploader() or transactions.upload() is recommended for large data transactions`);
+    if (!transaction.chunks) {
+      await transaction.prepareChunks(transaction.data);
     }
     
-    const uploader = await this.getUploader(transaction as Transaction);
+    const uploader = await this.getUploader(transaction);
     
     // Emulate existing error & return value behaviour.
     try {
