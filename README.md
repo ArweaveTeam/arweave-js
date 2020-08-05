@@ -60,7 +60,7 @@ Single bundle file (web only - use the NPM method if using Node).
 ```js
 const Arweave = require('arweave/node');
 
-const instance = Arweave.init({
+const arweave = Arweave.init({
     host: '127.0.0.1',
     port: 1984,
     protocol: 'http'
@@ -136,7 +136,7 @@ arweave.wallets.generate().then((key) => {
 #### Get the wallet address for a private key
 
 ```js
-arweave.wallets.jwkToAddress(jwk).then((address) => {
+arweave.wallets.jwkToAddress(key).then((address) => {
     console.log(address);
     //1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY
 });
@@ -263,7 +263,7 @@ transaction.addTag('key2', 'value2');
 console.log(transaction);
 // Transaction {
 //   format: 2,
-//   id: 'dUaZG84fJpiPQTt4J1VMBGvAr2ugyevFf0zmdkC1Ch4',
+//   id: '',
 //   last_tx: 'Tk-0c7260Ya5zjfjzl4f6-W-vRO94qiqZMAScKBcYXc68v1Pd8bYfTbKWi7pepUF',
 //   owner: 'kmM4O08BJB85RbxfQ2nkka9VNO6Czm2Tc_IGQNYC...',
 //   tags: [
@@ -277,7 +277,7 @@ console.log(transaction);
 //   data_root: 'GQunzmbwk2_JPU7oJOmLrTMvj8v_7BJaF0weyjVn5Nc',
 //   data_tree: [],
 //   reward: '7673074',
-//   signature: 'JhioDyYS76tkfCqoRUfqvy-GW1tn3abARX0q8Fo_SRygCq...'
+//   signature: ''
 // }
 ```
 
@@ -324,7 +324,7 @@ let data = fs.readFileSync('path/to/file.pdf');
 let transaction = await arweave.createTransaction({ data: data }, key);
 transaction.addTag('Content-Type', 'application/pdf');
 
-await arweave.transaction.sign(transaction, key);
+await arweave.transactions.sign(transaction, key);
 
 let uploader = await arweave.transactions.getUploader(transaction);
 
