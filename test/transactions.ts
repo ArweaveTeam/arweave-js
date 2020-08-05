@@ -184,9 +184,6 @@ describe("Transactions", function() {
 
   it("should get transaction data", async function() {
     
-    // This TX is not seeded properly atm so fails a lot. 
-    // TODO: renable
-    this.skip();
 
     const txRawData = await arweave.transactions.getData(liveDataTxid);
     expect(txRawData)
