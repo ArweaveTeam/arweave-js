@@ -1,5 +1,5 @@
 // @ts-ignore
-import * as asn from "arweave-asn1";
+import * as asn from "asn1.js";
 
 function urlize(base64: string): string {
   return base64
