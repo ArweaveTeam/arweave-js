@@ -59,7 +59,7 @@ Single bundle file (web only - use the NPM method if using Node).
 
 ### NPM Node
 ```js
-const Arweave = require('arweave/node');
+const Arweave = require('arweave');
 
 const arweave = Arweave.init({
     host: '127.0.0.1',
@@ -70,7 +70,7 @@ const arweave = Arweave.init({
 
 ### NPM Web
 ```js
-import Arweave from 'arweave/web';
+import Arweave from 'arweave';
 
 // Since v1.5.1 you're now able to call the init function for the web version without options. The current path will be used by default, recommended.
 const arweave = Arweave.init();
