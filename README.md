@@ -29,6 +29,7 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
       - [Get transaction data](#get-transaction-data)
       - [Decode data and tags from transactions](#decode-data-and-tags-from-transactions)
     - [ArQL](#arql)
+    - [License](#license)
 
 ## Installation
 ### NPM
@@ -537,3 +538,7 @@ There are a number of community produced helper packages for building ArQL queri
 
  - https://www.npmjs.com/package/arlang
  - https://www.npmjs.com/package/arql-ops
+
+### License
+
+This software is released under the Apache License 2.0. See [LICENSE.md](./LICENSE.md) for full license details.
