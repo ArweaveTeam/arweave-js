@@ -541,4 +541,4 @@ There are a number of community produced helper packages for building ArQL queri
 
 ### License
 
-This software is released under the Apache License 2.0. See [LICENSE.md](./LICENSE.md) for full license details.
+This software is released under MIT license. See [LICENSE.md](./LICENSE.md) for full license details.
