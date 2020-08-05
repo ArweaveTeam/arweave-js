@@ -27,7 +27,7 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
       - [Get a transaction status](#get-a-transaction-status)
       - [Get a transaction](#get-a-transaction)
       - [Get transaction data](#get-transaction-data)
-      - [Decode data and tags from transactions](#decode-data-and-tags-from-transactions)
+      - [Decode tags from transactions](#decode-tags-from-transactions)
     - [ArQL](#arql)
     - [License](#license)
 
@@ -409,6 +409,9 @@ arweave.transactions.getStatus('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').th
 
 Fetch a transaction from the connected arweave node. The data and tags are base64 encoded, these can be decoded using the built in helper methods.
 
+**Update since v1.9.0**
+
+Due to how the API has evolved over time and with larger transaction support, the `data` field is no longer _guaranteed_ to be returned from the network as part of the transaction json, therefore, it is not recommended that you use this function for fetching data anymore. You should update your applications to use [`arweave.transactions.getData()`](#get-transaction-data) instead, this will handle small transactions, as well as the reassembling of chunks for larger ones, it can also benefit from gateway optimisations.
 ```js
 const transaction = arweave.transactions.get('hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8').then(transaction => {
   console.log(transaction);
@@ -447,7 +450,7 @@ arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then
 });
 
 // Get the data decoded to a Uint8Array for binary data
-getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U', {decode: true}).then(data => {
+arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U', {decode: true}).then(data => {
   console.log(data);
   // Uint8Array [10, 60, 33, 68, ...]
 });
@@ -459,30 +462,10 @@ arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U', {dec
 });
 ```
 
-#### Decode data and tags from transactions
+#### Decode tags from transactions
 
 ```js
 const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(transaction => {
-
-  // Use the get method to get a specific transaction field.
-  console.log(transaction.get('signature'));
-  // NLiRQSci56KVNk-x86eLT1TyF1ST8pzE-s7jdCJbW-V...
-
-  console.log(transaction.get('data'));
-  //CjwhRE9DVFlQRSBodG1sPgo8aHRtbCBsYW5nPSJlbiI-C...
-
-  // Get the data base64 decoded as a Uint8Array byte array.
-  console.log(transaction.get('data', {decode: true}));
-  //Uint8Array[10,60,33,68,79,67,84,89,80,69...
-
-  // Get the data base64 decoded as a string.
-  console.log(transaction.get('data', {decode: true, string: true}));
-  //<!DOCTYPE html>
-  //<html lang="en">
-  //<head>
-  //    <meta charset="UTF-8">
-  //    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  //    <title>ARWEAVE / PEER EXPLORER</title>
 
   transaction.get('tags').forEach(tag => {
     let key = tag.get('name', {decode: true, string: true});
