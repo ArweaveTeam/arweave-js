@@ -61,6 +61,9 @@ export class TransactionUploader {
     if (!transaction.id) {
       throw new Error(`Transaction is not signed`);
     }
+    if (!transaction.chunks) {
+      throw new Error(`Transaction chunks not prepared`);
+    }
     // Make a copy of transaction, zeroing the data so we can serialize.
     this.data = transaction.data;
     this.transaction = new Transaction(Object.assign({}, transaction, { data: new Uint8Array(0) }));
