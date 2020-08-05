@@ -40,7 +40,12 @@
     "permanence",
     "http"
   ],
-  "author": "Kyle Beckles",
+  "author": "Arweave Team <team@arweave.org>",
+  "contributors": [
+    "Kyle Beckles <kyle@arweave.org>",
+    "Aidan O'Kelly <aidan@arweave.org>",
+    "Cedrik Boudreau <cedrik@arweave.org>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ArweaveTeam/arweave-js/issues"
