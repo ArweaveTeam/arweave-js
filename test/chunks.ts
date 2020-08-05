@@ -27,6 +27,7 @@ const offset = 262143;
 const dataSize = 836907;
 
 describe("Chunks", function() {
+  this.timeout(10000);
   
   const data = readFileSync("./test/rebar3");
   

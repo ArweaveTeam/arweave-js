@@ -17,6 +17,7 @@ const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
 const liveDataTxidLarge = "KDKSOaecDl_IM4E0_0XiApwdrElvb9TnwOzeHt65Sno"
 
 describe("Transactions", function() {
+  this.timeout(10000);
   it("should create and sign data transactions", async function() {
     this.timeout(10000);
 

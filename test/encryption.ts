@@ -6,6 +6,7 @@ const expect = chai.expect;
 
 const arweave = arweaveInstance();
 describe("Encryption", function() {
+  this.timeout(10000);
   it("should encrypt and decrypt using key round trip", async function() {
     const text = "some data to encrypt";
 

@@ -7,6 +7,7 @@ const expect = chai.expect;
 const arweave = arweaveInstance();
 
 describe("Silo", function() {
+  this.timeout(10000);
   it("should resolve Silo URIs", async function() {
     const siloResource = await arweave.silo.parseUri("someref.1");
 
