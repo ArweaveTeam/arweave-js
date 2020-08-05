@@ -25,5 +25,5 @@ export function arweaveInstanceDirectNode() {
     protocol: "http",
     port: 1984,
     logging: false
-  })
+  });
 }

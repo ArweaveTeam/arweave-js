@@ -1,32 +1,32 @@
 import Api from "./lib/api";
 import { getError } from "./lib/error";
-import * as ArweaveUtils from './lib/utils';
+import * as ArweaveUtils from "./lib/utils";
 
 export interface TransactionOffsetResponse {
-  size: string
-  offset: string
+  size: string;
+  offset: string;
 }
 
 export interface TransactionChunkResponse {
-  chunk: string
-  data_path: string 
-  tx_path: string
+  chunk: string;
+  data_path: string;
+  tx_path: string;
 }
 
 export default class Chunks {
+  constructor(private api: Api) {}
 
-  constructor(private api: Api) {
-  }
-  
   async getTransactionOffset(id: string): Promise<TransactionOffsetResponse> {
-    const resp = await this.api.get(`tx/${id}/offset`)
+    const resp = await this.api.get(`tx/${id}/offset`);
     if (resp.status === 200) {
-      return resp.data
+      return resp.data;
     }
     throw new Error(`Unable to get transaction offset: ${getError(resp)}`);
   }
 
-  async getChunk(offset: string | number | BigInt): Promise<TransactionChunkResponse> {
+  async getChunk(
+    offset: string | number | BigInt
+  ): Promise<TransactionChunkResponse> {
     const resp = await this.api.get(`chunk/${offset}`);
     if (resp.status === 200) {
       return resp.data;
@@ -35,7 +35,7 @@ export default class Chunks {
   }
 
   async getChunkData(offset: string | number | BigInt): Promise<Uint8Array> {
-    const chunk = await this.getChunk(offset)
+    const chunk = await this.getChunk(offset);
     const buf = ArweaveUtils.b64UrlToBuffer(chunk.chunk);
     return buf;
   }
@@ -50,10 +50,10 @@ export default class Chunks {
     const size = parseInt(offsetResponse.size);
     const endOffset = parseInt(offsetResponse.offset);
     const startOffset = endOffset - size + 1;
-    
+
     const data = new Uint8Array(size);
     let byte = 0;
-    
+
     while (startOffset + byte < endOffset) {
       const chunkData = await this.getChunkData(startOffset + byte);
       data.set(chunkData, byte);

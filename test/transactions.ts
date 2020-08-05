@@ -14,7 +14,7 @@ const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
 // These are all identical data (test.mp4)
 // const liveDataTxidLarge = "8S0uH6EtRkJOG0b0Q2XsEBSZmbMLnxAwIlNAe_P7ZHg";
 // const liveDataTxidLarge = "P4l6aCN97rt4GoyrpG1oKq3A20B2Y24GqmMLWNZlNIk"
-const liveDataTxidLarge = "KDKSOaecDl_IM4E0_0XiApwdrElvb9TnwOzeHt65Sno"
+const liveDataTxidLarge = "KDKSOaecDl_IM4E0_0XiApwdrElvb9TnwOzeHt65Sno";
 
 describe("Transactions", function() {
   this.timeout(10000);
@@ -34,7 +34,7 @@ describe("Transactions", function() {
 
     expect(transaction).to.be.an.instanceOf(Transaction);
 
-    expect(transaction.get('data')).to.equal("dGVzdA");
+    expect(transaction.get("data")).to.equal("dGVzdA");
 
     expect(transaction.last_tx).to.match(/^[a-z0-9-_]{64}$/i);
 
@@ -183,8 +183,6 @@ describe("Transactions", function() {
   });
 
   it("should get transaction data", async function() {
-    
-
     const txRawData = await arweave.transactions.getData(liveDataTxid);
     expect(txRawData)
       .to.be.a("string")
@@ -208,15 +206,20 @@ describe("Transactions", function() {
 
   it("should get transaction data > 12MiB from a gateway", async function() {
     this.timeout(20000);
-    const data = await arweave.transactions.getData(liveDataTxidLarge, { decode: true }) as Uint8Array;
+    const data = (await arweave.transactions.getData(liveDataTxidLarge, {
+      decode: true
+    })) as Uint8Array;
     expect(data.byteLength).to.equal(14166765);
-  })
+  });
 
   it("should get transaction data > 12MiB from a node", async function() {
     this.timeout(80000);
-    const data = await arweaveDirectNode.transactions.getData(liveDataTxidLarge, { decode: true }) as Uint8Array;
+    const data = (await arweaveDirectNode.transactions.getData(
+      liveDataTxidLarge,
+      { decode: true }
+    )) as Uint8Array;
     expect(data.byteLength).to.equal(14166765);
-  })
+  });
 
   it("should find transactions", async function() {
     const results = await arweave.transactions.search(

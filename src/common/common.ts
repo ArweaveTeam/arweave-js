@@ -41,7 +41,7 @@ export default class Arweave {
 
   public silo: Silo;
 
-  public chunks: Chunks
+  public chunks: Chunks;
 
   public static init: (apiConfig: ApiConfig) => Arweave;
 
@@ -109,7 +109,9 @@ export default class Arweave {
     }
 
     if (attributes.data && !(attributes.data instanceof Uint8Array)) {
-      throw new Error("Expected data to be a string, Uint8Array or ArrayBuffer");
+      throw new Error(
+        "Expected data to be a string, Uint8Array or ArrayBuffer"
+      );
     }
 
     if (attributes.reward == undefined) {
@@ -120,8 +122,10 @@ export default class Arweave {
       );
     }
 
-    transaction.data_root = '';
-    transaction.data_size = attributes.data ? attributes.data.byteLength.toString() : '0'
+    transaction.data_root = "";
+    transaction.data_size = attributes.data
+      ? attributes.data.byteLength.toString()
+      : "0";
     transaction.data = attributes.data || new Uint8Array(0);
 
     return new Transaction(transaction as TransactionInterface);

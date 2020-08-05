@@ -48,15 +48,14 @@ export async function chunkData(data: Uint8Array): Promise<Chunk[]> {
   let cursor = 0;
 
   while (rest.byteLength >= MAX_CHUNK_SIZE) {
+    let chunkSize = MAX_CHUNK_SIZE;
 
-    let chunkSize = MAX_CHUNK_SIZE; 
-    
-    // If the total bytes left will produce a chunk < MIN_CHUNK_SIZE, 
+    // If the total bytes left will produce a chunk < MIN_CHUNK_SIZE,
     // then adjust the amount we put in this 2nd last chunk.
-    
-    let nextChunkSize = rest.byteLength - MAX_CHUNK_SIZE
-    if (nextChunkSize > 0 && nextChunkSize < MIN_CHUNK_SIZE) {  
-      chunkSize = Math.ceil(rest.byteLength / 2)
+
+    let nextChunkSize = rest.byteLength - MAX_CHUNK_SIZE;
+    if (nextChunkSize > 0 && nextChunkSize < MIN_CHUNK_SIZE) {
+      chunkSize = Math.ceil(rest.byteLength / 2);
       // console.log(`Last chunk will be: ${nextChunkSize} which is below ${MIN_CHUNK_SIZE}, adjusting current to ${chunkSize} with ${rest.byteLength} left.`)
     }
 
@@ -66,7 +65,7 @@ export async function chunkData(data: Uint8Array): Promise<Chunk[]> {
     chunks.push({
       dataHash,
       minByteRange: cursor - chunk.byteLength,
-      maxByteRange: cursor,
+      maxByteRange: cursor
     });
     rest = rest.slice(chunkSize);
   }
@@ -74,7 +73,7 @@ export async function chunkData(data: Uint8Array): Promise<Chunk[]> {
   chunks.push({
     dataHash: await Arweave.crypto.hash(rest),
     minByteRange: cursor,
-    maxByteRange: cursor + rest.byteLength,
+    maxByteRange: cursor + rest.byteLength
   });
 
   return chunks;
@@ -91,7 +90,7 @@ export async function generateLeaves(chunks: Chunk[]): Promise<LeafNode[]> {
           ),
           dataHash: dataHash,
           minByteRange,
-          maxByteRange,
+          maxByteRange
         };
       }
     )
@@ -116,34 +115,33 @@ export async function generateTree(data: Uint8Array): Promise<MerkelNode> {
 }
 
 /**
- * Generates the data_root, chunks & proofs 
- * needed for a transaction. 
- * 
+ * Generates the data_root, chunks & proofs
+ * needed for a transaction.
+ *
  * This also checks if the last chunk is a zero-length
  * chunk and discards that chunk and proof if so.
  * (we do not need to upload this zero length chunk)
- * 
- * @param data 
+ *
+ * @param data
  */
 export async function generateTransactionChunks(data: Uint8Array) {
-  
   const chunks = await chunkData(data);
   const leaves = await generateLeaves(chunks);
   const root = await buildLayers(leaves);
   const proofs = await generateProofs(root);
-  
+
   // Discard the last chunk & proof if it's zero length.
   const lastChunk = chunks.slice(-1)[0];
   if (lastChunk.maxByteRange - lastChunk.minByteRange === 0) {
-    chunks.splice(chunks.length-1, 1);
-    proofs.splice(proofs.length-1, 1);
+    chunks.splice(chunks.length - 1, 1);
+    proofs.splice(proofs.length - 1, 1);
   }
-  
+
   return {
     data_root: root.id,
     chunks,
     proofs
-  }
+  };
 }
 
 /**
@@ -183,7 +181,7 @@ export async function buildLayers(
 export function generateProofs(root: MerkelNode) {
   const proofs = resolveBranchProofs(root);
   if (!Array.isArray(proofs)) {
-    return [ proofs ]
+    return [proofs];
   }
   return arrayFlatten<Proof>(proofs);
 }
@@ -204,8 +202,8 @@ function resolveBranchProofs(
       proof: concatBuffers([
         proof,
         node.dataHash,
-        intToBuffer(node.maxByteRange),
-      ]),
+        intToBuffer(node.maxByteRange)
+      ])
     };
   }
 
@@ -214,11 +212,11 @@ function resolveBranchProofs(
       proof,
       node.leftChild!.id!,
       node.rightChild!.id!,
-      intToBuffer(node.byteRange),
+      intToBuffer(node.byteRange)
     ]);
     return [
       resolveBranchProofs(node.leftChild!, partialProof, depth + 1),
-      resolveBranchProofs(node.rightChild!, partialProof, depth + 1),
+      resolveBranchProofs(node.rightChild!, partialProof, depth + 1)
     ] as [Proof, Proof];
   }
 
@@ -228,7 +226,7 @@ function resolveBranchProofs(
 export function arrayFlatten<T = any>(input: T[]): T[] {
   const flat: any[] = [];
 
-  input.forEach((item) => {
+  input.forEach(item => {
     if (Array.isArray(item)) {
       flat.push(...arrayFlatten(item));
     } else {
@@ -251,12 +249,12 @@ async function hashBranch(
     id: await hash([
       await hash(left.id),
       await hash(right.id),
-      await hash(intToBuffer(left.maxByteRange)),
+      await hash(intToBuffer(left.maxByteRange))
     ]),
     byteRange: left.maxByteRange,
     maxByteRange: right.maxByteRange,
     leftChild: left,
-    rightChild: right,
+    rightChild: right
   } as BranchNode;
 
   return branch;
@@ -273,12 +271,12 @@ async function hash(data: Uint8Array | Uint8Array[]) {
 export function intToBuffer(note: number): Uint8Array {
   const buffer = new Uint8Array(NOTE_SIZE);
 
-  for (var i = buffer.length-1; i >= 0; i--) {
+  for (var i = buffer.length - 1; i >= 0; i--) {
     var byte = note % 256;
     buffer[i] = byte;
-    note = (note - byte) / 256 ;
+    note = (note - byte) / 256;
   }
-  
+
   return buffer;
 }
 
@@ -300,7 +298,10 @@ export async function validatePath(
   leftBound: number,
   rightBound: number,
   path: Uint8Array
-): Promise<false | { offset: number, leftBound: number, rightBound: number, chunkSize: number }> {
+): Promise<
+  | false
+  | { offset: number; leftBound: number; rightBound: number; chunkSize: number }
+> {
   if (rightBound <= 0) {
     return false;
   }
@@ -322,13 +323,18 @@ export async function validatePath(
 
     const pathDataHash = await hash([
       await hash(pathData),
-      await hash(endOffsetBuffer),
+      await hash(endOffsetBuffer)
     ]);
-    let result = arrayCompare(id, pathDataHash); 
+    let result = arrayCompare(id, pathDataHash);
     if (result) {
-      return { offset: rightBound - 1, leftBound: leftBound, rightBound: rightBound, chunkSize: rightBound - leftBound }
+      return {
+        offset: rightBound - 1,
+        leftBound: leftBound,
+        rightBound: rightBound,
+        chunkSize: rightBound - leftBound
+      };
     }
-    return false
+    return false;
   }
 
   const left = path.slice(0, HASH_SIZE);
@@ -346,7 +352,7 @@ export async function validatePath(
   const pathHash = await hash([
     await hash(left),
     await hash(right),
-    await hash(offsetBuffer),
+    await hash(offsetBuffer)
   ]);
 
   if (arrayCompare(id, pathHash)) {
@@ -397,7 +403,7 @@ export async function debug(proof: Uint8Array, output = ""): Promise<string> {
   const pathHash = await hash([
     await hash(left),
     await hash(right),
-    await hash(offsetBuffer),
+    await hash(offsetBuffer)
   ]);
 
   const updatedOutput = `${output}\n${inspect(Buffer.from(left))},${inspect(

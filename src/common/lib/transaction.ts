@@ -1,6 +1,6 @@
 import * as ArweaveUtils from "./utils";
 import deepHash from "./deepHash";
-import { Chunk, Proof, generateTransactionChunks } from './merkle';
+import { Chunk, Proof, generateTransactionChunks } from "./merkle";
 
 class BaseObject {
   [key: string]: any;
@@ -26,16 +26,16 @@ class BaseObject {
     }
 
     // Handle fields that are Uint8Arrays.
-    // To maintain compat we encode them to b64url 
+    // To maintain compat we encode them to b64url
     // if decode option is not specificed.
     if (this[field] instanceof Uint8Array) {
       if (options && options.decode && options.string) {
         return ArweaveUtils.bufferToString(this[field]);
       }
       if (options && options.decode && !options.string) {
-        return this[field]
+        return this[field];
       }
-      return ArweaveUtils.bufferTob64Url(this[field])
+      return ArweaveUtils.bufferTob64Url(this[field]);
     }
 
     if (options && options.decode == true) {
@@ -93,22 +93,22 @@ export default class Transaction extends BaseObject
 
   // Computed when needed.
   public chunks?: {
-    data_root: Uint8Array
-    chunks: Chunk[]
-    proofs: Proof[]
-  }
-  
+    data_root: Uint8Array;
+    chunks: Chunk[];
+    proofs: Proof[];
+  };
+
   public constructor(attributes: Partial<TransactionInterface> = {}) {
     super();
     Object.assign(this, attributes);
-    
-    // If something passes in a Tx that has been toJSON'ed and back, 
-    // or where the data was filled in from /tx/data endpoint. 
+
+    // If something passes in a Tx that has been toJSON'ed and back,
+    // or where the data was filled in from /tx/data endpoint.
     // data will be b64url encoded, so decode it.
-    if (typeof this.data === 'string') {
+    if (typeof this.data === "string") {
       this.data = ArweaveUtils.b64UrlToBuffer(this.data as string);
     }
-    
+
     if (attributes.tags) {
       this.tags = attributes.tags.map(
         (tag: { name: string; value: string }) => {
@@ -141,7 +141,7 @@ export default class Transaction extends BaseObject
       data_root: this.data_root,
       data_tree: this.data_tree,
       reward: this.reward,
-      signature: this.signature,
+      signature: this.signature
     };
   }
 
@@ -156,24 +156,24 @@ export default class Transaction extends BaseObject
     // This function computes the chunks for the data passed in and
     // assigns the result to this transaction. It should not read the
     // data *from* this transaction.
-    
+
     if (!this.chunks && data.byteLength > 0) {
       this.chunks = await generateTransactionChunks(data);
-      this.data_root = ArweaveUtils.bufferTob64Url(this.chunks.data_root);         
+      this.data_root = ArweaveUtils.bufferTob64Url(this.chunks.data_root);
     }
 
     if (!this.chunks && data.byteLength === 0) {
       this.chunks = {
         chunks: [],
         data_root: new Uint8Array(),
-        proofs: [],
-      }
-      this.data_root = '';
+        proofs: []
+      };
+      this.data_root = "";
     }
   }
 
   // Returns a chunk in a format suitable for posting to /chunk.
-  // Similar to `prepareChunks()` this does not operate `this.data`, 
+  // Similar to `prepareChunks()` this does not operate `this.data`,
   // instead using the data passed in.
   public getChunk(idx: number, data: Uint8Array) {
     if (!this.chunks) {
@@ -186,10 +186,12 @@ export default class Transaction extends BaseObject
       data_size: this.data_size,
       data_path: ArweaveUtils.bufferTob64Url(proof.proof),
       offset: proof.offset.toString(),
-      chunk: ArweaveUtils.bufferTob64Url(data.slice(chunk.minByteRange, chunk.maxByteRange))
+      chunk: ArweaveUtils.bufferTob64Url(
+        data.slice(chunk.minByteRange, chunk.maxByteRange)
+      )
     };
   }
-  
+
   public async getSignatureData(): Promise<Uint8Array> {
     switch (this.format) {
       case 1:
@@ -208,15 +210,14 @@ export default class Transaction extends BaseObject
           ArweaveUtils.stringToBuffer(this.quantity),
           ArweaveUtils.stringToBuffer(this.reward),
           this.get("last_tx", { decode: true, string: false }),
-          ArweaveUtils.stringToBuffer(tagString),
+          ArweaveUtils.stringToBuffer(tagString)
         ]);
       case 2:
-
         await this.prepareChunks(this.data);
-        
-        const tagList: [Uint8Array, Uint8Array][] = this.tags.map((tag) => [
+
+        const tagList: [Uint8Array, Uint8Array][] = this.tags.map(tag => [
           tag.get("name", { decode: true, string: false }),
-          tag.get("value", { decode: true, string: false }),
+          tag.get("value", { decode: true, string: false })
         ]);
 
         return await deepHash([
@@ -228,7 +229,7 @@ export default class Transaction extends BaseObject
           this.get("last_tx", { decode: true, string: false }),
           tagList,
           ArweaveUtils.stringToBuffer(this.data_size),
-          this.get("data_root", { decode: true, string: false }),
+          this.get("data_root", { decode: true, string: false })
         ]);
       default:
         throw new Error(`Unexpected transaction format: ${this.format}`);
