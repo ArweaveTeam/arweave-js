@@ -52,13 +52,11 @@ export default class Arweave {
   constructor(apiConfig: ApiConfig) {
     this.api = new Api(apiConfig);
     this.wallets = new Wallets(this.api, Arweave.crypto);
-
-    this.transactions = new Transactions(this.api, Arweave.crypto);
+    this.chunks = new Chunks(this.api);
+    this.transactions = new Transactions(this.api, Arweave.crypto, this.chunks);
     this.silo = new Silo(this.api, this.crypto, this.transactions);
-
     this.network = new Network(this.api);
     this.ar = new Ar();
-    this.chunks = new Chunks(this.api);
   }
 
   /** @deprecated */

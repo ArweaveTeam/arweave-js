@@ -1,12 +1,11 @@
 import Api from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
-import ArweaveError, { ArweaveErrorType } from "./lib/error";
+import ArweaveError, { ArweaveErrorType, getError } from "./lib/error";
 import Transaction from "./lib/transaction";
 import * as ArweaveUtils from "./lib/utils";
 import { JWKInterface } from "./lib/wallet";
-import { AxiosResponse } from "axios";
 import { TransactionUploader, SerializedUploader } from "./lib/transaction-uploader";
-import { MAX_CHUNK_SIZE } from "./lib/merkle";
+import Chunks from "./chunks";
 
 export interface TransactionConfirmedData {
   block_indep_hash: string;
@@ -23,9 +22,12 @@ export default class Transactions {
 
   private crypto: CryptoInterface;
 
-  constructor(api: Api, crypto: CryptoInterface) {
+  private chunks: Chunks;
+
+  constructor(api: Api, crypto: CryptoInterface, chunks: Chunks) {
     this.api = api;
     this.crypto = crypto;
+    this.chunks = chunks;
   }
 
   public getTransactionAnchor(): Promise<string> {
@@ -63,7 +65,8 @@ export default class Transactions {
     const response = await this.api.get(`tx/${id}`);
 
     if (response.status == 200) {
-      if (response.data.format >= 2 && response.data.data_size > 0) {
+      const data_size = parseInt(response.data.data_size);
+      if (response.data.format >= 2 && data_size > 0 && data_size <= 1024 * 1024 * 12) {
         const data = await this.getData(id);
         return new Transaction({
           ...response.data,
@@ -125,27 +128,50 @@ export default class Transactions {
     });
   }
 
-  public getData(
+  public async getData(
     id: string,
     options?: { decode?: boolean; string?: boolean }
   ): Promise<string | Uint8Array> {
-    return this.api.get(`tx/${id}/data`).then(response => {
-      if (response.status === 200) {
-        const data = response.data;
+    
+    // Attempt to download from /txid, fall back to downloading chunks.
+    
+    const resp = await this.api.get(`${id}`, { responseType: 'arraybuffer' }); 
+    let data: Uint8Array | undefined = undefined;
+    if (resp.status === 200) {
+      data = new Uint8Array(resp.data);
+    } 
 
-        if (options && options.decode == true) {
-          if (options && options.string) {
-            return ArweaveUtils.b64UrlToString(data);
-          }
+    if (resp.status === 400 && getError(resp) === 'tx_data_too_big') {
+      data = await this.chunks.downloadChunkedData(id);
+    }
 
-          return ArweaveUtils.b64UrlToBuffer(data);
-        }
+    // If we don't have data, throw an exception. Previously we 
+    // just returned an empty data object. 
 
-        return data;
+    if (!data) {
+      if (resp.status == 202) {
+        throw new ArweaveError(ArweaveErrorType.TX_PENDING);
+      }
+  
+      if (resp.status == 404) {
+        throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
+      }
+  
+      if (resp.status == 410) {
+        throw new ArweaveError(ArweaveErrorType.TX_FAILED);
       }
 
-      return (options && options.decode) ? new Uint8Array(0) : '';
-    });
+      throw new Error(`Unable to get data: ${resp.status} - ${getError(resp)}`);
+    }
+
+    if (options && options.decode && !options.string) {
+      return data;
+    }
+    if (options && options.decode && options.string) {
+      return ArweaveUtils.bufferToString(data);
+    }
+    // Since decode wasn't requested, caller expects b64url encoded data.
+    return ArweaveUtils.bufferTob64Url(data);
   }
 
   public async sign(
