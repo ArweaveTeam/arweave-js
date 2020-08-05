@@ -293,6 +293,7 @@ describe("Encryption", function() {
 
 describe("Silo Web", function() {
   it("should read Silo transaction", async function() {
+    this.skip();
     this.timeout(5000);
 
     // This is a manually generated silo transaction
