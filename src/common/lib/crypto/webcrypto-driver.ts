@@ -13,7 +13,7 @@ export default class WebCryptoDriver implements CryptoInterface {
       throw new Error("SubtleCrypto not available!");
     }
 
-    this.driver = window.crypto.subtle;
+    this.driver = crypto.subtle;
   }
 
   public async generateJWK(): Promise<JWKInterface> {
@@ -124,33 +124,21 @@ export default class WebCryptoDriver implements CryptoInterface {
   }
 
   private detectWebCrypto() {
-    if (!window || !window.crypto || !window.crypto.subtle) {
+    if (typeof crypto === "undefined") {
       return false;
     }
-
-    let subtle = window.crypto.subtle;
-
-    if (typeof subtle.generateKey != "function") {
+    const subtle = crypto?.subtle;
+    if (subtle === undefined) {
       return false;
     }
-
-    if (typeof subtle.importKey != "function") {
-      return false;
-    }
-
-    if (typeof subtle.exportKey != "function") {
-      return false;
-    }
-
-    if (typeof subtle.digest != "function") {
-      return false;
-    }
-
-    if (typeof subtle.sign != "function") {
-      return false;
-    }
-
-    return true;
+    const names = <const>[
+      "generateKey",
+      "importKey",
+      "exportKey",
+      "digest",
+      "sign",
+    ];
+    return names.every((name) => typeof subtle[name] === "function");
   }
 
   public async encrypt(
