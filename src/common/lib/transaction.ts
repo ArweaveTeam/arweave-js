@@ -195,13 +195,13 @@ export default class Transaction extends BaseObject
   public async getSignatureData(): Promise<Uint8Array> {
     switch (this.format) {
       case 1:
-        let tagString = this.tags.reduce((accumulator: string, tag: Tag) => {
-          return (
-            accumulator +
-            tag.get("name", { decode: true, string: true }) +
-            tag.get("value", { decode: true, string: true })
-          );
-        }, "");
+        let tags = this.tags.reduce((accumulator: Uint8Array, tag: Tag) => {
+          return ArweaveUtils.concatBuffers([
+            accumulator,
+            tag.get("name", { decode: true, string: false }),
+            tag.get("value", { decode: true, string: false }),
+          ]);
+        }, new Uint8Array());
 
         return ArweaveUtils.concatBuffers([
           this.get("owner", { decode: true, string: false }),
@@ -210,7 +210,7 @@ export default class Transaction extends BaseObject
           ArweaveUtils.stringToBuffer(this.quantity),
           ArweaveUtils.stringToBuffer(this.reward),
           this.get("last_tx", { decode: true, string: false }),
-          ArweaveUtils.stringToBuffer(tagString)
+          tags,
         ]);
       case 2:
         await this.prepareChunks(this.data);
