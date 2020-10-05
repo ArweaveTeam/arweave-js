@@ -2,6 +2,23 @@ import * as chai from "chai";
 
 const expect = chai.expect;
 
+let globals = <any>global;
+
+// The web distro will attach to the browser window so we just
+// need to mock a global window object with a subtle crypto stub
+// to make this test work.
+globals.crypto = {
+  subtle: {
+    generateKey: async () => {},
+    importKey: async () => {},
+    exportKey: async () => {},
+    digest: async () => {},
+    sign: async () => {},
+  },
+};
+
+globals.window = {};
+
 describe("Node distribution", function() {
   it("should initilize from compiled node dist", async function() {
     const dist = require("../node");
@@ -28,23 +45,6 @@ describe("Node distribution", function() {
 
 describe("Web distribution", function() {
   it("should initilize from web compiled dist", async function() {
-    // The web distro will attach to the browser window so we just
-    // need to mock a global window object with a subtle crypto stub
-    // to make this test work.
-    let globals = <any>global;
-
-    globals.window = {
-      crypto: {
-        subtle: {
-          generateKey: async () => {},
-          importKey: async () => {},
-          exportKey: async () => {},
-          digest: async () => {},
-          sign: async () => {}
-        }
-      }
-    };
-
     require("../web");
 
     const dist = globals.window.Arweave;
@@ -74,23 +74,6 @@ describe("Web distribution", function() {
   });
 
   it("should initilize from web bundle", async function() {
-    // The web distro will attach to the browser window so we just
-    // need to mock a global window object with a subtle crypto stub
-    // to make this test work.
-    let globals = <any>global;
-
-    globals.window = {
-      crypto: {
-        subtle: {
-          generateKey: async () => {},
-          importKey: async () => {},
-          exportKey: async () => {},
-          digest: async () => {},
-          sign: async () => {}
-        }
-      }
-    };
-
     require("../bundles/web.bundle");
 
     const dist = globals.window.Arweave;
@@ -120,23 +103,6 @@ describe("Web distribution", function() {
   });
 
   it("should initilize from minified web bundle", async function() {
-    // The web distro will attach to the browser window so we just
-    // need to mock a global window object with a subtle crypto stub
-    // to make this test work.
-    let globals = <any>global;
-
-    globals.window = {
-      crypto: {
-        subtle: {
-          generateKey: async () => {},
-          importKey: async () => {},
-          exportKey: async () => {},
-          digest: async () => {},
-          sign: async () => {}
-        }
-      }
-    };
-
     require("../bundles/web.bundle.min");
 
     const dist = globals.window.Arweave;
