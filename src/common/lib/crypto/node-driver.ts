@@ -50,7 +50,6 @@ export default class NodeCryptoDriver implements CryptoInterface {
           .sign({
             key: this.jwkToPem(jwk),
             padding: constants.RSA_PKCS1_PSS_PADDING,
-            saltLength: 0
           })
       );
     });
@@ -78,7 +77,6 @@ export default class NodeCryptoDriver implements CryptoInterface {
             {
               key: pem,
               padding: constants.RSA_PKCS1_PSS_PADDING,
-              saltLength: 0
             },
             signature
           )
