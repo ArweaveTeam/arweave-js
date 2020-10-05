@@ -12,7 +12,8 @@ const defaultInstance = initInstance({
   host: "arweave.net",
   protocol: "https",
   port: 443,
-  logging: false
+  logging: false,
+  timeout: 15000,
 });
 
 export function arweaveInstance() {
@@ -24,6 +25,7 @@ export function arweaveInstanceDirectNode() {
     host: "lon-1.eu-west-1.arweave.net",
     protocol: "http",
     port: 1984,
-    logging: false
+    logging: false,
+    timeout: 15000,
   });
 }
