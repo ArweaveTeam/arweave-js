@@ -1,5 +1,5 @@
 import { JWKInterface } from "../wallet";
-import CryptoInterface from "./crypto-interface";
+import CryptoInterface, { SignatureOptions } from "./crypto-interface";
 
 import { pemTojwk, jwkTopem } from "./pem";
 
@@ -41,7 +41,11 @@ export default class NodeCryptoDriver implements CryptoInterface {
     });
   }
 
-  public sign(jwk: object, data: Uint8Array): Promise<Uint8Array> {
+  public sign(
+    jwk: object,
+    data: Uint8Array,
+    { saltLength }: SignatureOptions = {}
+  ): Promise<Uint8Array> {
     return new Promise((resolve, reject) => {
       resolve(
         crypto
@@ -50,6 +54,7 @@ export default class NodeCryptoDriver implements CryptoInterface {
           .sign({
             key: this.jwkToPem(jwk),
             padding: constants.RSA_PKCS1_PSS_PADDING,
+            saltLength,
           })
       );
     });

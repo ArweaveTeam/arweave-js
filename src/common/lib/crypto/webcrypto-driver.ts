@@ -1,5 +1,5 @@
 import { JWKInterface, JWKPublicInterface } from "../wallet";
-import CryptoInterface from "./crypto-interface";
+import CryptoInterface, { SignatureOptions } from "./crypto-interface";
 import * as ArweaveUtils from "../utils";
 
 export default class WebCryptoDriver implements CryptoInterface {
@@ -45,10 +45,15 @@ export default class WebCryptoDriver implements CryptoInterface {
     };
   }
 
-  public async sign(jwk: JWKInterface, data: Uint8Array): Promise<Uint8Array> {
+  public async sign(
+    jwk: JWKInterface,
+    data: Uint8Array,
+    { saltLength }: SignatureOptions = {}
+  ): Promise<Uint8Array> {
     let signature = await this.driver.sign(
       {
         name: "RSA-PSS",
+        saltLength
       },
       await this.jwkToCryptoKey(jwk),
       data

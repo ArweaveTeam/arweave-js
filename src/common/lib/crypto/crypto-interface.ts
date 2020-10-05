@@ -1,9 +1,17 @@
 import { JWKInterface } from "../wallet";
 
+export interface SignatureOptions {
+  saltLength?: number;
+}
+
 export default interface CryptoInterface {
   generateJWK(): Promise<JWKInterface>;
 
-  sign(jwk: JWKInterface, data: Uint8Array): Promise<Uint8Array>;
+  sign(
+    jwk: JWKInterface,
+    data: Uint8Array,
+    options?: SignatureOptions
+  ): Promise<Uint8Array>;
 
   verify(
     publicModulus: string,

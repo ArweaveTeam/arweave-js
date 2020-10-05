@@ -1,5 +1,7 @@
 import Api from "./lib/api";
-import CryptoInterface from "./lib/crypto/crypto-interface";
+import CryptoInterface, {
+  SignatureOptions,
+} from "./lib/crypto/crypto-interface";
 import ArweaveError, { ArweaveErrorType, getError } from "./lib/error";
 import Transaction from "./lib/transaction";
 import * as ArweaveUtils from "./lib/utils";
@@ -182,11 +184,12 @@ export default class Transactions {
 
   public async sign(
     transaction: Transaction,
-    jwk: JWKInterface
+    jwk: JWKInterface,
+    options?: SignatureOptions
   ): Promise<void> {
     let dataToSign = await transaction.getSignatureData();
 
-    let rawSignature = await this.crypto.sign(jwk, dataToSign);
+    let rawSignature = await this.crypto.sign(jwk, dataToSign, options);
 
     let id = await this.crypto.hash(rawSignature);
 

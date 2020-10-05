@@ -250,7 +250,10 @@ describe("Transactions", function() {
       },
       jwk
     );
-    await arweave.transactions.sign(tx, jwk);
+
+    // Pass an explicit saltLength = 0 to get a deterministic signature
+    // that matches the test fixture
+    await arweave.transactions.sign(tx, jwk, { saltLength: 0 });
 
     let dataRoot = arweave.utils.bufferTob64Url(
       tx.get("data_root", { decode: true, string: false })
