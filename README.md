@@ -28,6 +28,10 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
       - [Get a transaction](#get-a-transaction)
       - [Get transaction data](#get-transaction-data)
       - [Decode tags from transactions](#decode-tags-from-transactions)
+    - [Blocks](#blocks)
+      - [Get Block Via Id](#get-block-via-id)
+      - [Get Block By Height](#get-block-by-height)
+      - [Get current Block](#get-current-block)
     - [ArQL](#arql)
     - [License](#license)
 
@@ -84,7 +88,7 @@ const arweave = Arweave.init({
 ```
 
 ### Web Bundles
-```js
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -476,7 +480,26 @@ const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hm
   // User-Agent : ArweaveDeploy/1.1.0
 });
 ```
+### Blocks
+#### Get Block Via Id
 
+```js
+arweave.block.getBlockById("9Vi5_2U1v4a7WFZKR1UllFXyokeL_eu2EsDQRUFYyJJvb0WbDwN2hZ4BBDRWcoga").then(str=>{
+    console.log(str)
+})
+```
+#### Get Block By Height
+```js
+arweave.block.getBlockByHeight(123).then(str=>{
+    console.log(str)
+})
+```
+#### Get current Block
+```js
+arweave.block.getBlockByHeight().then(str=>{
+    console.log(str)
+})
+```
 ### ArQL
 
 ArQL allows you to search for transactions by tags or by wallet address.
