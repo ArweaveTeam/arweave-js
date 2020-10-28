@@ -261,4 +261,35 @@ describe("Transactions", function() {
     expect(dataRoot).to.equal(expectedDataRoot);
     expect(tx.signature).to.equal(expectedSignature);
   });
+
+  const dataRootTests = [
+    {fixture: "./fixtures/small_last_chunk_data.json", comment: "of data with last chunk smaller than 32 KiB"},
+    {fixture: "./fixtures/big_last_chunk_data.json", comment: "of data with last chunk bigger than 32 KiB"}
+  ];
+
+  dataRootTests.forEach(function(test) {
+    it("should compute data_root the same way nodes do, " + test.comment, async function() {
+      const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+      const testData = require(test.fixture);
+      const expectedDataRoot = testData.expected_data_root;
+      const data = arweave.utils.b64UrlToBuffer(testData.data);
+
+      const tx = await arweave.createTransaction(
+        {
+          format: 2,
+          last_tx: "",
+          data,
+          reward: arweave.ar.arToWinston("100")
+	},
+	jwk
+       );
+       await arweave.transactions.sign(tx, jwk, { saltLength: 0 });
+
+       let dataRoot = arweave.utils.bufferTob64Url(
+         tx.get("data_root", { decode: true, string: false })
+        );
+        expect(dataRoot).to.equal(expectedDataRoot);
+    });
+  });
+
 });
