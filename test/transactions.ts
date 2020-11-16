@@ -66,6 +66,46 @@ describe("Transactions", function() {
     expect(verifiedWithModififedTags).to.be.false;
   });
 
+  it("should use JWK.n as transaction owner", async function() {
+    const wallet = await arweave.wallets.generate();
+
+    const transaction = await arweave.createTransaction(
+      {
+        data: "test",
+      },
+      wallet
+    );
+
+    expect(transaction.get("owner")).to.equal(wallet.n);
+  });
+
+  it("should use the provided transaction owner attribute", async function() {
+    const transaction = await arweave.createTransaction({
+      data: "test",
+      owner: "owner-test-abc",
+    });
+
+    expect(transaction.get("owner")).to.equal("owner-test-abc");
+  });
+
+  it("should throw if no owner or JWK provided", async function() {
+    const error = await (async () => {
+      try {
+        await arweave.createTransaction({
+          data: "test",
+        });
+      } catch (error) {
+        return error;
+      }
+    })();
+
+    expect(error)
+      .to.be.an.instanceOf(Error)
+      .match(
+        /must either have an 'owner' attribute, or you must provide the jwk parameter/
+      );
+  });
+
   it("should create and sign ar transactions", async function() {
     this.timeout(10000);
 
