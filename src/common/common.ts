@@ -136,7 +136,7 @@ export default class Arweave {
 
   public async createSiloTransaction(
     attributes: Partial<CreateTransactionInterface>,
-    jwk?: JWKInterface,
+    jwk: JWKInterface,
     siloUri: string
   ): Promise<Transaction> {
     const transaction: Partial<CreateTransactionInterface> = {};
