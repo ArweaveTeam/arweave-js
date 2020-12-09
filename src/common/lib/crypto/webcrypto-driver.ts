@@ -50,7 +50,6 @@ export default class WebCryptoDriver implements CryptoInterface {
     data: Uint8Array,
     { saltLength = 0 }: SignatureOptions = {}
   ): Promise<Uint8Array> {
-    console.log(saltLength)
     let signature = await this.driver.sign(
       {
         name: "RSA-PSS",
