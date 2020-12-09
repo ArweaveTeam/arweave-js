@@ -48,7 +48,7 @@ export default class WebCryptoDriver implements CryptoInterface {
   public async sign(
     jwk: JWKInterface,
     data: Uint8Array,
-    { saltLength }: SignatureOptions = {}
+    { saltLength = 0 }: SignatureOptions = {}
   ): Promise<Uint8Array> {
     console.log(saltLength)
     let signature = await this.driver.sign(
