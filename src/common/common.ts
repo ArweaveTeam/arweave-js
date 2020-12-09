@@ -43,7 +43,7 @@ export default class Arweave {
 
   public chunks: Chunks;
 
-  public static init: (apiConfig: ApiConfig) => Arweave;
+  public static init: (apiConfig?: ApiConfig) => Arweave;
 
   public static crypto: CryptoInterface;
 
