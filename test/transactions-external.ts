@@ -21,8 +21,6 @@ describe("External Transactions", function() {
     // get the transaction created externally
     const transaction = await arweave.transactions.get('DheCVCoV7HcZHu5qxQUAlJJRYdfeOkP4oVgFJok2pWg');
 
-    console.log(transaction);
-
     const verified = await arweave.transactions.verify(transaction);
 
     expect(verified).to.be.a("boolean");
