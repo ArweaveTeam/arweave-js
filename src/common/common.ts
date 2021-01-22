@@ -78,10 +78,8 @@ export default class Arweave {
 
   public async createTransaction(
     attributes: Partial<CreateTransactionInterface>,
-    jwk: JWKInterface
+    jwk?: JWKInterface
   ): Promise<Transaction> {
-    const from = await this.wallets.jwkToAddress(jwk);
-
     const transaction: Partial<CreateTransactionInterface> = {};
 
     Object.assign(transaction, attributes);
@@ -93,6 +91,11 @@ export default class Arweave {
     }
 
     if (attributes.owner == undefined) {
+      if (!jwk || !jwk.n) {
+        throw new Error(
+          `A new Arweave transaction must either have an 'owner' attribute, or you must provide the jwk parameter.`
+        );
+      }
       transaction.owner = jwk.n;
     }
 
@@ -136,8 +139,6 @@ export default class Arweave {
     jwk: JWKInterface,
     siloUri: string
   ): Promise<Transaction> {
-    const from = await this.wallets.jwkToAddress(jwk);
-
     const transaction: Partial<CreateTransactionInterface> = {};
 
     Object.assign(transaction, attributes);
@@ -157,6 +158,11 @@ export default class Arweave {
     }
 
     if (attributes.owner == undefined) {
+      if (!jwk || !jwk.n) {
+        throw new Error(
+          `A new Arweave transaction must either have an 'owner' attribute, or you must provide the jwk parameter.`
+        );
+      }
       transaction.owner = jwk.n;
     }
 
