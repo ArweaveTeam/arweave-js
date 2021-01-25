@@ -1,8 +1,6 @@
 import * as chai from "chai";
-import * as crypto from "crypto";
 import { readFileSync } from 'fs';
-import Transaction from "../src/common/lib/transaction";
-import { arweaveInstance, arweaveInstanceDirectNode } from "./_arweave";
+import { arweaveInstance } from "./_arweave";
 
 import wallet from "./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json";
 
