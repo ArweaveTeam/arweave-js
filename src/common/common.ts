@@ -125,13 +125,16 @@ export default class Arweave {
       );
     }
 
+    // here we should call prepare chunk 
     transaction.data_root = "";
     transaction.data_size = attributes.data
       ? attributes.data.byteLength.toString()
       : "0";
     transaction.data = attributes.data || new Uint8Array(0);
 
-    return new Transaction(transaction as TransactionInterface);
+    const createdTransaction = new Transaction(transaction as TransactionInterface);
+    await createdTransaction.getSignatureData();
+    return createdTransaction;
   }
 
   public async createSiloTransaction(
