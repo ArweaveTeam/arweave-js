@@ -87,6 +87,7 @@ export default class WebCryptoDriver implements CryptoInterface {
     return this.driver.verify(
       {
         name: "RSA-PSS",
+        saltLength: 32,
       },
       key,
       signature,
