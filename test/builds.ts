@@ -20,7 +20,7 @@ globals.crypto = {
 globals.window = {};
 
 describe("Node distribution", function() {
-  it("should initilize from compiled node dist", async function() {
+  it("should initialize from compiled node dist", async function() {
     const dist = require("../node");
 
     expect(dist).to.be.a("function");
@@ -44,7 +44,7 @@ describe("Node distribution", function() {
 });
 
 describe("Web distribution", function() {
-  it("should initilize from web compiled dist", async function() {
+  it("should initialize from web compiled dist", async function() {
     require("../web");
 
     const dist = globals.window.Arweave;
@@ -73,7 +73,7 @@ describe("Web distribution", function() {
     expect(instance.silo.constructor.name).to.equal("Silo");
   });
 
-  it("should initilize from web bundle", async function() {
+  it("should initialize from web bundle", async function() {
     require("../bundles/web.bundle");
 
     const dist = globals.window.Arweave;
@@ -102,7 +102,7 @@ describe("Web distribution", function() {
     expect(instance.silo.constructor.name).to.equal("Silo");
   });
 
-  it("should initilize from minified web bundle", async function() {
+  it("should initialize from minified web bundle", async function() {
     require("../bundles/web.bundle.min");
 
     const dist = globals.window.Arweave;
