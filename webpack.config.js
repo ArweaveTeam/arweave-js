@@ -1,6 +1,7 @@
 const BabelMinify = require("babel-minify-webpack-plugin");
 const path = require("path");
 const config = {};
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 config.web = {
   name: "web",
@@ -11,12 +12,9 @@ config.web = {
   devServer: {
     contentBase: "./dist"
   },
-  resolve: {
-    fallback: {
-      "crypto": require.resolve('crypto-browserify'),
-      "util": require.resolve("util")
-    }
-  },
+  plugins: [
+    new NodePolyfillPlugin()
+  ],
   output: {
     filename: "web.bundle.js",
     path: path.resolve(__dirname, "bundles")
@@ -34,12 +32,9 @@ config.webprod = {
   optimization: {
     minimizer: [new BabelMinify({ mangle: false })]
   },
-  resolve: {
-    fallback: {
-      "crypto": require.resolve('crypto-browserify'),
-      "util": require.resolve("util")
-    }
-  },
+  plugins: [
+    new NodePolyfillPlugin()
+  ],
   output: {
     filename: "web.bundle.min.js",
     path: path.resolve(__dirname, "bundles")
@@ -61,16 +56,14 @@ config.webtests = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
-    fallback: {
-      "crypto": require.resolve('crypto-browserify'),
-      "util": require.resolve("util")
-    }
   },
   devtool: "inline-source-map",
   devServer: {
     contentBase: "./dist"
   },
-  plugins: [],
+  plugins: [
+    new NodePolyfillPlugin()
+  ],
   output: {
     filename: "webtests.bundle.js",
     path: path.resolve(__dirname, "bundles")
