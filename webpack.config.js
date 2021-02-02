@@ -11,6 +11,12 @@ config.web = {
   devServer: {
     contentBase: "./dist"
   },
+  resolve: {
+    fallback: {
+      "crypto": require.resolve('crypto-browserify'),
+      "util": require.resolve("util")
+    }
+  },
   output: {
     filename: "web.bundle.js",
     path: path.resolve(__dirname, "bundles")
@@ -27,6 +33,12 @@ config.webprod = {
   },
   optimization: {
     minimizer: [new BabelMinify({ mangle: false })]
+  },
+  resolve: {
+    fallback: {
+      "crypto": require.resolve('crypto-browserify'),
+      "util": require.resolve("util")
+    }
   },
   output: {
     filename: "web.bundle.min.js",
@@ -48,7 +60,11 @@ config.webtests = {
     ]
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js"]
+    extensions: [".tsx", ".ts", ".js"],
+    fallback: {
+      "crypto": require.resolve('crypto-browserify'),
+      "util": require.resolve("util")
+    }
   },
   devtool: "inline-source-map",
   devServer: {
