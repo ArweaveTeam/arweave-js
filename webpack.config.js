@@ -1,7 +1,7 @@
 const BabelMinify = require("babel-minify-webpack-plugin");
 const path = require("path");
+const webpack = require("webpack");
 const config = {};
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 config.web = {
   name: "web",
@@ -12,8 +12,23 @@ config.web = {
   devServer: {
     contentBase: "./dist"
   },
+  resolve: {
+    alias: {
+      process: "process/browser",
+      crypto: "crypto-browserify",
+      stream: "stream-browserify"
+    },
+    fallback: {
+      "util": require.resolve("util"),
+      "process": require.resolve("process/browser"),
+      "crypto": require.resolve("crypto-browserify"),
+      "stream": require.resolve("stream-browserify")
+    }
+  },
   plugins: [
-    new NodePolyfillPlugin()
+    new webpack.ProvidePlugin({
+      process: 'process/browser'
+    }),
   ],
   output: {
     filename: "web.bundle.js",
@@ -29,12 +44,27 @@ config.webprod = {
   devServer: {
     contentBase: "./dist"
   },
+  resolve: {
+    alias: {
+      process: "process/browser",
+      crypto: "crypto-browserify",
+      stream: "stream-browserify"
+    },
+    fallback: {
+      "util": require.resolve("util"),
+      "process": require.resolve("process/browser"),
+      "crypto": require.resolve("crypto-browserify"),
+      "stream": require.resolve("stream-browserify")
+    }
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser'
+    }),
+  ],
   optimization: {
     minimizer: [new BabelMinify({ mangle: false })]
   },
-  plugins: [
-    new NodePolyfillPlugin()
-  ],
   output: {
     filename: "web.bundle.min.js",
     path: path.resolve(__dirname, "bundles")
@@ -56,14 +86,27 @@ config.webtests = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
+    alias: {
+      process: "process/browser"
+    },
+    fallback: {
+      "util": require.resolve("util"),
+      "process": require.resolve("process/browser"),
+      "crypto": require.resolve("crypto-browserify"),
+      "stream": require.resolve("stream-browserify")
+    }
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+      crypto: 'crypto-browserify',
+      stream: 'stream-browserify'
+    }),
+  ],
   devtool: "inline-source-map",
   devServer: {
     contentBase: "./dist"
   },
-  plugins: [
-    new NodePolyfillPlugin()
-  ],
   output: {
     filename: "webtests.bundle.js",
     path: path.resolve(__dirname, "bundles")

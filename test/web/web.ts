@@ -1,5 +1,6 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
+import Arweave from "../../web";
 import { bufferToString, stringToBuffer } from "../../src/common/lib/utils";
 
 const expect = chai.expect;
@@ -9,7 +10,7 @@ let globals = <any>global;
 // globals.window = { Arweave: {} };
 
 //@ts-ignore
-const arweave = window.Arweave.init({
+const arweave: Arweave = window.Arweave.init({
   host: "arweave.net",
   protocol: "https",
   logging: false
@@ -23,7 +24,7 @@ const liveAddressBalance = "498557055636";
 const liveAddress = "9_666Wkk2GzL0LGd3xhb0jY7HqNy71BaV4sULQlJsBQ";
 const liveTxid = "CE-1SFiXqWUEu0aSTebE6LC0-5JBAc3IAehYGwdF5iI";
 
-const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
+const liveDataTxid = "H53lxlOS3ZZ6_yHiTEYIoEkw-aBWjJ-koXssCKCU3z4";
 
 describe("Initialization", function() {
   it("should have components", function() {
@@ -219,9 +220,11 @@ describe("Transactions", function() {
     );
 
     expect(transaction.get("data", { decode: true, string: true })).to.contain(
-      "<title>ARWEAVE / PEER EXPLORER</title>"
+      "<title>CommunityXYZ</title>"
     );
-    expect(await arweave.transactions.verify(transaction)).to.be.true;
+
+    const verify = await arweave.transactions.verify(transaction);
+    expect(verify).to.be.true;
 
     transaction.signature = "xxx";
 
@@ -360,26 +363,46 @@ describe("Silo Web", function() {
   });
 });
 
-describe("ArQL", function() {
+describe("GraphQL", function() {
   it("should return a list of results", async function() {
-    const plainTextTransactions = await arweave.arql({
-      op: "equals",
-      expr1: "Content-Type",
-      expr2: "text/plain"
-    });
+    const txs = (await arweave.api.post('/graphql', {
+      query: `
+      {
+        transactions(
+          tags: [
+            { name: "App-Name", values: ["CommunityXYZ"] }
+          ]
+        ) {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }`
+    })).data.data.transactions.edges;
 
-    expect(plainTextTransactions).to.be.an("array");
-    expect(plainTextTransactions.length).to.be.greaterThan(0);
+    expect(txs).to.be.an("array");
+    expect(txs.length).to.be.greaterThan(0);
   });
 
   it("should return an empty list when no results are found", async function() {
-    const plainTextTransactions = await arweave.arql({
-      op: "equals",
-      expr1: "from",
-      expr2: "hnRI7JoN2vpv__w90o4MC_ybE9fse6SUemwQeY8hFxM"
-    });
+    const txs = (await arweave.api.post('/graphql', {
+      query: `
+      {
+        transactions(
+          owners: ["hnRI7JoN2vpv__w90o4MC_ybE9fse6SUemwQeY8hFxM"]
+        ) {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }`
+    })).data.data.transactions.edges;
 
-    expect(plainTextTransactions).to.be.an("array");
-    expect(plainTextTransactions.length).to.equal(0);
+    expect(txs).to.be.an("array");
+    expect(txs.length).to.equal(0);
   });
 });
