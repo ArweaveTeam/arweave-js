@@ -6,9 +6,9 @@ const expect = chai.expect;
 
 const arweave = arweaveInstance();
 
-describe("Silo", function() {
+describe("Silo", function () {
   this.timeout(10000);
-  it("should resolve Silo URIs", async function() {
+  it("should resolve Silo URIs", async function () {
     const siloResource = await arweave.silo.parseUri("someref.1");
 
     expect(siloResource).to.be.an.instanceOf(SiloResource);
@@ -25,7 +25,7 @@ describe("Silo", function() {
     expect(actualKey).to.equal(expectedKey);
   });
 
-  it("should read and write encrypted data", async function() {
+  it("should read and write encrypted data", async function () {
     this.timeout(5000);
 
     const siloURI = "some-secret.1";
@@ -34,7 +34,7 @@ describe("Silo", function() {
 
     const siloTransaction = await arweave.createSiloTransaction(
       {
-        data: "something"
+        data: "something",
       },
       wallet,
       siloURI
@@ -55,10 +55,10 @@ describe("Silo", function() {
     expect(decrypted.toString()).to.equal("something");
 
     const misdecrypted = await (() => {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         arweave.silo
           .readTransactionData(siloTransaction, "wronguri.1")
-          .catch(error => {
+          .catch((error) => {
             resolve(error);
           });
       });

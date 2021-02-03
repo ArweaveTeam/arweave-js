@@ -72,7 +72,7 @@ export default class Arweave {
   public getConfig(): Config {
     return {
       api: this.api.getConfig(),
-      crypto: null!
+      crypto: null!,
     };
   }
 
@@ -125,14 +125,16 @@ export default class Arweave {
       );
     }
 
-    // here we should call prepare chunk 
+    // here we should call prepare chunk
     transaction.data_root = "";
     transaction.data_size = attributes.data
       ? attributes.data.byteLength.toString()
       : "0";
     transaction.data = attributes.data || new Uint8Array(0);
 
-    const createdTransaction = new Transaction(transaction as TransactionInterface);
+    const createdTransaction = new Transaction(
+      transaction as TransactionInterface
+    );
     await createdTransaction.getSignatureData();
     return createdTransaction;
   }
@@ -208,6 +210,8 @@ export default class Arweave {
   }
 
   public arql(query: object): Promise<string[]> {
-    return this.api.post("/arql", query).then(response => response.data || []);
+    return this.api
+      .post("/arql", query)
+      .then((response) => response.data || []);
   }
 }

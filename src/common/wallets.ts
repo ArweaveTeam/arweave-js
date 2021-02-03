@@ -31,12 +31,12 @@ export default class Wallets {
            * return it as a winston string.
            * @param data
            */
-          function(data): string {
+          function (data): string {
             return data;
-          }
-        ]
+          },
+        ],
       })
-      .then(response => {
+      .then((response) => {
         return response.data;
       });
   }
@@ -49,7 +49,7 @@ export default class Wallets {
    * @returns {Promise<string>} - Promise which resolves with a winston string balance.
    */
   public getLastTransactionID(address: string): Promise<string> {
-    return this.api.get(`wallet/${address}/last_tx`).then(response => {
+    return this.api.get(`wallet/${address}/last_tx`).then((response) => {
       return response.data;
     });
   }

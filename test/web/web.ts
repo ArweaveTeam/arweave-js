@@ -13,7 +13,7 @@ let globals = <any>global;
 const arweave: Arweave = window.Arweave.init({
   host: "arweave.net",
   protocol: "https",
-  logging: false
+  logging: false,
 });
 
 //@ts-ignore
@@ -26,8 +26,8 @@ const liveTxid = "CE-1SFiXqWUEu0aSTebE6LC0-5JBAc3IAehYGwdF5iI";
 
 const liveDataTxid = "H53lxlOS3ZZ6_yHiTEYIoEkw-aBWjJ-koXssCKCU3z4";
 
-describe("Initialization", function() {
-  it("should have components", function() {
+describe("Initialization", function () {
+  it("should have components", function () {
     expect(arweave.api).to.an("object");
 
     expect(arweave.transactions).to.an("object");
@@ -42,8 +42,8 @@ describe("Initialization", function() {
   });
 });
 
-describe("Network Info", function() {
-  it("should get network info", async function() {
+describe("Network Info", function () {
+  it("should get network info", async function () {
     this.timeout(3000);
 
     const info = await arweave.network.getInfo();
@@ -56,19 +56,17 @@ describe("Network Info", function() {
       "current",
       "release",
       "version",
-      "blocks"
+      "blocks",
     ]);
 
-    expect(info.height)
-      .to.be.a("number")
-      .greaterThan(0);
+    expect(info.height).to.be.a("number").greaterThan(0);
 
     expect(peers).to.be.an("array");
   });
 });
 
-describe("Wallets and keys", function() {
-  it("should generate valid JWKs", async function() {
+describe("Wallets and keys", function () {
+  it("should generate valid JWKs", async function () {
     this.timeout(15000);
 
     const walletA = await arweave.wallets.generate();
@@ -108,7 +106,7 @@ describe("Wallets and keys", function() {
     expect(addressA).to.not.equal(addressB);
   });
 
-  it("should get wallet info", async function() {
+  it("should get wallet info", async function () {
     this.timeout(5000);
 
     const wallet = await arweave.wallets.generate();
@@ -141,8 +139,8 @@ describe("Wallets and keys", function() {
   });
 });
 
-describe("Transactions", function() {
-  it("should create and sign transactions", async function() {
+describe("Transactions", function () {
+  it("should create and sign transactions", async function () {
     this.timeout(5000);
 
     const wallet = await arweave.wallets.generate();
@@ -171,7 +169,7 @@ describe("Transactions", function() {
       "signature",
       "reward",
       "owner",
-      "last_tx"
+      "last_tx",
     ]);
 
     expect(transaction.signature).to.match(/^[a-z0-9-_]+$/i);
@@ -196,7 +194,7 @@ describe("Transactions", function() {
     expect(verifiedWithModififedTags).to.be.false;
   });
 
-  it("should get transaction info", async function() {
+  it("should get transaction info", async function () {
     this.timeout(5000);
 
     const transactionStatus = await arweave.transactions.getStatus(
@@ -210,7 +208,7 @@ describe("Transactions", function() {
     expect(Object.keys(transactionStatus.confirmed!)).to.contain.members([
       "block_indep_hash",
       "block_height",
-      "number_of_confirmations"
+      "number_of_confirmations",
     ]);
 
     expect(transactionStatus.confirmed!.block_indep_hash).to.be.a("string");
@@ -229,7 +227,7 @@ describe("Transactions", function() {
     transaction.signature = "xxx";
 
     const verifyResult = await (() => {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         arweave.transactions.verify(transaction).catch((error: any) => {
           resolve(error);
         });
@@ -242,7 +240,7 @@ describe("Transactions", function() {
       .and.match(/^.*invalid transaction signature.*$/i);
   });
 
-  it("should find transactions", async function() {
+  it("should find transactions", async function () {
     this.timeout(5000);
 
     const results = await arweave.transactions.search(
@@ -256,8 +254,8 @@ describe("Transactions", function() {
   });
 });
 
-describe("Encryption", function() {
-  it("should encrypt and decrypt using key round trip", async function() {
+describe("Encryption", function () {
+  it("should encrypt and decrypt using key round trip", async function () {
     this.timeout(5000);
 
     const text = "some data to encrypt";
@@ -275,7 +273,7 @@ describe("Encryption", function() {
     expect(bufferToString(decrypted)).to.equal(text);
   });
 
-  it("should encrypt and decrypt using passphrase round trip", async function() {
+  it("should encrypt and decrypt using passphrase round trip", async function () {
     this.timeout(5000);
 
     const text = "some data to encrypt";
@@ -294,8 +292,8 @@ describe("Encryption", function() {
   });
 });
 
-describe("Silo Web", function() {
-  it("should read Silo transaction", async function() {
+describe("Silo Web", function () {
+  it("should read Silo transaction", async function () {
     this.skip();
     this.timeout(5000);
 
@@ -309,7 +307,7 @@ describe("Silo Web", function() {
       tags: [
         { name: "Q29udGVudC1UeXBl", value: "dGV4dC9odG1s" },
         { name: "VXNlci1BZ2VudA", value: "QXJ3ZWF2ZURlcGxveS8xLjAuMA" },
-        { name: "U2lsby1WZXJzaW9u", value: "MC4xLjA" }
+        { name: "U2lsby1WZXJzaW9u", value: "MC4xLjA" },
       ],
       target: "",
       quantity: "0",
@@ -318,7 +316,7 @@ describe("Silo Web", function() {
       reward: "349612332",
       signature:
         "DJ6V8zXFMvkyNS4nNHxdFgXx1cbMuzQfWdtP_navPG1STMUarYKHWnJvFQqNkFl5CekNql0xTOjY5hWLt2AVxfMWgvvi5498vNUpbFoWxjrVl6fk86ARx2lzYB7iQK4YFIuIQ7MdR0w8Dy836hW7c8gXe_FPRAqOI7J_l8fqUSzaUtlcwLSfvhXJM-2a3WmoGLcg8Gvj53B8-RizvM3BrKQQWrcat78zeOgb-Fzl3PQ_Ej3CiRIDgAYnTxmd7M6jI84uck1gBRjMql42n0F8pQuTgMqzDbeXW2iBuvIE5tYVmUgnNrPjkDedLWe0Hp4KLDQyDY9lO-zIJLpiYCbc7kUfDBontxCCJIy9N8XM9gHqQofCItYAEO4v3B7sXgdSAQzcibnM3j6EhB9-mhiDcKKRuTSvyJh3sBTWHFrnWylfq84JOJLNhR4aZA_UfjkccA7Z-yqoiMI0mOB0HaAEmsa6ZsoLs5C-6vDnGaBCqYeVKKqKizfOQGsc9IuzdsSQwY7yTE-C3Xb3eAgnq0BLn6iUNqFU-mkwHi-c_hpxoR0lY91k98Ra9UhrgFS5m_9x3BhCXNhDaUXb16p0fHKGYSggqgqS3FbEcdOnsQlhw3IFEccFOTvuv1xEoE1zYeZ06q6NkFKMik6soXl9LXXgJgZvpEut_2LaHKtojbWqSkc",
-      id: "S-9ICDleH3PEx9LXVEbguVffe5dHEM0I3wEr_MJidqU"
+      id: "S-9ICDleH3PEx9LXVEbguVffe5dHEM0I3wEr_MJidqU",
     });
 
     const verified = await arweave.transactions.verify(transaction);
@@ -335,7 +333,7 @@ describe("Silo Web", function() {
       .and.contain("<title>Hello world!</title>");
   });
 
-  it("should pass a Silo transaction roundtrip", async function() {
+  it("should pass a Silo transaction roundtrip", async function () {
     this.timeout(10000);
 
     const wallet = await arweave.wallets.generate();
@@ -357,16 +355,15 @@ describe("Silo Web", function() {
       "my-silo-ref.1"
     );
 
-    expect(bufferToString(decrypted))
-      .to.be.a("string")
-      .and.equal("test data");
+    expect(bufferToString(decrypted)).to.be.a("string").and.equal("test data");
   });
 });
 
-describe("GraphQL", function() {
-  it("should return a list of results", async function() {
-    const txs = (await arweave.api.post('/graphql', {
-      query: `
+describe("GraphQL", function () {
+  it("should return a list of results", async function () {
+    const txs = (
+      await arweave.api.post("/graphql", {
+        query: `
       {
         transactions(
           tags: [
@@ -379,16 +376,18 @@ describe("GraphQL", function() {
             }
           }
         }
-      }`
-    })).data.data.transactions.edges;
+      }`,
+      })
+    ).data.data.transactions.edges;
 
     expect(txs).to.be.an("array");
     expect(txs.length).to.be.greaterThan(0);
   });
 
-  it("should return an empty list when no results are found", async function() {
-    const txs = (await arweave.api.post('/graphql', {
-      query: `
+  it("should return an empty list when no results are found", async function () {
+    const txs = (
+      await arweave.api.post("/graphql", {
+        query: `
       {
         transactions(
           owners: ["hnRI7JoN2vpv__w90o4MC_ybE9fse6SUemwQeY8hFxM"]
@@ -399,8 +398,9 @@ describe("GraphQL", function() {
             }
           }
         }
-      }`
-    })).data.data.transactions.edges;
+      }`,
+      })
+    ).data.data.transactions.edges;
 
     expect(txs).to.be.an("array");
     expect(txs.length).to.equal(0);

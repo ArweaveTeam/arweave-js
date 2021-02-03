@@ -2,46 +2,42 @@
 import * as asn from "asn1.js";
 
 function urlize(base64: string): string {
-  return base64
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 }
 
 function hex2b64url(str: string): string {
   return urlize(Buffer.from(str, "hex").toString("base64"));
 }
 
-var RSAPublicKey = asn.define("RSAPublicKey", function(this: any) {
+var RSAPublicKey = asn.define("RSAPublicKey", function (this: any) {
   this.seq().obj(this.key("n").int(), this.key("e").int());
 });
 
-var AlgorithmIdentifier = asn.define("AlgorithmIdentifier", function(
-  this: any
-) {
-  this.seq().obj(
-    this.key("algorithm").objid(),
-    this.key("parameters")
-      .optional()
-      .any()
-  );
-});
+var AlgorithmIdentifier = asn.define(
+  "AlgorithmIdentifier",
+  function (this: any) {
+    this.seq().obj(
+      this.key("algorithm").objid(),
+      this.key("parameters").optional().any()
+    );
+  }
+);
 
-var PublicKeyInfo = asn.define("PublicKeyInfo", function(this: any) {
+var PublicKeyInfo = asn.define("PublicKeyInfo", function (this: any) {
   this.seq().obj(
     this.key("algorithm").use(AlgorithmIdentifier),
     this.key("publicKey").bitstr()
   );
 });
 
-var Version = asn.define("Version", function(this: any) {
+var Version = asn.define("Version", function (this: any) {
   this.int({
     0: "two-prime",
-    1: "multi"
+    1: "multi",
   });
 });
 
-var OtherPrimeInfos = asn.define("OtherPrimeInfos", function(this: any) {
+var OtherPrimeInfos = asn.define("OtherPrimeInfos", function (this: any) {
   this.seq().obj(
     this.key("ri").int(),
     this.key("di").int(),
@@ -49,7 +45,7 @@ var OtherPrimeInfos = asn.define("OtherPrimeInfos", function(this: any) {
   );
 });
 
-var RSAPrivateKey = asn.define("RSAPrivateKey", function(this: any) {
+var RSAPrivateKey = asn.define("RSAPrivateKey", function (this: any) {
   this.seq().obj(
     this.key("version").use(Version),
     this.key("n").int(),
@@ -60,13 +56,11 @@ var RSAPrivateKey = asn.define("RSAPrivateKey", function(this: any) {
     this.key("dp").int(),
     this.key("dq").int(),
     this.key("qi").int(),
-    this.key("other")
-      .optional()
-      .use(OtherPrimeInfos)
+    this.key("other").optional().use(OtherPrimeInfos)
   );
 });
 
-var PrivateKeyInfo = asn.define("PrivateKeyInfo", function(this: any) {
+var PrivateKeyInfo = asn.define("PrivateKeyInfo", function (this: any) {
   this.seq().obj(
     this.key("version").use(Version),
     this.key("algorithm").use(AlgorithmIdentifier),
@@ -78,7 +72,7 @@ const RSA_OID = "1.2.840.113549.1.1.1";
 
 function addExtras(obj: any, extras?: any): any {
   extras = extras || {};
-  Object.keys(extras).forEach(function(key) {
+  Object.keys(extras).forEach(function (key) {
     obj[key] = extras[key];
   });
   return obj;
@@ -94,7 +88,7 @@ function decodeRsaPublic(buffer: any, extras?: any) {
   var jwk = {
     kty: "RSA",
     n: bn2base64url(key.n),
-    e: hex2b64url(e)
+    e: hex2b64url(e),
   };
   return addExtras(jwk, extras);
 }
@@ -111,7 +105,7 @@ function decodeRsaPrivate(buffer: any, extras?: any) {
     q: bn2base64url(key.q),
     dp: bn2base64url(key.dp),
     dq: bn2base64url(key.dq),
-    qi: bn2base64url(key.qi)
+    qi: bn2base64url(key.qi),
   };
   return addExtras(jwk, extras);
 }
@@ -148,7 +142,7 @@ function parse(jwk: any): any {
     q: jwk.q && string2bn(jwk.q),
     dp: jwk.dp && string2bn(jwk.dp),
     dq: jwk.dq && string2bn(jwk.dq),
-    qi: jwk.qi && string2bn(jwk.qi)
+    qi: jwk.qi && string2bn(jwk.qi),
   };
 }
 
@@ -169,7 +163,7 @@ function string2bn(str: string): any {
 
 export function pemTojwk(pem: any, extras?: any): any {
   var text = pem.toString().split(/(\r\n|\r|\n)+/g);
-  text = text.filter(function(line: string) {
+  text = text.filter(function (line: string) {
     return line.trim().length !== 0;
   });
   var decoder = getDecoder(text[0]);

@@ -27,9 +27,9 @@ export default class NodeCryptoDriver implements CryptoInterface {
           publicExponent: this.publicExponent,
           privateKeyEncoding: {
             type: "pkcs1",
-            format: "pem"
+            format: "pem",
           },
-          publicKeyEncoding: { type: "pkcs1", format: "pem" }
+          publicKeyEncoding: { type: "pkcs1", format: "pem" },
         },
         (err: any, publicKey: string, privateKey: string) => {
           if (err) {
@@ -69,22 +69,19 @@ export default class NodeCryptoDriver implements CryptoInterface {
       const publicKey = {
         kty: "RSA",
         e: "AQAB",
-        n: publicModulus
+        n: publicModulus,
       };
 
       const pem = this.jwkToPem(publicKey);
 
       resolve(
-        crypto
-          .createVerify(this.hashAlgorithm)
-          .update(data)
-          .verify(
-            {
-              key: pem,
-              padding: constants.RSA_PKCS1_PSS_PADDING,
-            },
-            signature
-          )
+        crypto.createVerify(this.hashAlgorithm).update(data).verify(
+          {
+            key: pem,
+            padding: constants.RSA_PKCS1_PSS_PADDING,
+          },
+          signature
+        )
       );
     });
   }
@@ -173,7 +170,7 @@ export default class NodeCryptoDriver implements CryptoInterface {
 
       const decrypted = Buffer.concat([
         decipher.update(data),
-        decipher.final()
+        decipher.final(),
       ]);
 
       return decrypted;

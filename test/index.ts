@@ -12,9 +12,9 @@ const expect = chai.expect;
 
 const arweave = arweaveInstance();
 
-describe("Initialization", function() {
+describe("Initialization", function () {
   this.timeout(10000);
-  it("should have components", function() {
+  it("should have components", function () {
     expect(arweave.api).to.be.an.instanceOf(Api);
 
     expect(arweave.transactions).to.be.an.instanceOf(Transactions);
@@ -28,14 +28,14 @@ describe("Initialization", function() {
     expect(arweave.silo).to.be.an.instanceOf(Silo);
   });
 
-  it("should handle default ports", function() {
+  it("should handle default ports", function () {
     expect(initInstance({ port: 1234 }).api.config.port).to.equal(1234);
     expect(initInstance({ protocol: "http" }).api.config.port).to.equal(80);
     expect(initInstance({ protocol: "https" }).api.config.port).to.equal(443);
     expect(initInstance({}).api.config.port).to.equal(80);
   });
 
-  it("should handle the default host", function() {
+  it("should handle the default host", function () {
     expect(initInstance({}).api.config.host).to.equal("127.0.0.1");
     expect(
       initInstance({ host: "specific-host.example" }).api.config.host
@@ -43,8 +43,8 @@ describe("Initialization", function() {
   });
 });
 
-describe("Network Info", function() {
-  it("should get network info", async function() {
+describe("Network Info", function () {
+  it("should get network info", async function () {
     this.timeout(5000);
 
     const info = await arweave.network.getInfo();
@@ -57,12 +57,10 @@ describe("Network Info", function() {
       "current",
       "release",
       "version",
-      "blocks"
+      "blocks",
     ]);
 
-    expect(info.height)
-      .to.be.a("number")
-      .greaterThan(0);
+    expect(info.height).to.be.a("number").greaterThan(0);
 
     expect(peers).to.be.an("array");
   });

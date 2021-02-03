@@ -76,7 +76,8 @@ export interface TransactionInterface {
   data_root: string;
 }
 
-export default class Transaction extends BaseObject
+export default class Transaction
+  extends BaseObject
   implements TransactionInterface {
   public readonly format: number = 2;
   public id: string = "";
@@ -141,7 +142,7 @@ export default class Transaction extends BaseObject
       data_root: this.data_root,
       data_tree: this.data_tree,
       reward: this.reward,
-      signature: this.signature
+      signature: this.signature,
     };
   }
 
@@ -166,7 +167,7 @@ export default class Transaction extends BaseObject
       this.chunks = {
         chunks: [],
         data_root: new Uint8Array(),
-        proofs: []
+        proofs: [],
       };
       this.data_root = "";
     }
@@ -188,7 +189,7 @@ export default class Transaction extends BaseObject
       offset: proof.offset.toString(),
       chunk: ArweaveUtils.bufferTob64Url(
         data.slice(chunk.minByteRange, chunk.maxByteRange)
-      )
+      ),
     };
   }
 
@@ -215,9 +216,9 @@ export default class Transaction extends BaseObject
       case 2:
         await this.prepareChunks(this.data);
 
-        const tagList: [Uint8Array, Uint8Array][] = this.tags.map(tag => [
+        const tagList: [Uint8Array, Uint8Array][] = this.tags.map((tag) => [
           tag.get("name", { decode: true, string: false }),
-          tag.get("value", { decode: true, string: false })
+          tag.get("value", { decode: true, string: false }),
         ]);
 
         return await deepHash([
@@ -229,7 +230,7 @@ export default class Transaction extends BaseObject
           this.get("last_tx", { decode: true, string: false }),
           tagList,
           ArweaveUtils.stringToBuffer(this.data_size),
-          this.get("data_root", { decode: true, string: false })
+          this.get("data_root", { decode: true, string: false }),
         ]);
       default:
         throw new Error(`Unexpected transaction format: ${this.format}`);

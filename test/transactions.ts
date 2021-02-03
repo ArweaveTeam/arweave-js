@@ -16,9 +16,9 @@ const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
 // const liveDataTxidLarge = "P4l6aCN97rt4GoyrpG1oKq3A20B2Y24GqmMLWNZlNIk"
 const liveDataTxidLarge = "KDKSOaecDl_IM4E0_0XiApwdrElvb9TnwOzeHt65Sno";
 
-describe("Transactions", function() {
+describe("Transactions", function () {
   this.timeout(10000);
-  it("should create and sign data transactions", async function() {
+  it("should create and sign data transactions", async function () {
     this.timeout(10000);
 
     const wallet = await arweave.wallets.generate();
@@ -66,7 +66,7 @@ describe("Transactions", function() {
     expect(verifiedWithModififedTags).to.be.false;
   });
 
-  it("should use JWK.n as transaction owner", async function() {
+  it("should use JWK.n as transaction owner", async function () {
     const wallet = await arweave.wallets.generate();
 
     const transaction = await arweave.createTransaction(
@@ -79,7 +79,7 @@ describe("Transactions", function() {
     expect(transaction.get("owner")).to.equal(wallet.n);
   });
 
-  it("should use the provided transaction owner attribute", async function() {
+  it("should use the provided transaction owner attribute", async function () {
     const transaction = await arweave.createTransaction({
       data: "test",
       owner: "owner-test-abc",
@@ -88,7 +88,7 @@ describe("Transactions", function() {
     expect(transaction.get("owner")).to.equal("owner-test-abc");
   });
 
-  it("should throw if no owner or JWK provided", async function() {
+  it("should throw if no owner or JWK provided", async function () {
     const error = await (async () => {
       try {
         await arweave.createTransaction({
@@ -106,7 +106,7 @@ describe("Transactions", function() {
       );
   });
 
-  it("should create and sign ar transactions", async function() {
+  it("should create and sign ar transactions", async function () {
     this.timeout(10000);
 
     const wallet = await arweave.wallets.generate();
@@ -114,23 +114,21 @@ describe("Transactions", function() {
     const transaction = await arweave.createTransaction(
       {
         target: "GRQ7swQO1AMyFgnuAPI7AvGQlW3lzuQuwlJbIpWV7xk",
-        quantity: arweave.ar.arToWinston("1.5")
+        quantity: arweave.ar.arToWinston("1.5"),
       },
       wallet
     );
 
     expect(transaction).to.be.an.instanceOf(Transaction);
 
-    expect(transaction.quantity)
-      .to.be.a("string")
-      .and.equal("1500000000000");
+    expect(transaction.quantity).to.be.a("string").and.equal("1500000000000");
 
     expect(transaction.target)
       .to.be.a("string")
       .and.equal("GRQ7swQO1AMyFgnuAPI7AvGQlW3lzuQuwlJbIpWV7xk");
   });
 
-  it("should work with buffers", async function() {
+  it("should work with buffers", async function () {
     this.timeout(5000);
 
     const wallet = await arweave.wallets.generate();
@@ -179,7 +177,7 @@ describe("Transactions", function() {
     expect(verifiedWithModififedTags).to.be.false;
   });
 
-  it("should get transaction info", async function() {
+  it("should get transaction info", async function () {
     this.timeout(5000);
 
     const transactionStatus = await arweave.transactions.getStatus(
@@ -195,7 +193,7 @@ describe("Transactions", function() {
     expect(Object.keys(transactionStatus.confirmed!)).to.contain.members([
       "block_indep_hash",
       "block_height",
-      "number_of_confirmations"
+      "number_of_confirmations",
     ]);
 
     expect(transactionStatus.confirmed!.block_indep_hash).to.be.a("string");
@@ -209,8 +207,8 @@ describe("Transactions", function() {
     transaction.signature = "xxx";
 
     const verifyResult = await (() => {
-      return new Promise(resolve => {
-        arweave.transactions.verify(transaction).catch(error => {
+      return new Promise((resolve) => {
+        arweave.transactions.verify(transaction).catch((error) => {
           resolve(error);
         });
       });
@@ -222,18 +220,16 @@ describe("Transactions", function() {
       .and.match(/^.*invalid transaction signature.*$/i);
   });
 
-  it("should get transaction data", async function() {
+  it("should get transaction data", async function () {
     const txRawData = await arweave.transactions.getData(liveDataTxid);
     expect(txRawData)
       .to.be.a("string")
       .which.contain("CjwhRE9DVFlQRSBodG1sPgo");
 
     const txDecodeData = await arweave.transactions.getData(liveDataTxid, {
-      decode: true
+      decode: true,
     });
-    expect(txDecodeData)
-      .to.be.a("Uint8Array")
-      .to.contain([10, 60, 33, 68]);
+    expect(txDecodeData).to.be.a("Uint8Array").to.contain([10, 60, 33, 68]);
 
     const txDecodeStringData = await arweave.transactions.getData(
       liveDataTxid,
@@ -244,15 +240,15 @@ describe("Transactions", function() {
       .which.contain("<title>ARWEAVE / PEER EXPLORER</title>");
   });
 
-  it("should get transaction data > 12MiB from a gateway", async function() {
+  it("should get transaction data > 12MiB from a gateway", async function () {
     this.timeout(20000);
     const data = (await arweave.transactions.getData(liveDataTxidLarge, {
-      decode: true
+      decode: true,
     })) as Uint8Array;
     expect(data.byteLength).to.equal(14166765);
   });
 
-  it("should get transaction data > 12MiB from a node", async function() {
+  it("should get transaction data > 12MiB from a node", async function () {
     this.timeout(80000);
     const data = (await arweaveDirectNode.transactions.getData(
       liveDataTxidLarge,
@@ -261,7 +257,7 @@ describe("Transactions", function() {
     expect(data.byteLength).to.equal(14166765);
   });
 
-  it("should find transactions", async function() {
+  it("should find transactions", async function () {
     const results = await arweave.transactions.search(
       "Silo-Name",
       "BmjRGIsemI77+eQb4zX8"
@@ -272,7 +268,7 @@ describe("Transactions", function() {
       .which.contains("Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE");
   });
 
-  it("should support format=2 transaction signing", async function() {
+  it("should support format=2 transaction signing", async function () {
     const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
     const unsignedV2TxFixture = require("./fixtures/unsigned_v2_tx.json");
     const signedV2TxFixture = require("./fixtures/signed_v2_tx.json");
@@ -286,7 +282,7 @@ describe("Transactions", function() {
         format: 2,
         last_tx: "",
         data,
-        reward: arweave.ar.arToWinston("100")
+        reward: arweave.ar.arToWinston("100"),
       },
       jwk
     );

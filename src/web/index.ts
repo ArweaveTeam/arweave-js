@@ -10,7 +10,7 @@ declare global {
 
 Arweave.crypto = new WebCryptoDriver();
 
-Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
+Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
   function getDefaultConfig(): {
     protocol: string;
     host: string;
@@ -19,7 +19,7 @@ Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
     const defaults = {
       host: "arweave.net",
       port: 443,
-      protocol: "https"
+      protocol: "https",
     };
 
     if (
@@ -53,7 +53,7 @@ Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
     return {
       host: currentHost,
       port: currentPort,
-      protocol: currentProtocol
+      protocol: currentProtocol,
     };
   }
 
@@ -67,7 +67,7 @@ Arweave.init = function(apiConfig: ApiConfig = {}): Arweave {
     ...apiConfig,
     host,
     protocol,
-    port
+    port,
   });
 };
 

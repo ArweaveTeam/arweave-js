@@ -37,7 +37,7 @@ export default class Api {
       port,
       timeout: config.timeout || 20000,
       logging: config.logging || false,
-      logger: config.logger || console.log
+      logger: config.logger || console.log,
     };
   }
 
@@ -78,20 +78,18 @@ export default class Api {
    */
   public request(): AxiosInstance {
     let instance = Axios.create({
-      baseURL: `${this.config.protocol}://${this.config.host}:${
-        this.config.port
-      }`,
+      baseURL: `${this.config.protocol}://${this.config.host}:${this.config.port}`,
       timeout: this.config.timeout,
-      maxContentLength: 1024 * 1024 * 512
+      maxContentLength: 1024 * 1024 * 512,
     });
 
     if (this.config.logging) {
-      instance.interceptors.request.use(request => {
+      instance.interceptors.request.use((request) => {
         this.config.logger!(`Requesting: ${request.baseURL}/${request.url}`);
         return request;
       });
 
-      instance.interceptors.response.use(response => {
+      instance.interceptors.response.use((response) => {
         this.config.logger!(
           `Response:   ${response.config.url} - ${response.status}`
         );

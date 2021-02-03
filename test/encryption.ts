@@ -5,9 +5,9 @@ import { arweaveInstance } from "./_arweave";
 const expect = chai.expect;
 
 const arweave = arweaveInstance();
-describe("Encryption", function() {
+describe("Encryption", function () {
   this.timeout(10000);
-  it("should encrypt and decrypt using key round trip", async function() {
+  it("should encrypt and decrypt using key round trip", async function () {
     const text = "some data to encrypt";
 
     const data = Buffer.from(text);
@@ -24,7 +24,7 @@ describe("Encryption", function() {
     expect(decrypted.toString()).to.equal(text);
   });
 
-  it("should encrypt and decrypt using passphrase round trip", async function() {
+  it("should encrypt and decrypt using passphrase round trip", async function () {
     const text = "some data to encrypt";
 
     const data = Buffer.from(text);

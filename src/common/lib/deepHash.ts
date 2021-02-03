@@ -11,7 +11,7 @@ export default async function deepHash(
   if (Array.isArray(data)) {
     const tag = Arweave.utils.concatBuffers([
       Arweave.utils.stringToBuffer("list"),
-      Arweave.utils.stringToBuffer(data.length.toString())
+      Arweave.utils.stringToBuffer(data.length.toString()),
     ]);
 
     return await deepHashChunks(
@@ -22,12 +22,12 @@ export default async function deepHash(
 
   const tag = Arweave.utils.concatBuffers([
     Arweave.utils.stringToBuffer("blob"),
-    Arweave.utils.stringToBuffer(data.byteLength.toString())
+    Arweave.utils.stringToBuffer(data.byteLength.toString()),
   ]);
 
   const taggedHash = Arweave.utils.concatBuffers([
     await Arweave.crypto.hash(tag, "SHA-384"),
-    await Arweave.crypto.hash(data, "SHA-384")
+    await Arweave.crypto.hash(data, "SHA-384"),
   ]);
 
   return await Arweave.crypto.hash(taggedHash, "SHA-384");
@@ -43,7 +43,7 @@ async function deepHashChunks(
 
   const hashPair = Arweave.utils.concatBuffers([
     acc,
-    await deepHash(chunks[0])
+    await deepHash(chunks[0]),
   ]);
   const newAcc = await Arweave.crypto.hash(hashPair, "SHA-384");
   return await deepHashChunks(chunks.slice(1), newAcc);

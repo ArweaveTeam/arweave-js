@@ -23,8 +23,8 @@ export default class WebCryptoDriver implements CryptoInterface {
         modulusLength: 4096,
         publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
         hash: {
-          name: "SHA-256"
-        }
+          name: "SHA-256",
+        },
       },
       true,
       ["sign"]
@@ -41,7 +41,7 @@ export default class WebCryptoDriver implements CryptoInterface {
       q: jwk.q,
       dp: jwk.dp,
       dq: jwk.dq,
-      qi: jwk.qi
+      qi: jwk.qi,
     };
   }
 
@@ -79,7 +79,7 @@ export default class WebCryptoDriver implements CryptoInterface {
     const publicKey = {
       kty: "RSA",
       e: "AQAB",
-      n: publicModulus
+      n: publicModulus,
     };
 
     const key = await this.jwkToPublicCryptoKey(publicKey);
@@ -114,8 +114,8 @@ export default class WebCryptoDriver implements CryptoInterface {
       {
         name: "RSA-PSS",
         hash: {
-          name: "SHA-256"
-        }
+          name: "SHA-256",
+        },
       },
       false,
       ["sign"]
@@ -131,8 +131,8 @@ export default class WebCryptoDriver implements CryptoInterface {
       {
         name: "RSA-PSS",
         hash: {
-          name: "SHA-256"
-        }
+          name: "SHA-256",
+        },
       },
       false,
       ["verify"]
@@ -166,7 +166,7 @@ export default class WebCryptoDriver implements CryptoInterface {
       typeof key == "string" ? ArweaveUtils.stringToBuffer(key) : key,
       {
         name: "PBKDF2",
-        length: 32
+        length: 32,
       },
       false,
       ["deriveKey"]
@@ -179,12 +179,12 @@ export default class WebCryptoDriver implements CryptoInterface {
         name: "PBKDF2",
         salt: salt,
         iterations: 100000,
-        hash: "SHA-256"
+        hash: "SHA-256",
       },
       initialKey,
       {
         name: "AES-CBC",
-        length: 256
+        length: 256,
       },
       false,
       ["encrypt", "decrypt"]
@@ -197,7 +197,7 @@ export default class WebCryptoDriver implements CryptoInterface {
     const encryptedData = await this.driver.encrypt(
       {
         name: "AES-CBC",
-        iv: iv
+        iv: iv,
       },
       derivedkey,
       data
@@ -215,7 +215,7 @@ export default class WebCryptoDriver implements CryptoInterface {
       typeof key == "string" ? ArweaveUtils.stringToBuffer(key) : key,
       {
         name: "PBKDF2",
-        length: 32
+        length: 32,
       },
       false,
       ["deriveKey"]
@@ -228,12 +228,12 @@ export default class WebCryptoDriver implements CryptoInterface {
         name: "PBKDF2",
         salt: salt,
         iterations: 100000,
-        hash: "SHA-256"
+        hash: "SHA-256",
       },
       initialKey,
       {
         name: "AES-CBC",
-        length: 256
+        length: 256,
       },
       false,
       ["encrypt", "decrypt"]
@@ -244,7 +244,7 @@ export default class WebCryptoDriver implements CryptoInterface {
     const data = await this.driver.decrypt(
       {
         name: "AES-CBC",
-        iv: iv
+        iv: iv,
       },
       derivedkey,
       encrypted.slice(16)

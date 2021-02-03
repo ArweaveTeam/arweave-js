@@ -9,7 +9,7 @@ import {
   MAX_CHUNK_SIZE,
   MIN_CHUNK_SIZE,
   intToBuffer,
-  bufferToInt
+  bufferToInt,
 } from "../src/common/lib/merkle";
 import { readFileSync } from "fs";
 import { randomBytes } from "crypto";
@@ -26,12 +26,12 @@ const path = b64UrlToBuffer(pathB64Url);
 const offset = 262143;
 const dataSize = 836907;
 
-describe("Chunks", function() {
+describe("Chunks", function () {
   this.timeout(10000);
 
   const data = readFileSync("./test/rebar3");
 
-  it("should validate all chunks from 1Mb.bin test file", async function() {
+  it("should validate all chunks from 1Mb.bin test file", async function () {
     this.timeout(5000);
     const data = readFileSync("./test/fixtures/1mb.bin");
 
@@ -60,7 +60,7 @@ describe("Chunks", function() {
     }
   });
 
-  it("should validate all chunks from lotsofdata.bin test file", async function() {
+  it("should validate all chunks from lotsofdata.bin test file", async function () {
     this.timeout(5000);
     const data = readFileSync("./test/fixtures/lotsofdata.bin");
 
@@ -89,7 +89,7 @@ describe("Chunks", function() {
     }
   });
 
-  it("should convert ints to buffers and back up to Number.MAX_SAFE_INTEGER", async function() {
+  it("should convert ints to buffers and back up to Number.MAX_SAFE_INTEGER", async function () {
     this.timeout(20000);
     // we cant test every number :)
     for (let i = 0; i < 1024 * 1024; i++) {
@@ -107,7 +107,7 @@ describe("Chunks", function() {
     );
   });
 
-  it("should infer the end offset when validating a chunk proof", async function() {
+  it("should infer the end offset when validating a chunk proof", async function () {
     this.timeout(5000);
     const key = await arweaveInstance().wallets.generate();
     const data = randomBytes(256 * 1024 * 3 - 128);
@@ -137,7 +137,7 @@ describe("Chunks", function() {
     expect(validatedChunk).to.be.ok;
   });
 
-  it("should fail to validate a chunk proof when the offset is not within the chunk", async function() {
+  it("should fail to validate a chunk proof when the offset is not within the chunk", async function () {
     this.timeout(5000);
     const key = await arweaveInstance().wallets.generate();
     const data = randomBytes(256 * 1024 + 256 * 50);
@@ -160,7 +160,7 @@ describe("Chunks", function() {
     expect(validatedChunk).to.be.equal(false);
   });
 
-  it("should infer the chunk size when validating a chunk proof", async function() {
+  it("should infer the chunk size when validating a chunk proof", async function () {
     this.timeout(5000);
     const key = await arweaveInstance().wallets.generate();
     const data = randomBytes(256 * 1024 * 2 - 128);
@@ -191,7 +191,7 @@ describe("Chunks", function() {
     expect(validatedChunk).to.be.ok;
   });
 
-  it("should build a tree with a valid root", async function() {
+  it("should build a tree with a valid root", async function () {
     const rootNode = await generateTree(data);
 
     expect(bufferTob64Url(rootNode.id)).to.equal(rootB64Url);
@@ -210,13 +210,13 @@ describe("Chunks", function() {
     // const toTest = sortedProofs[0];
   });
 
-  it("should build valid proofs from tree", async function() {
+  it("should build valid proofs from tree", async function () {
     const rootNode = await generateTree(data);
     const proofs = await generateProofs(rootNode);
     expect(bufferTob64Url(proofs[0].proof)).to.equal(pathB64Url);
   });
 
-  it("should validate own proofs and reject invalid verification parameters", async function() {
+  it("should validate own proofs and reject invalid verification parameters", async function () {
     const rootNode = await generateTree(data);
     const rootHash = await computeRootHash(data);
     const proofs = await generateProofs(rootNode);
@@ -228,7 +228,7 @@ describe("Chunks", function() {
       proofs[0].offset,
       0,
       data.byteLength,
-      proofs[0].proof
+      proofs[0].proof,
     ];
 
     const didValidate = await validatePath.apply(validatePath, testInput);
@@ -240,7 +240,7 @@ describe("Chunks", function() {
       proofs[0].offset,
       0,
       data.byteLength,
-      randomBytes(256) // invalid proof
+      randomBytes(256), // invalid proof
     ];
 
     const didValidateWithInvalidInputA = await validatePath.apply(
@@ -255,7 +255,7 @@ describe("Chunks", function() {
       proofs[0].offset,
       0,
       data.byteLength,
-      proofs[0].proof
+      proofs[0].proof,
     ];
 
     const didValidateWithInvalidInputB = await validatePath.apply(
@@ -266,11 +266,11 @@ describe("Chunks", function() {
     expect(didValidateWithInvalidInputB).to.equal(false);
   });
 
-  it("should validate a valid data path against a valid data root", async function() {
+  it("should validate a valid data path against a valid data root", async function () {
     expect(await validatePath(root, offset, 0, dataSize, path)).to.be.ok;
   });
 
-  it("should reject invalid root", async function() {
+  it("should reject invalid root", async function () {
     const invalidRoot = b64UrlToBuffer(
       "lX5K7gAUlIMt2hYYkoXVrjmVMnnjF6P6c5sov6mPqCm"
     );
@@ -279,7 +279,7 @@ describe("Chunks", function() {
     );
   });
 
-  it("should reject invalid path", async function() {
+  it("should reject invalid path", async function () {
     const invalidPath = b64UrlToBuffer(
       "VUSdubFW2cTvvr5s6VGSU2oxftxma77bRvils5fqikdj4qnP8xEG2HQQKyZeZGW5b9WNFlmDRBTyTJ8NnHQD3tLHc2VwctfdrXbkUODANATrOP6p8RNlSNT50jMKdSKymG0M8yv9g3LCoPB4QXawcRP6q9X5u1nnI7GFMlyuxoC4p21zWi7v68f1r73wXHWdH76VgCNbt0lEUDg1pW8sYvi6pdwAdTNdQIcAhqkO2JBJ2Kwtlxemj4E6NMKg9wi2pQHt6CKlX3T5rQdVd0Tt8czxrkOUBAW9J8XGK9iSLoj4LWZl3z4cKIFyZH7iUgIzCu9Id8jIoO93lVdgaUa4RW"
     );
@@ -289,7 +289,7 @@ describe("Chunks", function() {
     );
   });
 
-  it("should split multiples of MAX_CHUNK_SIZE with one extra zero-length chunk", async function() {
+  it("should split multiples of MAX_CHUNK_SIZE with one extra zero-length chunk", async function () {
     const data = randomBytes(MAX_CHUNK_SIZE * 4);
     const chunks = await chunkData(data);
     expect(chunks.length).to.equal(5);
@@ -304,7 +304,7 @@ describe("Chunks", function() {
     });
   });
 
-  it("should adjust the last two chunks to avoid chunks under MIN_CHUNK_SIZE", async function() {
+  it("should adjust the last two chunks to avoid chunks under MIN_CHUNK_SIZE", async function () {
     const data = randomBytes(MAX_CHUNK_SIZE + MIN_CHUNK_SIZE - 1);
     const chunks = await chunkData(data);
     expect(chunks.length).to.equal(2);
