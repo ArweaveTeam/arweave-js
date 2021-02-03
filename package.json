@@ -1,6 +1,6 @@
 {
   "name": "arweave",
-  "version": "1.10.5",
+  "version": "1.10.6",
   "description": "Arweave JS client library",
   "main": "./node/index.js",
   "browser": "./web/index.js",
@@ -24,8 +24,8 @@
     "prepare": "npm run clean && npm run build",
     "test": "mocha --require ts-node/register test/*.ts",
     "test:web": "npm run bundle:web && npx webpack --config-name web-tests && opener test/web/web.html",
-    "prettier:check": "prettier --check 'src/**/*.ts' 'test/**/*.ts'",
-    "prettier:write": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
+    "prettier:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
+    "prettier:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "preversion": "npm run test",
     "version": "npm run prettier:write && git add -A src",
     "postversion": "git push && git push --tags"
