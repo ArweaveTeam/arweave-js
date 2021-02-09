@@ -1,6 +1,6 @@
 # Arweave JS
 
-Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave network and uploading data ot the permaweb. It works in latest browsers and Node JS.
+Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave network and uploading data to the permaweb. It works in latest browsers and Node JS.
 
 - [Arweave JS](#arweave-js)
   - [Installation](#installation)
@@ -314,7 +314,7 @@ console.log(transaction);
 
 #### Submit a transaction
 
-The preferred method of submitting a data transaction is to use chunk uploading. This method will allow larger transaction sizes, resuming a transaction upload if its interrupted and give progress updates while uploading.
+The preferred method of submitting a data transaction is to use chunk uploading. This method will allow larger transaction sizes, resuming a transaction upload if it's interrupted and give progress updates while uploading.
 
 Simple example:
 
@@ -357,7 +357,7 @@ console.log(response.status);
 
 ##### Chunked uploading advanced options
 
-You can resume an upload from a saved uploader object, that you have persisted in storage some using `JSON.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object pass it to `getUploader()` along with the transactions data:
+You can resume an upload from a saved uploader object, that you have persisted in storage some using `JSON.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object and pass it to `getUploader()` along with the transactions data:
 
 ```js
 
@@ -387,7 +387,7 @@ while (!uploader.isComplete) {
 }
 ```
 
-There is also a async iterator interface to chunk uploading, but this method means you'll need to ensure you are using a transpiler and polyfill for the asyncIterator symbol for some environments. (Safari on iOS in particular). This method takes the same arguments for uploading/resuming a transaction as `getUploader()` and just has a slightly shorter syntax:
+There is also an async iterator interface to chunk uploading, but this method means you'll need to ensure you are using a transpiler and polyfill for the asyncIterator symbol for some environments. (Safari on iOS in particular). This method takes the same arguments for uploading/resuming a transaction as `getUploader()` and just has a slightly shorter syntax:
 
 ```js
 for await (const uploader of arweave.transactions.upload(tx)) {
