@@ -390,7 +390,7 @@ while (!uploader.isComplete) {
 There is also a async iterator interface to chunk uploading, but this method means you'll need to ensure you are using a transpiler and polyfill for the asyncIterator symbol for some environments. (Safari on iOS in particular). This method takes the same arguments for uploading/resuming a transaction as `getUploader()` and just has a slightly shorter syntax:
 
 ```js
-for await (const uploader of arweave.transactions.upload(tx) {
+for await (const uploader of arweave.transactions.upload(tx)) {
   console.log(`${uploader.pctComplete}% Complete`);
 }
 // done.
