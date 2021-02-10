@@ -97,6 +97,8 @@ describe("Transactions", function () {
 
     await arweave.transactions.sign(transaction, wallet);
 
+    expect(transaction.get("owner")).to.equal(wallet.n);
+
     const verified = await arweave.transactions.verify(transaction);
 
     expect(verified).to.be.a("boolean");
