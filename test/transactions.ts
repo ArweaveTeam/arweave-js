@@ -88,22 +88,19 @@ describe("Transactions", function () {
     expect(transaction.get("owner")).to.equal("owner-test-abc");
   });
 
-  it("should throw if no owner or JWK provided", async function () {
-    const error = await (async () => {
-      try {
-        await arweave.createTransaction({
-          data: "test",
-        });
-      } catch (error) {
-        return error;
-      }
-    })();
+  it("should create and sign valid transactions when no owner or JWK provided", async function () {
+    const wallet = await arweave.wallets.generate();
 
-    expect(error)
-      .to.be.an.instanceOf(Error)
-      .match(
-        /must either have an 'owner' attribute, or you must provide the jwk parameter/
-      );
+    const transaction = await arweave.createTransaction({
+      data: "test",
+    });
+
+    await arweave.transactions.sign(transaction, wallet);
+
+    const verified = await arweave.transactions.verify(transaction);
+
+    expect(verified).to.be.a("boolean");
+    expect(verified).to.be.true;
   });
 
   it("should create and sign ar transactions", async function () {

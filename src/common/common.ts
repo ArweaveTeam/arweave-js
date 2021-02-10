@@ -91,12 +91,9 @@ export default class Arweave {
     }
 
     if (attributes.owner == undefined) {
-      if (!jwk || !jwk.n) {
-        throw new Error(
-          `A new Arweave transaction must either have an 'owner' attribute, or you must provide the jwk parameter.`
-        );
+      if (jwk) {
+        transaction.owner = jwk.n;
       }
-      transaction.owner = jwk.n;
     }
 
     if (attributes.last_tx == undefined) {

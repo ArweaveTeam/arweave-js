@@ -187,6 +187,8 @@ export default class Transactions {
     jwk: JWKInterface,
     options?: SignatureOptions
   ): Promise<void> {
+    transaction.setOwner(jwk.n);
+
     let dataToSign = await transaction.getSignatureData();
 
     let rawSignature = await this.crypto.sign(jwk, dataToSign, options);

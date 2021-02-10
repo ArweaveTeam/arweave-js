@@ -82,7 +82,7 @@ export default class Transaction
   public readonly format: number = 2;
   public id: string = "";
   public readonly last_tx: string = "";
-  public readonly owner: string = "";
+  public owner: string = "";
   public readonly tags: Tag[] = [];
   public readonly target: string = "";
   public readonly quantity: string = "0";
@@ -144,6 +144,10 @@ export default class Transaction
       reward: this.reward,
       signature: this.signature,
     };
+  }
+
+  public setOwner(owner: string) {
+    this.owner = owner;
   }
 
   public setSignature({ signature, id }: { signature: string; id: string }) {
