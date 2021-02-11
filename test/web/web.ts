@@ -194,6 +194,16 @@ describe("Transactions", function () {
     expect(verifiedWithModififedTags).to.be.false;
   });
 
+  it("should create and sign transactions using wallet", async function () {
+    this.timeout(120000);
+
+    const transaction = await arweave.createTransaction({ data: "test" });
+    await arweave.transactions.sign(transaction);
+
+    const verified = await arweave.transactions.verify(transaction);
+    expect(verified).to.be.a("boolean").and.to.be.true;
+  });
+
   it("should get transaction info", async function () {
     this.timeout(5000);
 

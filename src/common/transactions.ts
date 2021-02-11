@@ -190,22 +190,18 @@ export default class Transactions {
     if (!jwk || jwk === "use_wallet") {
       try {
         // @ts-ignore
-        await window.arweaveWallet.connect(["SIGN_TRANSACTION"]);
+        await window.weavemask.connect(["SIGN_TRANSACTION"]);
       } catch {
         // Permission is already granted
       }
 
       // @ts-ignore
-      const signedTransaction = await window.arweaveWallet.sign(
+      const signedTransaction = await window.weavemask.sign(
         transaction,
         options
       );
 
-      transaction.setOwner(signedTransaction.owner);
-      transaction.setSignature({
-        signature: signedTransaction.signature,
-        id: signedTransaction.id,
-      });
+      transaction.set(signedTransaction);
     } else {
       transaction.setOwner(jwk.n);
 

@@ -79,14 +79,14 @@ export interface TransactionInterface {
 export default class Transaction
   extends BaseObject
   implements TransactionInterface {
-  public readonly format: number = 2;
+  public format: number = 2;
   public id: string = "";
-  public readonly last_tx: string = "";
+  public last_tx: string = "";
   public owner: string = "";
-  public readonly tags: Tag[] = [];
-  public readonly target: string = "";
-  public readonly quantity: string = "0";
-  public readonly data_size: string = "0";
+  public tags: Tag[] = [];
+  public target: string = "";
+  public quantity: string = "0";
+  public data_size: string = "0";
   public data: Uint8Array = new Uint8Array();
   public data_root: string = "";
   public reward: string = "0";
@@ -144,6 +144,22 @@ export default class Transaction
       reward: this.reward,
       signature: this.signature,
     };
+  }
+
+  public set(transaction: Transaction) {
+    this.format = transaction.format;
+    this.id = transaction.id;
+    this.last_tx = transaction.last_tx;
+    this.owner = transaction.owner;
+    this.tags = transaction.tags;
+    this.target = transaction.target;
+    this.quantity = transaction.quantity;
+    this.data = transaction.data;
+    this.data_size = transaction.data_size;
+    this.data_root = transaction.data_root;
+    this.data_tree = transaction.data_tree;
+    this.reward = transaction.reward;
+    this.signature = transaction.signature;
   }
 
   public setOwner(owner: string) {
