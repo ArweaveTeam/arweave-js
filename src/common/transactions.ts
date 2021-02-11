@@ -184,21 +184,37 @@ export default class Transactions {
 
   public async sign(
     transaction: Transaction,
-    jwk: JWKInterface,
+    jwk?: JWKInterface | "use_wallet",
     options?: SignatureOptions
   ): Promise<void> {
-    transaction.setOwner(jwk.n);
+    if (!jwk || jwk === "use_wallet") {
+      try {
+        // @ts-ignore
+        await window.arweaveWallet.connect(["SIGN_TRANSACTION"]);
+      } catch {
+        // Permission is already granted
+      }
 
-    let dataToSign = await transaction.getSignatureData();
+      // @ts-ignore
+      const signedTransaction = await window.arweaveWallet.sign(transaction, options);
 
-    let rawSignature = await this.crypto.sign(jwk, dataToSign, options);
+      transaction.setOwner(signedTransaction.owner);
+      transaction.setSignature({
+        signature: signedTransaction.signature,
+        id: signedTransaction.id,
+      });
+    } else {
+      transaction.setOwner(jwk.n);
+      
+      let dataToSign = await transaction.getSignatureData();
+      let rawSignature = await this.crypto.sign(jwk, dataToSign, options);
+      let id = await this.crypto.hash(rawSignature);
 
-    let id = await this.crypto.hash(rawSignature);
-
-    transaction.setSignature({
-      signature: ArweaveUtils.bufferTob64Url(rawSignature),
-      id: ArweaveUtils.bufferTob64Url(id),
-    });
+      transaction.setSignature({
+        signature: ArweaveUtils.bufferTob64Url(rawSignature),
+        id: ArweaveUtils.bufferTob64Url(id),
+      });
+    }
   }
 
   public async verify(transaction: Transaction): Promise<boolean> {
