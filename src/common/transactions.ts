@@ -196,7 +196,10 @@ export default class Transactions {
       }
 
       // @ts-ignore
-      const signedTransaction = await window.arweaveWallet.sign(transaction, options);
+      const signedTransaction = await window.arweaveWallet.sign(
+        transaction,
+        options
+      );
 
       transaction.setOwner(signedTransaction.owner);
       transaction.setSignature({
@@ -205,7 +208,7 @@ export default class Transactions {
       });
     } else {
       transaction.setOwner(jwk.n);
-      
+
       let dataToSign = await transaction.getSignatureData();
       let rawSignature = await this.crypto.sign(jwk, dataToSign, options);
       let id = await this.crypto.hash(rawSignature);
