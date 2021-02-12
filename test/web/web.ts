@@ -232,7 +232,7 @@ describe("Transactions", function () {
     );
 
     const verify = await arweave.transactions.verify(transaction);
-    expect(verify).to.be.true;
+    expect(verify).to.be.a("boolean").and.to.be.true;
 
     transaction.signature = "xxx";
 

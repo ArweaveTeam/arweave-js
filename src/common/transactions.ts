@@ -187,7 +187,13 @@ export default class Transactions {
     jwk?: JWKInterface | "use_wallet",
     options?: SignatureOptions
   ): Promise<void> {
-    if (!jwk || jwk === "use_wallet") {
+    // @ts-ignore
+    if(!jwk && (!window || !window.weavemask || !options)) {
+      throw new Error(
+        `A new Arweave transaction must provide the jwk parameter.`
+      );
+    }
+    else if (!jwk || jwk === "use_wallet") {
       try {
         // @ts-ignore
         await window.weavemask.connect(["SIGN_TRANSACTION"]);
