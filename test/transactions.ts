@@ -248,7 +248,7 @@ describe("Transactions", function () {
   });
 
   it("should get transaction data > 12MiB from a node", async function () {
-    this.timeout(80000);
+    this.timeout(150000);
     const data = (await arweaveDirectNode.transactions.getData(
       liveDataTxidLarge,
       { decode: true }
