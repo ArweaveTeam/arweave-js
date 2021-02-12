@@ -58,8 +58,32 @@ export default class Wallets {
     return this.crypto.generateJWK();
   }
 
-  public async jwkToAddress(jwk: JWKInterface): Promise<string> {
-    return this.ownerToAddress(jwk.n);
+  public async jwkToAddress(jwk?: JWKInterface | "use_wallet"): Promise<string> {
+    if(!jwk || jwk === "use_wallet") {
+      return this.getAddress();
+    }
+    else {
+      // @ts-ignore
+      return this.getAddress(jwk.n);
+    }
+  }
+
+  public async getAddress(jwk?: JWKInterface | "use_wallet"): Promise<string> {
+    if(!jwk || jwk === "use_wallet") {
+      try {
+        // @ts-ignore
+        await window.weavemask.connect(["ACCESS_ADDRESS"]);
+      } catch {
+        // Permission is already granted
+      }
+
+      // @ts-ignore
+      return window.weavemask.getActiveAddress();
+
+    }
+    else {
+      return this.ownerToAddress(jwk.n);
+    }
   }
 
   public async ownerToAddress(owner: string): Promise<string> {
