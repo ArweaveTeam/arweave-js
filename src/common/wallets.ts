@@ -59,12 +59,11 @@ export default class Wallets {
   }
 
   public async jwkToAddress(jwk?: JWKInterface | "use_wallet"): Promise<string> {
-    if(!jwk || jwk === "use_wallet") {
+    if (!jwk || jwk === "use_wallet") {
       return this.getAddress();
     }
     else {
-      // @ts-ignore
-      return this.getAddress(jwk.n);
+      return this.getAddress(jwk);
     }
   }
 
