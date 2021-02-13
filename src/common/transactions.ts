@@ -194,7 +194,10 @@ export default class Transactions {
       );
     } else if (!jwk || jwk === "use_wallet") {
       try {
-        await window.arweaveWallet.connect(["SIGN_TRANSACTION"]);
+        const existingPermissions = await window.arweaveWallet.getPermissions();
+        
+        if(!existingPermissions.includes("SIGN_TRANSACTION"))
+          await window.arweaveWallet.connect(["SIGN_TRANSACTION"]);
       } catch {
         // Permission is already granted
       }
