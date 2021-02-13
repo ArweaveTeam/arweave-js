@@ -72,13 +72,13 @@ export default class Wallets {
     if (!jwk || jwk === "use_wallet") {
       try {
         // @ts-ignore
-        await window.weavemask.connect(["ACCESS_ADDRESS"]);
+        await window.arweaveWallet.connect(["ACCESS_ADDRESS"]);
       } catch {
         // Permission is already granted
       }
 
       // @ts-ignore
-      return window.weavemask.getActiveAddress();
+      return window.arweaveWallet.getActiveAddress();
     } else {
       return this.ownerToAddress(jwk.n);
     }

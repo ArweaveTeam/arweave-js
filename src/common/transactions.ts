@@ -188,20 +188,20 @@ export default class Transactions {
     options?: SignatureOptions
   ): Promise<void> {
     // @ts-ignore
-    if (!jwk && (!window || !window.weavemask || !options)) {
+    if (!jwk && (!window || !window.arweaveWallet)) {
       throw new Error(
         `A new Arweave transaction must provide the jwk parameter.`
       );
     } else if (!jwk || jwk === "use_wallet") {
       try {
         // @ts-ignore
-        await window.weavemask.connect(["SIGN_TRANSACTION"]);
+        await window.arweaveWallet.connect(["SIGN_TRANSACTION"]);
       } catch {
         // Permission is already granted
       }
 
       // @ts-ignore
-      const signedTransaction = await window.weavemask.sign(
+      const signedTransaction = await window.arweaveWallet.sign(
         transaction,
         options
       );
