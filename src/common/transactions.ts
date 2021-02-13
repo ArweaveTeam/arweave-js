@@ -194,13 +194,11 @@ export default class Transactions {
       );
     } else if (!jwk || jwk === "use_wallet") {
       try {
-        // @ts-ignore
         await window.arweaveWallet.connect(["SIGN_TRANSACTION"]);
       } catch {
         // Permission is already granted
       }
 
-      // @ts-ignore
       const signedTransaction = await window.arweaveWallet.sign(
         transaction,
         options
@@ -379,3 +377,24 @@ export default class Transactions {
     return uploader;
   }
 }
+
+/**
+ * Arweave wallet declarations
+ */
+declare global {
+  interface Window {
+    arweaveWallet: {
+      getPermissions(): Promise<PermissionType[]>;
+      sign(transiction: Transaction, options?: SignatureOptions): Promise<Transaction>;
+      connect(permissions: PermissionType[]): Promise<void>;
+    }
+  }
+}
+
+/**
+ * Arweave wallet permission types
+ */
+export type PermissionType =
+  | "ACCESS_ADDRESS"
+  | "ACCESS_ALL_ADDRESSES"
+  | "SIGN_TRANSACTION";
