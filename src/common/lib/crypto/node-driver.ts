@@ -122,7 +122,7 @@ export default class NodeCryptoDriver implements CryptoInterface {
     // an additional random salt per passphrase.
     const derivedKey = crypto.pbkdf2Sync(
       key,
-      salt = salt ? salt :  '',
+      salt = salt ? salt :  'salt',
       100000,
       32,
       this.hashAlgorithm
@@ -162,7 +162,7 @@ export default class NodeCryptoDriver implements CryptoInterface {
       // an additional random salt per passphrase.
       const derivedKey = crypto.pbkdf2Sync(
         key,
-        salt = salt ? salt :  '',
+        salt = salt ? salt :  'salt',
         100000,
         32,
         this.hashAlgorithm
