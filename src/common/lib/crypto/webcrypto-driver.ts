@@ -159,7 +159,8 @@ export default class WebCryptoDriver implements CryptoInterface {
 
   public async encrypt(
     data: Buffer,
-    key: string | Buffer
+    key: string | Buffer,
+    salt?: string,
   ): Promise<Uint8Array> {
     const initialKey = await this.driver.importKey(
       "raw",
@@ -172,12 +173,14 @@ export default class WebCryptoDriver implements CryptoInterface {
       ["deriveKey"]
     );
 
-    const salt = ArweaveUtils.stringToBuffer("salt");
+    // const salt = ArweaveUtils.stringToBuffer("salt");
+    // create a random string for deriving the key 
+    // const salt = this.driver.randomBytes(16).toString('hex');
 
     const derivedkey = await this.driver.deriveKey(
       {
         name: "PBKDF2",
-        salt: salt,
+        salt: ( salt ) ? ArweaveUtils.stringToBuffer(salt) : ArweaveUtils.stringToBuffer('salt'),
         iterations: 100000,
         hash: "SHA-256",
       },
@@ -208,7 +211,8 @@ export default class WebCryptoDriver implements CryptoInterface {
 
   public async decrypt(
     encrypted: Buffer,
-    key: string | Buffer
+    key: string | Buffer,
+    salt?: string,
   ): Promise<Uint8Array> {
     const initialKey = await this.driver.importKey(
       "raw",
@@ -221,12 +225,12 @@ export default class WebCryptoDriver implements CryptoInterface {
       ["deriveKey"]
     );
 
-    const salt = ArweaveUtils.stringToBuffer("salt");
+    // const salt = ArweaveUtils.stringToBuffer("pepper");
 
     const derivedkey = await this.driver.deriveKey(
       {
         name: "PBKDF2",
-        salt: salt,
+        salt: ( salt ) ? ArweaveUtils.stringToBuffer(salt) : ArweaveUtils.stringToBuffer('salt'),
         iterations: 100000,
         hash: "SHA-256",
       },

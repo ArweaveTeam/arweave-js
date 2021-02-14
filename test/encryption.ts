@@ -41,4 +41,22 @@ describe("Encryption", function () {
 
     expect(decrypted.toString()).to.equal(text);
   });
+
+  it("should encrypt and decrypt using passphrase round trip and a salt", async function () {
+    const text = "some data to encrypt";
+
+    const data = Buffer.from(text);
+
+    const key = "super-secret-password";
+
+    const encrypted = await arweave.crypto.encrypt(data, key, 'hello arweave');
+
+    expect(encrypted).to.have.lengthOf(48);
+
+    const decrypted = await arweave.crypto.decrypt(encrypted, key, 'hello arweave');
+
+    expect(decrypted.toString()).to.equal(data.toString());
+
+    expect(decrypted.toString()).to.equal(text);
+  });
 });
