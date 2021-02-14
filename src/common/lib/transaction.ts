@@ -79,14 +79,14 @@ export interface TransactionInterface {
 export default class Transaction
   extends BaseObject
   implements TransactionInterface {
-  public format: number = 2;
+  public readonly format: number = 2;
   public id: string = "";
-  public last_tx: string = "";
+  public readonly last_tx: string = "";
   public owner: string = "";
   public tags: Tag[] = [];
-  public target: string = "";
-  public quantity: string = "0";
-  public data_size: string = "0";
+  public readonly target: string = "";
+  public readonly quantity: string = "0";
+  public readonly data_size: string = "0";
   public data: Uint8Array = new Uint8Array();
   public data_root: string = "";
   public reward: string = "0";
@@ -146,29 +146,25 @@ export default class Transaction
     };
   }
 
-  public set(transaction: Transaction) {
-    this.format = transaction.format;
-    this.id = transaction.id;
-    this.last_tx = transaction.last_tx;
-    this.owner = transaction.owner;
-    this.tags = transaction.tags;
-    this.target = transaction.target;
-    this.quantity = transaction.quantity;
-    this.data = transaction.data;
-    this.data_size = transaction.data_size;
-    this.data_root = transaction.data_root;
-    this.data_tree = transaction.data_tree;
-    this.reward = transaction.reward;
-    this.signature = transaction.signature;
-  }
-
   public setOwner(owner: string) {
     this.owner = owner;
   }
 
-  public setSignature({ signature, id }: { signature: string; id: string }) {
-    this.signature = signature;
+  public setSignature({
+    id,
+    owner,
+    tags,
+    signature,
+  }: {
+    id: string;
+    owner: string;
+    tags?: Tag[];
+    signature: string;
+  }) {
     this.id = id;
+    this.owner = owner;
+    if (tags) this.tags = tags;
+    this.signature = signature;
   }
 
   public async prepareChunks(data: Uint8Array) {
