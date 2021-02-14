@@ -206,7 +206,12 @@ export default class Transactions {
         options
       );
 
-      transaction.set(signedTransaction);
+      transaction.setSignature({
+        id: signedTransaction.id,
+        owner: signedTransaction.owner,
+        tags: signedTransaction.tags,
+        signature: signedTransaction.signature,
+      });
     } else {
       transaction.setOwner(jwk.n);
 
@@ -215,8 +220,9 @@ export default class Transactions {
       let id = await this.crypto.hash(rawSignature);
 
       transaction.setSignature({
-        signature: ArweaveUtils.bufferTob64Url(rawSignature),
         id: ArweaveUtils.bufferTob64Url(id),
+        owner: jwk.n,
+        signature: ArweaveUtils.bufferTob64Url(rawSignature),
       });
     }
   }
