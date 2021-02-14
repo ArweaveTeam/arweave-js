@@ -388,7 +388,7 @@ declare global {
   interface Window {
     arweaveWallet: {
       getPermissions(): Promise<PermissionType[]>;
-      sign(transiction: Transaction, options?: SignatureOptions): Promise<Transaction>;
+      sign(transaction: Transaction, options?: SignatureOptions): Promise<Transaction>;
       connect(permissions: PermissionType[]): Promise<void>;
     }
   }
