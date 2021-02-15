@@ -392,6 +392,10 @@ declare global {
       connect(permissions: PermissionType[]): Promise<void>;
     }
   }
+  interface WindowEventMap {
+    walletSwitch: CustomEvent<{ address: string }>;
+    arweaveWalletLoaded: CustomEvent<{}>;
+  }
 }
 
 /**
