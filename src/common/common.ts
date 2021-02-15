@@ -78,7 +78,7 @@ export default class Arweave {
 
   public async createTransaction(
     attributes: Partial<CreateTransactionInterface>,
-    jwk?: JWKInterface | "use_wallet",
+    jwk?: JWKInterface | "use_wallet"
   ): Promise<Transaction> {
     const transaction: Partial<CreateTransactionInterface> = {};
 
