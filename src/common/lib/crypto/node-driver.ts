@@ -110,13 +110,19 @@ export default class NodeCryptoDriver implements CryptoInterface {
    */
   public async encrypt(
     data: Buffer,
-    key: string | Buffer
+    key: string | Buffer,
+    salt?: string,
   ): Promise<Uint8Array> {
+
+    // create a random string for deriving the key 
+    // const salt = crypto.randomBytes(16);
+    // console.log(salt);
+
     // As we're using CBC with a randomised IV per cypher we don't really need
     // an additional random salt per passphrase.
     const derivedKey = crypto.pbkdf2Sync(
       key,
-      "salt",
+      salt = salt ? salt :  'salt',
       100000,
       32,
       this.hashAlgorithm
@@ -145,14 +151,18 @@ export default class NodeCryptoDriver implements CryptoInterface {
    */
   public async decrypt(
     encrypted: Buffer,
-    key: string | Buffer
+    key: string | Buffer,
+    salt?: string,
   ): Promise<Uint8Array> {
     try {
+       // create a random string for deriving the key 
+      // const salt = crypto.randomBytes(16).toString('hex');
+
       // As we're using CBC with a randomised IV per cypher we don't really need
       // an additional random salt per passphrase.
       const derivedKey = crypto.pbkdf2Sync(
         key,
-        "salt",
+        salt = salt ? salt :  'salt',
         100000,
         32,
         this.hashAlgorithm
