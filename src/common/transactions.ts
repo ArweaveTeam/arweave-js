@@ -195,8 +195,8 @@ export default class Transactions {
     } else if (!jwk || jwk === "use_wallet") {
       try {
         const existingPermissions = await window.arweaveWallet.getPermissions();
-        
-        if(!existingPermissions.includes("SIGN_TRANSACTION"))
+
+        if (!existingPermissions.includes("SIGN_TRANSACTION"))
           await window.arweaveWallet.connect(["SIGN_TRANSACTION"]);
       } catch {
         // Permission is already granted
@@ -394,9 +394,12 @@ declare global {
   interface Window {
     arweaveWallet: {
       getPermissions(): Promise<PermissionType[]>;
-      sign(transaction: Transaction, options?: SignatureOptions): Promise<Transaction>;
+      sign(
+        transaction: Transaction,
+        options?: SignatureOptions
+      ): Promise<Transaction>;
       connect(permissions: PermissionType[]): Promise<void>;
-    }
+    };
   }
   interface WindowEventMap {
     walletSwitch: CustomEvent<{ address: string }>;

@@ -49,11 +49,15 @@ describe("Encryption", function () {
 
     const key = "super-secret-password";
 
-    const encrypted = await arweave.crypto.encrypt(data, key, 'hello arweave');
+    const encrypted = await arweave.crypto.encrypt(data, key, "hello arweave");
 
     expect(encrypted).to.have.lengthOf(48);
 
-    const decrypted = await arweave.crypto.decrypt(encrypted, key, 'hello arweave');
+    const decrypted = await arweave.crypto.decrypt(
+      encrypted,
+      key,
+      "hello arweave"
+    );
 
     expect(decrypted.toString()).to.equal(data.toString());
 
