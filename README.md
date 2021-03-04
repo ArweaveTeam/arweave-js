@@ -479,6 +479,8 @@ const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hm
 
 ### ArQL
 
+**Note: It is recommended to use [GQL](https://gql-guide.vercel.app/) instead of ArQL**
+
 ArQL allows you to search for transactions by tags or by wallet address.
 
   The allowed operators are `and`, `or`, and `equals` which all accept exactly two expressions. Therefore, to `and` three or more expressions together, you will need to nest `and` expressions. The same goes for `or`. Searching by wallet is done by using the special tag `from`.
