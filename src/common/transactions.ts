@@ -403,6 +403,22 @@ declare global {
         options?: SignatureOptions
       ): Promise<Transaction>;
       getPermissions(): Promise<PermissionType[]>;
+      encrypt(
+        data: string,
+        options: {
+          algorithm: string;
+          hash: string;
+          salt?: string;
+        }
+      ): Promise<Uint8Array>;
+      decrypt(
+        data: Uint8Array,
+        options: {
+          algorithm: string;
+          hash: string;
+          salt?: string;
+        }
+      ): Promise<string>;
     };
   }
   interface WindowEventMap {
@@ -414,7 +430,9 @@ declare global {
 /**
  * Arweave wallet permission types
  */
-export type PermissionType =
+ export type PermissionType =
   | "ACCESS_ADDRESS"
   | "ACCESS_ALL_ADDRESSES"
-  | "SIGN_TRANSACTION";
+  | "SIGN_TRANSACTION"
+  | "ENCRYPT"
+  | "DECRYPT";
