@@ -393,12 +393,32 @@ export default class Transactions {
 declare global {
   interface Window {
     arweaveWallet: {
-      getPermissions(): Promise<PermissionType[]>;
+      connect(permissions: PermissionType[]): Promise<void>;
+      disconnect(): Promise<void>;
+      getActiveAddress(): Promise<string>;
+      getAllAddresses(): Promise<string[]>;
+      getWalletNames(): Promise<{ [addr: string]: string }>;
       sign(
         transaction: Transaction,
         options?: SignatureOptions
       ): Promise<Transaction>;
-      connect(permissions: PermissionType[]): Promise<void>;
+      getPermissions(): Promise<PermissionType[]>;
+      encrypt(
+        data: string,
+        options: {
+          algorithm: string;
+          hash: string;
+          salt?: string;
+        }
+      ): Promise<Uint8Array>;
+      decrypt(
+        data: Uint8Array,
+        options: {
+          algorithm: string;
+          hash: string;
+          salt?: string;
+        }
+      ): Promise<string>;
     };
   }
   interface WindowEventMap {
@@ -410,7 +430,9 @@ declare global {
 /**
  * Arweave wallet permission types
  */
-export type PermissionType =
+ export type PermissionType =
   | "ACCESS_ADDRESS"
   | "ACCESS_ALL_ADDRESSES"
-  | "SIGN_TRANSACTION";
+  | "SIGN_TRANSACTION"
+  | "ENCRYPT"
+  | "DECRYPT";
