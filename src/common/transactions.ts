@@ -430,7 +430,7 @@ declare global {
 /**
  * Arweave wallet permission types
  */
- export type PermissionType =
+export type PermissionType =
   | "ACCESS_ADDRESS"
   | "ACCESS_ALL_ADDRESSES"
   | "SIGN_TRANSACTION"

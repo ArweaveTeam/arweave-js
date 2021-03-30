@@ -71,8 +71,10 @@ export default class Wallets {
   public async getAddress(jwk?: JWKInterface | "use_wallet"): Promise<string> {
     if (!jwk || jwk === "use_wallet") {
       try {
-        // @ts-ignore
-        await window.arweaveWallet.connect(["ACCESS_ADDRESS"]);
+        const existingPermissions = await window.arweaveWallet.getPermissions();
+
+        if (!existingPermissions.includes("ACCESS_ADDRESS"))
+          await window.arweaveWallet.connect(["ACCESS_ADDRESS"]);
       } catch {
         // Permission is already granted
       }
