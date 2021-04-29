@@ -39,6 +39,7 @@ export default class Api {
       timeout: config.timeout || 20000,
       logging: config.logging || false,
       logger: config.logger || console.log,
+      network: config.network,
     };
   }
 
