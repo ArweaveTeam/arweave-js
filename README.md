@@ -179,7 +179,7 @@ The transaction ID is a hash of the transaction signature, so a transaction ID c
 
 #### Create a data transaction
 
-Data transactions are used to store data on the Arweave permaweb, they can contain HTML data and be serverd like webpages or they can contain any arbitrary data.
+Data transactions are used to store data on the Arweave permaweb. They can contain HTML or any arbitrary data and are served like webpages.
 
 ```js
 let key = await arweave.wallets.generate();
@@ -214,6 +214,8 @@ console.log(transactionA);
 ```
 
 #### Create a wallet to wallet transaction
+
+Wallet to wallet transactions can facilitate payments from one wallet to another, given a target wallet and AR token quantity in Winston.
 
 ```js
 let key = await arweave.wallets.generate();
