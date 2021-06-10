@@ -171,9 +171,9 @@ arweave.wallets.getLastTransactionID('1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKl
 
 Transactions are the building blocks of the Arweave permaweb, they can send [AR](https://docs.arweave.org/developers/server/http-api#ar-and-winston) betwen wallet addresses, or store data on the Arweave network.
 
-The create transaction methods simply creates and returns an unsigned transaction object, you must sign the transaction and submit it separeately using the `transactions.sign` and `transactions.submit` methods.
+The create transaction methods create and return an unsigned transaction object. You must sign the transaction and submit it separeately using the `transactions.sign` and `transactions.submit` methods.
 
-**Modifying a transaction object after signing it will invalidate the signature**, this will cause it to be rejected by the network if submitted in that state. Transaction prices are based on the size of the data field, so modifying the data field after a transaction has been created isn't recommended as you'll need to manually update the price.
+**Modifying a transaction object after signing it will invalidate the signature,** causing it to be rejected by the network if submitted in that state. Transaction prices are based on the size of the data field, so modifying the data field after a transaction has been created isn't recommended as you'll need to manually update the price.
 
 The transaction ID is a hash of the transaction signature, so a transaction ID can't be known until its contents are finalised and it has been signed.
 
