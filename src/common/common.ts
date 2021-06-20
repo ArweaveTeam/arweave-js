@@ -9,6 +9,7 @@ import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
 import Silo from "./silo";
 import Chunks from "./chunks";
+import Blocks from "./blocks";
 
 export interface Config {
   api: ApiConfig;
@@ -37,6 +38,8 @@ export default class Arweave {
 
   public network: Network;
 
+  public blocks: Blocks;
+
   public ar: Ar;
 
   public silo: Silo;
@@ -56,6 +59,7 @@ export default class Arweave {
     this.transactions = new Transactions(this.api, Arweave.crypto, this.chunks);
     this.silo = new Silo(this.api, this.crypto, this.transactions);
     this.network = new Network(this.api);
+    this.blocks = new Blocks(this.api, this.network);
     this.ar = new Ar();
   }
 

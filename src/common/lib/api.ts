@@ -41,12 +41,12 @@ export default class Api {
     };
   }
 
-  public async get(
+  public async get<T = any>(
     endpoint: string,
     config?: AxiosRequestConfig
-  ): Promise<AxiosResponse> {
+  ): Promise<AxiosResponse<T>> {
     try {
-      return await this.request().get(endpoint, config);
+      return await this.request().get<T>(endpoint, config);
     } catch (error) {
       if (error.response && error.response.status) {
         return error.response;
@@ -56,13 +56,13 @@ export default class Api {
     }
   }
 
-  public async post(
+  public async post<T = any>(
     endpoint: string,
     body: Buffer | string | object,
     config?: AxiosRequestConfig
-  ): Promise<AxiosResponse> {
+  ): Promise<AxiosResponse<T>> {
     try {
-      return await this.request().post(endpoint, body, config);
+      return await this.request().post<T>(endpoint, body, config);
     } catch (error) {
       if (error.response && error.response.status) {
         return error.response;

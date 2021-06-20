@@ -28,6 +28,9 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
       - [Get a transaction](#get-a-transaction)
       - [Get transaction data](#get-transaction-data)
       - [Decode tags from transactions](#decode-tags-from-transactions)
+    - [Blocks](#blocks)  
+      - [Get a block by indep_hash](#get-a-block-by-indep-hash)
+      - [Get current block](#get-current-block)
     - [ArQL](#arql)
     - [License](#license)
 
@@ -477,6 +480,45 @@ const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hm
   // Content-Type : text/html
   // User-Agent : ArweaveDeploy/1.1.0
 });
+```
+
+### Blocks
+Blocks are base elements of Arweave's blockweave data structure.
+Each block is linked to two prior blocks: the previous block in the "chain" (as with traditional blockchain
+protocols), and a block from the previous history of the blockchain (the "recall block"). Each block contains
+a list of zero to many transactions.
+
+
+#### Get a block by indep_hash
+Gets block data for given independent hash (see page 63. of [yellow-paper](https://www.arweave.org/yellow-paper.pdf) for details).
+
+```js
+const result = await arweave.blocks.get("zbUPQFA4ybnd8h99KI9Iqh4mogXJibr0syEwuJPrFHhOhld7XBMOUDeXfsIGvYDp"); 
+console.log(result)
+// {
+//   "nonce": "6jdzO4FzS4EVaQVcLBEmxm6uN5-1tqBXW24Pzp6JsRQ",
+//   "previous_block": "iNgEv6vf9nIrxLWeEu-vPNHFftEh0kfOnx0qd6NKUOc8Z3WeMeOmAmdOHwSUFAGn",
+//   "timestamp": 1624183433,
+//   "last_retarget": 1624183433,
+//   "diff": "115792089220940710686296942055695413965527953310049630981189590430430626054144",
+//   "height": 711150,
+//   "hash": "_____8V8BkM8Cyja5ZFJcc7HfX33eM4BKDAvcEBn22s",
+//   "indep_hash": "zbUPQFA4ybnd8h99KI9Iqh4mogXJibr0syEwuJPrFHhOhld7XBMOUDeXfsIGvYDp",
+//   "txs": [ ...
+```
+
+#### Get current block
+Gets a block data for current block, i.e., block with indep_hash:
+```js
+const {current} = await arweave.network.getInfo();
+```
+
+```js
+const result = await arweave.blocks.getCurrent(); 
+console.log(result)
+// {
+//   "indep_hash": "qoJwHSpzl6Ouo140HW2DTv1rGOrgfBEnHi5sHv-fJt_TsK7xA70F2QbjMCopLiMd",
+//   ...
 ```
 
 ### ArQL
