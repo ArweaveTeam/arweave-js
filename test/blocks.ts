@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import {arweaveInstance} from "./_arweave";
+import { arweaveInstance } from "./_arweave";
 
 const expect = chai.expect;
 
@@ -28,14 +28,14 @@ describe("Blocks", function () {
     "weave_size",
     "block_size",
     "cumulative_diff",
-    "hash_list_merkle"
-  ]
+    "hash_list_merkle",
+  ];
 
   it("should get block's data by its indep_hash", async function () {
-
     // given
     // https://arweave.net/block/hash/zbUPQFA4ybnd8h99KI9Iqh4mogXJibr0syEwuJPrFHhOhld7XBMOUDeXfsIGvYDp
-    const blockIndepHash = "zbUPQFA4ybnd8h99KI9Iqh4mogXJibr0syEwuJPrFHhOhld7XBMOUDeXfsIGvYDp";
+    const blockIndepHash =
+      "zbUPQFA4ybnd8h99KI9Iqh4mogXJibr0syEwuJPrFHhOhld7XBMOUDeXfsIGvYDp";
     const expectedResult = require("./fixtures/block_zbUPQFA4ybnd8h99KI9Iqh4mogXJibr0syEwuJPrFHhOhld7XBMOUDeXfsIGvYDp.json");
 
     // when
@@ -48,9 +48,8 @@ describe("Blocks", function () {
   });
 
   it("should get current block's data", async function () {
-
     // given
-    const {current} = await arweave.network.getInfo();
+    const { current } = await arweave.network.getInfo();
 
     // when
     const result = await arweave.blocks.getCurrent();
@@ -58,6 +57,4 @@ describe("Blocks", function () {
     // then
     expect(result.indep_hash).to.be.equal(current);
   });
-
-
 });
