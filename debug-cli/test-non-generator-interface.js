@@ -2,7 +2,7 @@
 
 const Arweave = require('../node');
 const fs = require('fs');
-const arweave = Arweave.init({ host: 'lon-1.eu-west-1.arweave.net', port: 1984, protocol: 'http' });
+const arweave = Arweave.init({ host: 'arweave.net', port: 443, protocol: 'https' });
 
 const jwk = JSON.parse(process.env.WALLET_JSON)
 
