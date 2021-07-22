@@ -189,7 +189,7 @@ export default class Transactions {
     options?: SignatureOptions
   ): Promise<void> {
     // @ts-ignore
-    if (!jwk && (!window || !window.arweaveWallet)) {
+    if (!jwk && (( typeof(window) === "undefined" ) || !window.arweaveWallet)) {
       throw new Error(
         `A new Arweave transaction must provide the jwk parameter.`
       );
