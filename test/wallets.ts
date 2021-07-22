@@ -51,7 +51,6 @@ describe("Wallets and keys", function () {
   });
 
   it("should get wallet info", async function () {
-
     const wallet = await arweave.wallets.generate();
 
     const address = await arweave.wallets.jwkToAddress(wallet);

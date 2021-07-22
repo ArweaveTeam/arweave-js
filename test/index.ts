@@ -14,7 +14,7 @@ const arweave = arweaveInstance();
 
 describe("Initialization", function () {
   this.timeout(100000);
-  
+
   it("should have components", function () {
     expect(arweave.api).to.be.an.instanceOf(Api);
 

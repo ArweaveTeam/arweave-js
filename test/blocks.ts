@@ -41,7 +41,6 @@ describe("Blocks", function () {
 
     // then
     expect(expectedResult).to.deep.equal(result);
-
   });
 
   it("should get current block's data", async function () {
@@ -53,6 +52,5 @@ describe("Blocks", function () {
 
     // then
     expect(result.indep_hash).to.be.equal(current);
-    
   });
 });
