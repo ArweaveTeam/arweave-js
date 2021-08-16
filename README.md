@@ -344,7 +344,7 @@ while (!uploader.isComplete) {
   console.log(`${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`);
 }
 ```
-> N.B. The above code has been simplified and ignores potential errors.
+_**N.B.** The above code has been simplified and ignores potential errors._
 
 You can also submit transactions using `transactions.post()` which is suitable for small transactions or token transfers:
 
@@ -365,7 +365,10 @@ console.log(response.status);
 
 // HTTP response codes (200 - server received the transaction, 4XX - invalid transaction, 5XX - error)
 ```
-N.B. ** This `200` response does not mean that the transaction has mined & confirmed, and that a txid can be used as if it's immutable. It just means that a node has recieved your transaction. See [Get a transaction status](#get-a-transaction-status) for more detail on how to correctly determine that your transaction has been mined & confirmed. This also applies to the `uploader` method. 
+
+**Please note!** 
+
+This `200` response does not mean that the transaction has mined & confirmed, and that a txid can be used as if it's immutable. It just means that a node has received your transaction. See [Get a transaction status](#get-a-transaction-status) for more detail on how to correctly determine that your transaction has been mined & confirmed. This also applies to the `uploader` method.
 
 
 ##### Chunked uploading advanced options
@@ -426,15 +429,15 @@ arweave.transactions.getStatus('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').th
     //}
 })
 ```
->N.B. We strongly advise that you check the status and number of confirmations for a given txid before integrating it elsewhere (for example, if you plan to integrate a txid into an NFT contract), even if you have received a ‘200’ status response.
+_**N.B.** We strongly advise that you check the status and number of confirmations for a given txid before integrating it elsewhere (for example, if you plan to integrate a txid into an NFT contract), even if you have received a ‘200’ status response._
 
 
 #### Get a transaction
 
 Fetch a transaction from the connected arweave node. The data and tags are base64 encoded, these can be decoded using the built in helper methods.
 
-> **Update since v1.9.0** 
-Due to how the API has evolved over time and with larger transaction support, the `data` field is no longer _guaranteed_ to be returned from the network as part of the transaction json, therefore, it is not recommended that you use this function for fetching data anymore. You should update your applications to use [`arweave.transactions.getData()`](#get-transaction-data) instead, this will handle small transactions, as well as the reassembling of chunks for larger ones, it can also benefit from gateway optimisations.
+**Update since v1.9.0** 
+*Due to how the API has evolved over time and with larger transaction support, the `data` field is no longer _guaranteed_ to be returned from the network as part of the transaction json, therefore, it is not recommended that you use this function for fetching data anymore. You should update your applications to use [`arweave.transactions.getData()`](#get-transaction-data) instead, this will handle small transactions, as well as the reassembling of chunks for larger ones, it can also benefit from gateway optimisations.*
 
 ```js
 const transaction = arweave.transactions.get('hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8').then(transaction => {
