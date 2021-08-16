@@ -366,14 +366,14 @@ console.log(response.status);
 // HTTP response codes (200 - server received the transaction, 4XX - invalid transaction, 5XX - error)
 ```
 
-**Please note!** 
-
-This `200` response does not mean that the transaction has mined & confirmed, and that a txid can be used as if it's immutable. It just means that a node has received your transaction. See [Get a transaction status](#get-a-transaction-status) for more detail on how to correctly determine that your transaction has been mined & confirmed. This also applies to the `uploader` method.
+**N.B.** 
+_This `200` response does not mean that the transaction has mined & confirmed, and that a txid can be used as if it's immutable._ _It just means that a node has received your transaction._ _See [Get a transaction status](#get-a-transaction-status) for more detail on how to correctly determine that your transaction has been mined & confirmed._ _This also applies to the `uploader` method._
 
 
 ##### Chunked uploading advanced options
 
-You can resume an upload from a saved uploader object, that you have persisted in storage some using `JSON.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object and pass it to `getUploader()` along with the transactions data:
+You can resume an upload from a saved uploader object, that you have persisted in storage some using `JSO
+.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object and pass it to `getUploader()` along with the transactions data:
 
 ```js
 
