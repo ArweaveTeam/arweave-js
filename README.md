@@ -75,14 +75,19 @@ const arweave = Arweave.init({
 ```js
 import Arweave from 'arweave';
 
-// Since v1.5.1 you're now able to call the init function for the web version without options. The current path will be used by default, recommended.
-const arweave = Arweave.init();
+// Since v1.5.1 you're now able to call the init function for the web version without options. The current URL path will be used by default. This is recommended when running from a gateway.
+const arweave = Arweave.init({});
 
 // Or manually specify a host
 const arweave = Arweave.init({
     host: '127.0.0.1',
     port: 1984,
     protocol: 'http'
+});
+
+// Or to specify a gateway when running from NodeJS you might use
+const arweave = Arweave.init({
+  host: 'arweave.net' 
 });
 ```
 
@@ -339,6 +344,7 @@ while (!uploader.isComplete) {
   console.log(`${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`);
 }
 ```
+> N.B. The above code has been simplified and ignores potential errors.
 
 You can also submit transactions using `transactions.post()` which is suitable for small transactions or token transfers:
 
@@ -355,10 +361,12 @@ await arweave.transactions.sign(transaction, key);
 const response = await arweave.transactions.post(transaction);
 
 console.log(response.status);
-// 200
+// 200 : not to be confused with getStatus === 200, see note below**
 
-// HTTP response codes (200 - ok, 400 - invalid transaction, 500 - error)
+// HTTP response codes (200 - server received the transaction, 4XX - invalid transaction, 5XX - error)
 ```
+N.B. ** This `200` response does not mean that the transaction has mined & confirmed, and that a txid can be used as if it's immutable. It just means that a node has recieved your transaction. See [Get a transaction status](#get-a-transaction-status) for more detail on how to correctly determine that your transaction has been mined & confirmed. This also applies to the `uploader` method. 
+
 
 ##### Chunked uploading advanced options
 
@@ -403,20 +411,31 @@ for await (const uploader of arweave.transactions.upload(tx)) {
 
 #### Get a transaction status
 
+Remember: Just like other blockchain-style systems (like Bitcoin and Ethereum), you should always ensure that your transaction has received a number of confirmations in blocks before you assume that the transaction has been fully accepted by the network.
+
 ```js
-arweave.transactions.getStatus('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(status => {
-    console.log(status);
-    // 200
+arweave.transactions.getStatus('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(res => {
+    console.log(res);
+    // {
+    //  status: 200,
+    //  confirmed: {
+    //    block_height: 140151,
+    //    block_indep_hash: 'OR1wue3oBSg3XWvH0GBlauAtAjBICVs2F_8YLYQ3aoAR7q6_3fFeuBOw7d-JTEdR',
+    //    number_of_confirmations: 20
+    //  }
+    //}
 })
 ```
+>N.B. We strongly advise that you check the status and number of confirmations for a given txid before integrating it elsewhere (for example, if you plan to integrate a txid into an NFT contract), even if you have received a ‘200’ status response.
+
 
 #### Get a transaction
 
 Fetch a transaction from the connected arweave node. The data and tags are base64 encoded, these can be decoded using the built in helper methods.
 
-**Update since v1.9.0**
-
+> **Update since v1.9.0** 
 Due to how the API has evolved over time and with larger transaction support, the `data` field is no longer _guaranteed_ to be returned from the network as part of the transaction json, therefore, it is not recommended that you use this function for fetching data anymore. You should update your applications to use [`arweave.transactions.getData()`](#get-transaction-data) instead, this will handle small transactions, as well as the reassembling of chunks for larger ones, it can also benefit from gateway optimisations.
+
 ```js
 const transaction = arweave.transactions.get('hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8').then(transaction => {
   console.log(transaction);
