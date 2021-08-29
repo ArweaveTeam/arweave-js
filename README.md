@@ -544,9 +544,9 @@ console.log(result)
 ```
 
 ### GraphQL 
-Find your transation ids and tags by searching metadata
+Find your transation ids and tags by searching their metadata. GraphQL (GQL) provides flexible querying and allows you to search for transactions by tags, wallet address, block height, etc. 
 
-GraphQL (GQL) allows you to search for transactions by tags, wallet address, block height, etc. Please see the [GQL Guide](https://gql-guide.vercel.app/) for details.
+Please see the [GQL Guide](https://gql-guide.vercel.app/) for further details.
 
 
 
