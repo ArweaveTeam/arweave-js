@@ -29,9 +29,9 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
       - [Get transaction data](#get-transaction-data)
       - [Decode tags from transactions](#decode-tags-from-transactions)
     - [Blocks](#blocks)  
-      - [Get a block by indep_hash](#get-a-block-by-indep-hash)
+      - [Get a block by indep_hash](#get-a-block-by-indep_hash)
       - [Get current block](#get-current-block)
-    - [ArQL](#arql)
+    - [GraphQL](#graphql)
     - [License](#license)
 
 ## Installation
@@ -543,52 +543,12 @@ console.log(result)
 //   ...
 ```
 
-### ArQL
+### GraphQL 
+Find your transation ids and tags by searching metadata
 
-**Note: It is recommended to use [GQL](https://gql-guide.vercel.app/) instead of ArQL**
+GraphQL (GQL) allows you to search for transactions by tags, wallet address, block height, etc. Please see the [GQL Guide](https://gql-guide.vercel.app/) for details.
 
-ArQL allows you to search for transactions by tags or by wallet address.
 
-  The allowed operators are `and`, `or`, and `equals` which all accept exactly two expressions. Therefore, to `and` three or more expressions together, you will need to nest `and` expressions. The same goes for `or`. Searching by wallet is done by using the special tag `from`.
-
-`arweave.arql` takes the ArQL query as an object and returns the matching transaction IDs as an array of strings.
-
-```js
-const txids = await arweave.arql({
-  op: "and",
-  expr1: {
-    op: "equals",
-    expr1: "from",
-    expr2: "hnRI7JoN2vpv__w90o4MC_ybE9fse6SUemwQeY8hFxM"
-  },
-  expr2: {
-    op: "or",
-    expr1: {
-      op: "equals",
-      expr1: "type",
-      expr2: "post"
-    },
-    expr2: {
-      op: "equals",
-      expr1: "type",
-      expr2: "comment"
-    }
-  }
-})
-
-console.log(txids)
-// [
-//   'TwS2G8mi5JGypMZO_EWtHKvrJkB76hXmWN3ROCjkLBc',
-//   'urdjQI4iKo7l8xQ0A55G7bOM3oi4QdGAd7MeVE_ru5c',
-//   '_CD8p7z3uFJCB03OCMU7R80FTQ3ZRf8O2UGhNxoUaOg',
-//   ...
-// ]
-```
-
-There are a number of community produced helper packages for building ArQL queries.
-
- - https://www.npmjs.com/package/arlang
- - https://www.npmjs.com/package/arql-ops
 
 ### License
 
