@@ -180,9 +180,11 @@ arweave.wallets.getLastTransactionID('1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKl
 
 ### Transactions
 
-Transactions are the building blocks of the Arweave permaweb, they can send [AR](https://docs.arweave.org/developers/server/http-api#ar-and-winston) betwen wallet addresses, or store data on the Arweave network.
+Transactions are the building blocks of the Arweave permaweb. They can send [AR](https://docs.arweave.org/developers/server/http-api#ar-and-winston) between wallet addresses or store data on the Arweave network.
 
 The create transaction methods create and return an unsigned transaction object. You must sign the transaction and submit it separeately using the `transactions.sign` and `transactions.submit` methods.
+
+If you don't pass in a `key` argument when creating a transaction, Arweave.js will attempt to use a browser-based wallet extension, such as [ArConnect](https://arconnect.io) or [Finnie](https://koii.network/getFinnie), to sign the transaction.
 
 **Modifying a transaction object after signing it will invalidate the signature,** causing it to be rejected by the network if submitted in that state. Transaction prices are based on the size of the data field, so modifying the data field after a transaction has been created isn't recommended as you'll need to manually update the price.
 
