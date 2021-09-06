@@ -2,6 +2,8 @@
 
 Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave network and uploading data to the permaweb. It works in latest browsers and Node JS.
 
+**Note:** If you are planning to upload large batches of data transactions to the Arweave network, it is strongly advised that you use [ArBundles](https://github.com/Bundler-Network/arbundles) instead of transactions with Arweave.js. You can read about bundles and their advantages on the [Arwiki](https://arwiki.wiki/#/en/preview/WUAtjfiDQEIqhsUcHXIFTn5ZmeDIE7If9hJREBLRgak).
+
 - [Arweave JS](#arweave-js)
   - [Installation](#installation)
     - [NPM](#npm)
@@ -187,6 +189,8 @@ The create transaction methods create and return an unsigned transaction object.
 The transaction ID is a hash of the transaction signature, so a transaction ID can't be known until its contents are finalised and it has been signed.
 
 #### Create a data transaction
+
+**Note:** If you are planning to upload large batches of data transactions to the Arweave network, it is strongly advised that you use [ArBundles](https://github.com/Bundler-Network/arbundles) instead of transactions with Arweave.js. You can read about bundles and their advantages on the [Arwiki](https://arwiki.wiki/#/en/preview/WUAtjfiDQEIqhsUcHXIFTn5ZmeDIE7If9hJREBLRgak).
 
 Data transactions are used to store data on the Arweave permaweb. They can contain HTML or any arbitrary data and are served like webpages.
 
