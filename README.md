@@ -226,6 +226,8 @@ console.log(transactionA);
 // }
 ```
 
+If you don't pass in a `key` argument when creating a transaction, Arweave.js will attempt to use a browser-based wallet extension, such as [ArConnect](https://arconnect.io) or [Finnie](https://koii.network/getFinnie).
+
 #### Create a wallet to wallet transaction
 
 Wallet to wallet transactions can facilitate payments from one wallet to another, given a target wallet and AR token quantity in Winston.
