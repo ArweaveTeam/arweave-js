@@ -153,16 +153,19 @@ export default class Transaction
   public setSignature({
     id,
     owner,
+    reward,
     tags,
     signature,
   }: {
     id: string;
     owner: string;
+    reward?: string;
     tags?: Tag[];
     signature: string;
   }) {
     this.id = id;
     this.owner = owner;
+    if (reward) this.reward = reward;
     if (tags) this.tags = tags;
     this.signature = signature;
   }
