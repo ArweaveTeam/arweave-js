@@ -263,7 +263,7 @@ console.log(transaction);
 
 Metadata can be added to transactions through tags, these are simple key/value attributes that can be used to document the contents of a transaction or provide related data.
 
-ARQL uses tags when searching for transactions.
+[GraphQL](#graphql) uses tags when searching for transactions.
 
 The `Content-Type` is a reserved tag and is used to set the data content type. For example, a transaction with HTML data and a content type tag of `text/html` will be served as a HTML page and render correctly in browsers,
 if the content type is set to `text/plain` then it will be served as a plain text document and not render in browsers.
