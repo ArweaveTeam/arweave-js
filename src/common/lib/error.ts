@@ -1,7 +1,6 @@
 import { AxiosResponse } from "axios";
 
 export const enum ArweaveErrorType {
-  TX_PENDING = "TX_PENDING",
   TX_NOT_FOUND = "TX_NOT_FOUND",
   TX_FAILED = "TX_FAILED",
   TX_INVALID = "TX_INVALID",
@@ -50,13 +49,13 @@ export function getError(resp: AxiosResponseLite) {
   if (typeof resp.data === "string") {
     try {
       data = JSON.parse(resp.data);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   if (resp.data instanceof ArrayBuffer || resp.data instanceof Uint8Array) {
     try {
       data = JSON.parse(data.toString());
-    } catch (e) {}
+    } catch (e) { }
   }
 
   return data ? data.error || data : resp.statusText || "unknown";

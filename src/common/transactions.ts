@@ -89,10 +89,6 @@ export default class Transactions {
       });
     }
 
-    if (response.status == 202) {
-      throw new ArweaveError(ArweaveErrorType.TX_PENDING);
-    }
-
     if (response.status == 404) {
       throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
     }
@@ -158,10 +154,6 @@ export default class Transactions {
     // just returned an empty data object.
 
     if (!data) {
-      if (resp.status == 202) {
-        throw new ArweaveError(ArweaveErrorType.TX_PENDING);
-      }
-
       if (resp.status == 404) {
         throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
       }
