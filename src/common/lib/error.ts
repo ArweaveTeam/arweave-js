@@ -49,13 +49,13 @@ export function getError(resp: AxiosResponseLite) {
   if (typeof resp.data === "string") {
     try {
       data = JSON.parse(resp.data);
-    } catch (e) { }
+    } catch (e) {}
   }
 
   if (resp.data instanceof ArrayBuffer || resp.data instanceof Uint8Array) {
     try {
       data = JSON.parse(data.toString());
-    } catch (e) { }
+    } catch (e) {}
   }
 
   return data ? data.error || data : resp.statusText || "unknown";
