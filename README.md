@@ -75,7 +75,9 @@ const arweave = Arweave.init({
 
 // Or to specify a gateway when running from NodeJS you might use
 const arweave = Arweave.init({
-  host: 'arweave.net' 
+  host: 'arweave.net',
+  port: 443,
+  protocol: 'https'
 });
 ```
 
