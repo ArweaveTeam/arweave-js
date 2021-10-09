@@ -41,10 +41,10 @@ export class TransactionUploader {
   private chunkIndex: number = 0;
   private txPosted: boolean = false;
   private transaction: Transaction;
-  private data: Uint8Array;
   private lastRequestTimeEnd: number = 0;
   private totalErrors = 0; // Not serialized.
 
+  public data: Uint8Array;
   public lastResponseStatus: number = 0;
   public lastResponseError: string = "";
 

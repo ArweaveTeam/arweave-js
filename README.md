@@ -412,6 +412,39 @@ while (!uploader.isComplete) {
 }
 ```
 
+
+alternatively
+
+```js
+// example of tx being accepted and mined, but the network is missing the data
+const Arweave = require("./node/index.js"); // assumed locally built nodejs target
+const ArweaveTransaction = require("./node/lib/transaction.js");
+const fs = require("fs");
+
+// initialize a gateway connection
+const arweave = Arweave.init({
+  host: "arweave.net",
+  port: 443,
+  protocol: "https",
+});
+
+// the data that you paid for but is missing in the network
+let missingData = fs.readFileSync(
+  "./myfile.mov"
+);
+
+// get the tx headers from arweave.net/tx/{txid}
+let txHeaders = require("./txheaders.json");
+
+(async () => {
+  const tx = new ArweaveTransaction.default(txHeaders);
+  let uploader = await arweave.transactions.getUploader(tx, missingData);
+  while (!uploader.isComplete) {
+    await uploader.uploadChunk();
+  }
+})();
+```
+
 There is also an async iterator interface to chunk uploading, but this method means you'll need to ensure you are using a transpiler and polyfill for the asyncIterator symbol for some environments. (Safari on iOS in particular). This method takes the same arguments for uploading/resuming a transaction as `getUploader()` and just has a slightly shorter syntax:
 
 ```js
