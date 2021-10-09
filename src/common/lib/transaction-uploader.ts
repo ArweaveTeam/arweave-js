@@ -185,10 +185,14 @@ export class TransactionUploader {
 
     // Everything looks ok, reconstruct the TransactionUpload,
     // prepare the chunks again and verify the data_root matches
+    var transaction = new Transaction(serialized.transaction);
+    if (!transaction.chunks) {
+      await transaction.prepareChunks(data);
+    }
 
     const upload = new TransactionUploader(
       api,
-      new Transaction(serialized.transaction)
+      transaction
     );
 
     // Copy the serialized upload information, and data passed in.
@@ -199,7 +203,7 @@ export class TransactionUploader {
     upload.txPosted = serialized.txPosted;
     upload.data = data;
 
-    await upload.transaction.prepareChunks(data);
+    
 
     if (upload.transaction.data_root !== serialized.transaction.data_root) {
       throw new Error(`Data mismatch: Uploader doesn't match provided data.`);
