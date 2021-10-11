@@ -75,7 +75,9 @@ const arweave = Arweave.init({
 
 // Or to specify a gateway when running from NodeJS you might use
 const arweave = Arweave.init({
-  host: 'arweave.net' 
+  host: 'arweave.net',
+  port: 443,
+  protocol: 'https'
 });
 ```
 
@@ -263,7 +265,7 @@ console.log(transaction);
 
 Metadata can be added to transactions through tags, these are simple key/value attributes that can be used to document the contents of a transaction or provide related data.
 
-ARQL uses tags when searching for transactions.
+[GraphQL](#graphql) uses tags when searching for transactions.
 
 The `Content-Type` is a reserved tag and is used to set the data content type. For example, a transaction with HTML data and a content type tag of `text/html` will be served as a HTML page and render correctly in browsers,
 if the content type is set to `text/plain` then it will be served as a plain text document and not render in browsers.
@@ -408,6 +410,39 @@ while (!uploader.isComplete) {
   await uploader.uploadChunks();
   console.log(`${progress.pctComplete}% complete`);
 }
+```
+
+
+alternatively
+
+```js
+// example of tx being accepted and mined, but the network is missing the data
+const Arweave = require("./node/index.js"); // assumed locally built nodejs target
+const ArweaveTransaction = require("./node/lib/transaction.js");
+const fs = require("fs");
+
+// initialize a gateway connection
+const arweave = Arweave.init({
+  host: "arweave.net",
+  port: 443,
+  protocol: "https",
+});
+
+// the data that you paid for but is missing in the network
+let missingData = fs.readFileSync(
+  "./myfile.mov"
+);
+
+// get the tx headers from arweave.net/tx/{txid}
+let txHeaders = require("./txheaders.json");
+
+(async () => {
+  const tx = new ArweaveTransaction.default(txHeaders);
+  let uploader = await arweave.transactions.getUploader(tx, missingData);
+  while (!uploader.isComplete) {
+    await uploader.uploadChunk();
+  }
+})();
 ```
 
 There is also an async iterator interface to chunk uploading, but this method means you'll need to ensure you are using a transpiler and polyfill for the asyncIterator symbol for some environments. (Safari on iOS in particular). This method takes the same arguments for uploading/resuming a transaction as `getUploader()` and just has a slightly shorter syntax:

@@ -37,7 +37,14 @@ export default class Transactions {
   }
 
   public getTransactionAnchor(): Promise<string> {
-    return this.api.get(`tx_anchor`).then((response) => {
+    /**
+     * Maintain compatibility with erdjs which sets a global axios.defaults.transformResponse
+     * in order to overcome some other issue in:  https://github.com/axios/axios/issues/983
+     *
+     * However, this introduces a problem with ardrive-js, so we will enforce
+     * config =  {transformReponse: []} where we do not require a transform
+     */
+    return this.api.get(`tx_anchor`, { transformResponse: [] }).then((response) => {
       return response.data;
     });
   }
@@ -87,10 +94,6 @@ export default class Transactions {
         ...response.data,
         format: response.data.format || 1,
       });
-    }
-
-    if (response.status == 202) {
-      throw new ArweaveError(ArweaveErrorType.TX_PENDING);
     }
 
     if (response.status == 404) {
@@ -158,10 +161,6 @@ export default class Transactions {
     // just returned an empty data object.
 
     if (!data) {
-      if (resp.status == 202) {
-        throw new ArweaveError(ArweaveErrorType.TX_PENDING);
-      }
-
       if (resp.status == 404) {
         throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
       }
@@ -284,7 +283,7 @@ export default class Transactions {
       await transaction.prepareChunks(transaction.data);
     }
 
-    const uploader = await this.getUploader(transaction);
+    const uploader = await this.getUploader(transaction, transaction.data);
 
     // Emulate existing error & return value behaviour.
     try {
@@ -330,21 +329,29 @@ export default class Transactions {
    */
   public async getUploader(
     upload: Transaction | SerializedUploader | string,
-    data?: Uint8Array | ArrayBuffer
+    data: Uint8Array | ArrayBuffer
   ) {
     let uploader!: TransactionUploader;
 
+    if (data instanceof ArrayBuffer) {
+      data = new Uint8Array(data);
+    }
+
+    if (!data || !(data instanceof Uint8Array)) {
+      throw new Error(`Must provide data when resuming upload`);
+    }
+
     if (upload instanceof Transaction) {
+      if (!upload.chunks) {
+        await upload.prepareChunks(data);
+      }
+
       uploader = new TransactionUploader(this.api, upload);
+
+      if (!uploader.data || uploader.data.length === 0) {
+        uploader.data = data;
+      }
     } else {
-      if (data instanceof ArrayBuffer) {
-        data = new Uint8Array(data);
-      }
-
-      if (!data || !(data instanceof Uint8Array)) {
-        throw new Error(`Must provide data when resuming upload`);
-      }
-
       if (typeof upload === "string") {
         upload = await TransactionUploader.fromTransactionId(this.api, upload);
       }
@@ -376,7 +383,7 @@ export default class Transactions {
    */
   public async *upload(
     upload: Transaction | SerializedUploader | string,
-    data?: Uint8Array
+    data: Uint8Array
   ) {
     const uploader = await this.getUploader(upload, data);
 
