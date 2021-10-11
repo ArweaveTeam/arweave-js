@@ -321,7 +321,7 @@ export default class Transactions {
    */
   public async getUploader(
     upload: Transaction | SerializedUploader | string,
-    data: Uint8Array | ArrayBuffer
+    data?: Uint8Array | ArrayBuffer
   ) {
     let uploader!: TransactionUploader;
 
@@ -329,11 +329,15 @@ export default class Transactions {
       data = new Uint8Array(data);
     }
 
-    if (!data || !(data instanceof Uint8Array)) {
-      throw new Error(`Must provide data when resuming upload`);
-    }
-
     if (upload instanceof Transaction) {
+      if (!data) {
+        data = upload.data;
+      }
+
+      if(!(data instanceof Uint8Array)){
+        throw new Error("Data format is invalid");
+      }
+
       if (!upload.chunks) {
         await upload.prepareChunks(data);
       }
@@ -346,6 +350,10 @@ export default class Transactions {
     } else {
       if (typeof upload === "string") {
         upload = await TransactionUploader.fromTransactionId(this.api, upload);
+      }
+
+      if (!data || !(data instanceof Uint8Array)) {
+        throw new Error(`Must provide data when resuming upload`);
       }
 
       // upload should be a serialized upload.
