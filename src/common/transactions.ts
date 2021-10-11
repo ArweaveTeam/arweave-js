@@ -37,7 +37,14 @@ export default class Transactions {
   }
 
   public getTransactionAnchor(): Promise<string> {
-    return this.api.get(`tx_anchor`).then((response) => {
+    /**
+     * Maintain compatibility with erdjs which sets a global axios.defaults.transformResponse
+     * in order to overcome some other issue in:  https://github.com/axios/axios/issues/983
+     *
+     * However, this introduces a problem with ardrive-js, so we will enforce
+     * config =  {transformReponse: []} where we do not require a transform
+     */
+    return this.api.get(`tx_anchor`, { transformResponse: [] }).then((response) => {
       return response.data;
     });
   }
