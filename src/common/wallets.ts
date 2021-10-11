@@ -70,7 +70,7 @@ export default class Wallets {
   }
 
   public async getAddress(jwk?: JWKInterface | "use_wallet"): Promise<string> {
-    if ( ( typeof(window) !== "undefined" ) && !jwk || jwk === "use_wallet") {
+    if ((typeof window !== "undefined" && !jwk) || jwk === "use_wallet") {
       try {
         // @ts-ignore
         await window.arweaveWallet.connect(["ACCESS_ADDRESS"]);
