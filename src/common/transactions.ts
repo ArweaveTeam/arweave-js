@@ -210,6 +210,7 @@ export default class Transactions {
       transaction.setSignature({
         id: signedTransaction.id,
         owner: signedTransaction.owner,
+        reward: signedTransaction.reward,
         tags: signedTransaction.tags,
         signature: signedTransaction.signature,
       });
