@@ -18,9 +18,8 @@ const liveDataTxidLarge = "KDKSOaecDl_IM4E0_0XiApwdrElvb9TnwOzeHt65Sno";
 
 describe("Transactions", function () {
   this.timeout(10000);
-  it("should create and sign data transactions", async function () {
-    this.timeout(10000);
 
+  it("should create and sign data transactions", async function () {
     const wallet = await arweave.wallets.generate();
 
     const transaction = await arweave.createTransaction(
@@ -106,8 +105,6 @@ describe("Transactions", function () {
   });
 
   it("should create and sign ar transactions", async function () {
-    this.timeout(10000);
-
     const wallet = await arweave.wallets.generate();
 
     const transaction = await arweave.createTransaction(
@@ -128,7 +125,7 @@ describe("Transactions", function () {
   });
 
   it("should work with buffers", async function () {
-    this.timeout(5000);
+    this.timeout(10000);
 
     const wallet = await arweave.wallets.generate();
 
@@ -177,8 +174,6 @@ describe("Transactions", function () {
   });
 
   it("should get transaction info", async function () {
-    this.timeout(5000);
-
     const transactionStatus = await arweave.transactions.getStatus(
       liveDataTxid
     );
@@ -275,6 +270,9 @@ describe("Transactions", function () {
     const data = arweave.utils.b64UrlToBuffer(unsignedV2TxFixture.data);
     const expectedSignature = signedV2TxFixture.signature;
     const expectedDataRoot = signedV2TxFixture.data_root;
+
+    console.log(unsignedV2TxFixture);
+    console.log(signedV2TxFixture);
 
     const tx = await arweave.createTransaction(
       {

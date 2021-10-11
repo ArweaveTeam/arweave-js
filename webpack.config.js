@@ -1,4 +1,4 @@
-const BabelMinify = require("babel-minify-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 const path = require("path");
 const webpack = require("webpack");
 const config = {};
@@ -63,7 +63,8 @@ config.webprod = {
     }),
   ],
   optimization: {
-    minimizer: [new BabelMinify({ mangle: false })]
+    minimize: true,
+    minimizer: [new TerserPlugin()],
   },
   output: {
     filename: "web.bundle.min.js",

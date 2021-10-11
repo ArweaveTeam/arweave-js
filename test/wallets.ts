@@ -13,8 +13,6 @@ const liveTxid = "CE-1SFiXqWUEu0aSTebE6LC0-5JBAc3IAehYGwdF5iI";
 describe("Wallets and keys", function () {
   this.timeout(10000);
   it("should generate valid JWKs", async function () {
-    this.timeout(5000);
-
     const walletA = await arweave.wallets.generate();
     const walletB = await arweave.wallets.generate();
 
@@ -53,8 +51,6 @@ describe("Wallets and keys", function () {
   });
 
   it("should get wallet info", async function () {
-    this.timeout(5000);
-
     const wallet = await arweave.wallets.generate();
 
     const address = await arweave.wallets.jwkToAddress(wallet);
