@@ -44,9 +44,11 @@ export default class Transactions {
      * However, this introduces a problem with ardrive-js, so we will enforce
      * config =  {transformReponse: []} where we do not require a transform
      */
-    return this.api.get(`tx_anchor`, { transformResponse: [] }).then((response) => {
-      return response.data;
-    });
+    return this.api
+      .get(`tx_anchor`, { transformResponse: [] })
+      .then((response) => {
+        return response.data;
+      });
   }
 
   public getPrice(byteSize: number, targetAddress?: string): Promise<string> {
@@ -187,7 +189,6 @@ export default class Transactions {
     jwk?: JWKInterface | "use_wallet",
     options?: SignatureOptions
   ): Promise<void> {
-    
     if (!jwk && (typeof window === "undefined" || !window.arweaveWallet)) {
       throw new Error(
         `A new Arweave transaction must provide the jwk parameter.`
@@ -342,7 +343,7 @@ export default class Transactions {
         data = upload.data;
       }
 
-      if(!(data instanceof Uint8Array)){
+      if (!(data instanceof Uint8Array)) {
         throw new Error("Data format is invalid");
       }
 

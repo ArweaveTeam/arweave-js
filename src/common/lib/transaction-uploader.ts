@@ -190,10 +190,7 @@ export class TransactionUploader {
       await transaction.prepareChunks(data);
     }
 
-    const upload = new TransactionUploader(
-      api,
-      transaction
-    );
+    const upload = new TransactionUploader(api, transaction);
 
     // Copy the serialized upload information, and data passed in.
     upload.chunkIndex = serialized.chunkIndex;
@@ -202,8 +199,6 @@ export class TransactionUploader {
     upload.lastResponseStatus = serialized.lastResponseStatus;
     upload.txPosted = serialized.txPosted;
     upload.data = data;
-
-    
 
     if (upload.transaction.data_root !== serialized.transaction.data_root) {
       throw new Error(`Data mismatch: Uploader doesn't match provided data.`);
