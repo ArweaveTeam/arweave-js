@@ -11,7 +11,8 @@
             "src/node"
         ],
         "esModuleInterop": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "useUnknownInCatchVariables": false,
     },
     "include": [
         "src/common",

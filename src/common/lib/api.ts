@@ -62,7 +62,7 @@ export default class Api {
     config?: AxiosRequestConfig
   ): Promise<AxiosResponse<T>> {
     try {
-      return await this.request().post<T>(endpoint, body, config);
+      return await this.request().post(endpoint, body, config);
     } catch (error) {
       if (error.response && error.response.status) {
         return error.response;
