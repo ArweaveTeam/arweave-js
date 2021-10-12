@@ -10,7 +10,6 @@
             "src/common",
             "src/web"
         ],
-        "useUnknownInCatchVariables": false
     },
     "include": [
         "src/common",
