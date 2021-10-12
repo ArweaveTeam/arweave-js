@@ -271,9 +271,6 @@ describe("Transactions", function () {
     const expectedSignature = signedV2TxFixture.signature;
     const expectedDataRoot = signedV2TxFixture.data_root;
 
-    console.log(unsignedV2TxFixture);
-    console.log(signedV2TxFixture);
-
     const tx = await arweave.createTransaction(
       {
         format: 2,

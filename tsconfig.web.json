@@ -9,7 +9,7 @@
         "rootDirs": [
             "src/common",
             "src/web"
-        ]
+        ],
     },
     "include": [
         "src/common",
