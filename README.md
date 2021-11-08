@@ -105,7 +105,7 @@ const arweave = Arweave.init({
     <title>Hello world</title>
     <script src="https://unpkg.com/arweave/bundles/web.bundle.js"></script>
     <script>
-    const arweave = Arweave.init();
+    const arweave = Arweave.init({});
     arweave.network.getInfo().then(console.log);
     </script>
 </head>
