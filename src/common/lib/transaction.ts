@@ -233,7 +233,7 @@ export default class Transaction
           tags,
         ]);
       case 2:
-        await this.prepareChunks(this.data);
+        if (!this.data_root) { await this.prepareChunks(this.data); }
 
         const tagList: [Uint8Array, Uint8Array][] = this.tags.map((tag) => [
           tag.get("name", { decode: true, string: false }),
