@@ -87,7 +87,7 @@ export class TransactionUploader {
    * itself and on any subsequent calls uploads the
    * next chunk until it completes.
    */
-  public async uploadChunk(): Promise<void> {
+  public async uploadChunk(chunkIndex_?: number): Promise<void> {
     if (this.isComplete) {
       throw new Error(`Upload is already complete`);
     }
@@ -127,7 +127,14 @@ export class TransactionUploader {
       return;
     }
 
-    const chunk = this.transaction.getChunk(this.chunkIndex, this.data);
+    if (chunkIndex_) {
+      this.chunkIndex = chunkIndex_;
+    }
+
+    const chunk = this.transaction.getChunk(
+      chunkIndex_ || this.chunkIndex,
+      this.data
+    );
 
     const chunkOk = await validatePath(
       this.transaction.chunks!.data_root,

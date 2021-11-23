@@ -147,32 +147,14 @@ export default class Transactions {
     id: string,
     options?: { decode?: boolean; string?: boolean }
   ): Promise<string | Uint8Array> {
-    // Attempt to download from /txid, fall back to downloading chunks.
+    // Only download from chunks, while /{txid} may work
+    // it may give false positive about the data being seeded
+    // if getData is problematic, please consider fetch-ing
+    // an arweave gateway directly!
 
-    const resp = await this.api.get(`${id}`, { responseType: "arraybuffer" });
-    let data: Uint8Array | undefined = undefined;
-    if (resp.status === 200) {
-      data = new Uint8Array(resp.data);
-    }
-
-    if (resp.status === 400 && getError(resp) === "tx_data_too_big") {
-      data = await this.chunks.downloadChunkedData(id);
-    }
-
-    // If we don't have data, throw an exception. Previously we
-    // just returned an empty data object.
-
-    if (!data) {
-      if (resp.status == 404) {
-        throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
-      }
-
-      if (resp.status == 410) {
-        throw new ArweaveError(ArweaveErrorType.TX_FAILED);
-      }
-
-      throw new Error(`Unable to get data: ${resp.status} - ${getError(resp)}`);
-    }
+    const data: Uint8Array | undefined = await this.chunks.downloadChunkedData(
+      id
+    );
 
     if (options && options.decode && !options.string) {
       return data;
