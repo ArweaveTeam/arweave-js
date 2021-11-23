@@ -54,7 +54,10 @@ export default class Chunks {
     let byte = 0;
 
     while (byte < size) {
-      console.log(`[chunk] ${byte}/${size}`);
+      if (this.api.config.logging) {
+        console.log(`[chunk] ${byte}/${size}`);
+      }
+
       let chunkData;
       try {
         chunkData = await this.getChunkData(startOffset + byte);
