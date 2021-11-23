@@ -46,7 +46,6 @@ export default class Chunks {
 
   async downloadChunkedData(id: string): Promise<Uint8Array> {
     const offsetResponse = await this.getTransactionOffset(id);
-    console.log({ offsetResponse });
     const size = parseInt(offsetResponse.size);
     const endOffset = parseInt(offsetResponse.offset);
     const startOffset = endOffset - size + 1;
