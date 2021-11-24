@@ -42,15 +42,4 @@ describe("Blocks", function () {
     // then
     expect(expectedResult).to.deep.equal(result);
   });
-
-  it("should get current block's data", async function () {
-    // given
-    const { current } = await arweave.network.getInfo();
-
-    // when
-    const result = await arweave.blocks.getCurrent();
-
-    // then (account for fast mining rate and forgive it being in previous_block)
-    expect(current).to.be.oneOf([result.previous_block, result.indep_hash]);
-  });
 });
