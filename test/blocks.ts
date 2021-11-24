@@ -50,7 +50,7 @@ describe("Blocks", function () {
     // when
     const result = await arweave.blocks.getCurrent();
 
-    // then
-    expect(result.indep_hash).to.be.equal(current);
+    // then (account for fast mining rate and forgive it being in previous_block)
+    expect(current).to.be.oneOf([result.previous_block, result.indep_hash]);
   });
 });
