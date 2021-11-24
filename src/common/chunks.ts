@@ -46,7 +46,6 @@ export default class Chunks {
 
   async downloadChunkedData(id: string): Promise<Uint8Array> {
     const offsetResponse = await this.getTransactionOffset(id);
-
     const size = parseInt(offsetResponse.size);
     const endOffset = parseInt(offsetResponse.offset);
     const startOffset = endOffset - size + 1;
@@ -54,10 +53,29 @@ export default class Chunks {
     const data = new Uint8Array(size);
     let byte = 0;
 
-    while (startOffset + byte < endOffset) {
-      const chunkData = await this.getChunkData(startOffset + byte);
-      data.set(chunkData, byte);
-      byte += chunkData.length;
+    while (byte < size) {
+      if (this.api.config.logging) {
+        console.log(`[chunk] ${byte}/${size}`);
+      }
+
+      let chunkData;
+      try {
+        chunkData = await this.getChunkData(startOffset + byte);
+      } catch (error) {
+        console.error(
+          `[chunk] Failed to fetch chunk at offset ${startOffset + byte}`
+        );
+        console.error(
+          `[chunk] This could indicate that the chunk wasn't uploaded or hasn't yet seeded properly to a particular gatway/node`
+        );
+      }
+
+      if (chunkData) {
+        data.set(chunkData, byte);
+        byte += chunkData.length;
+      } else {
+        throw new Error(`Coudn't complete data download at ${byte}/${size}`);
+      }
     }
 
     return data;

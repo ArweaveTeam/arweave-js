@@ -14,6 +14,7 @@
         "resolveJsonModule": true,
     },
     "include": [
+        "src/modules.d.ts",
         "src/common",
         "src/node"
     ]
