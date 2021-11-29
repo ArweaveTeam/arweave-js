@@ -11,6 +11,7 @@ import {
   SerializedUploader,
 } from "./lib/transaction-uploader";
 import Chunks from "./chunks";
+import "arconnect";
 
 export interface TransactionConfirmedData {
   block_indep_hash: string;
@@ -36,9 +37,18 @@ export default class Transactions {
   }
 
   public getTransactionAnchor(): Promise<string> {
-    return this.api.get(`tx_anchor`).then((response) => {
-      return response.data;
-    });
+    /**
+     * Maintain compatibility with erdjs which sets a global axios.defaults.transformResponse
+     * in order to overcome some other issue in:  https://github.com/axios/axios/issues/983
+     *
+     * However, this introduces a problem with ardrive-js, so we will enforce
+     * config =  {transformReponse: []} where we do not require a transform
+     */
+    return this.api
+      .get(`tx_anchor`, { transformResponse: [] })
+      .then((response) => {
+        return response.data;
+      });
   }
 
   public getPrice(byteSize: number, targetAddress?: string): Promise<string> {
@@ -86,10 +96,6 @@ export default class Transactions {
         ...response.data,
         format: response.data.format || 1,
       });
-    }
-
-    if (response.status == 202) {
-      throw new ArweaveError(ArweaveErrorType.TX_PENDING);
     }
 
     if (response.status == 404) {
@@ -141,36 +147,14 @@ export default class Transactions {
     id: string,
     options?: { decode?: boolean; string?: boolean }
   ): Promise<string | Uint8Array> {
-    // Attempt to download from /txid, fall back to downloading chunks.
+    // Only download from chunks, while /{txid} may work
+    // it may give false positive about the data being seeded
+    // if getData is problematic, please consider fetch-ing
+    // an arweave gateway directly!
 
-    const resp = await this.api.get(`${id}`, { responseType: "arraybuffer" });
-    let data: Uint8Array | undefined = undefined;
-    if (resp.status === 200) {
-      data = new Uint8Array(resp.data);
-    }
-
-    if (resp.status === 400 && getError(resp) === "tx_data_too_big") {
-      data = await this.chunks.downloadChunkedData(id);
-    }
-
-    // If we don't have data, throw an exception. Previously we
-    // just returned an empty data object.
-
-    if (!data) {
-      if (resp.status == 202) {
-        throw new ArweaveError(ArweaveErrorType.TX_PENDING);
-      }
-
-      if (resp.status == 404) {
-        throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
-      }
-
-      if (resp.status == 410) {
-        throw new ArweaveError(ArweaveErrorType.TX_FAILED);
-      }
-
-      throw new Error(`Unable to get data: ${resp.status} - ${getError(resp)}`);
-    }
+    const data: Uint8Array | undefined = await this.chunks.downloadChunkedData(
+      id
+    );
 
     if (options && options.decode && !options.string) {
       return data;
@@ -187,8 +171,7 @@ export default class Transactions {
     jwk?: JWKInterface | "use_wallet",
     options?: SignatureOptions
   ): Promise<void> {
-    // @ts-ignore
-    if (!jwk && (!window || !window.arweaveWallet)) {
+    if (!jwk && (typeof window === "undefined" || !window.arweaveWallet)) {
       throw new Error(
         `A new Arweave transaction must provide the jwk parameter.`
       );
@@ -210,6 +193,7 @@ export default class Transactions {
       transaction.setSignature({
         id: signedTransaction.id,
         owner: signedTransaction.owner,
+        reward: signedTransaction.reward,
         tags: signedTransaction.tags,
         signature: signedTransaction.signature,
       });
@@ -282,7 +266,7 @@ export default class Transactions {
       await transaction.prepareChunks(transaction.data);
     }
 
-    const uploader = await this.getUploader(transaction);
+    const uploader = await this.getUploader(transaction, transaction.data);
 
     // Emulate existing error & return value behaviour.
     try {
@@ -332,19 +316,35 @@ export default class Transactions {
   ) {
     let uploader!: TransactionUploader;
 
+    if (data instanceof ArrayBuffer) {
+      data = new Uint8Array(data);
+    }
+
     if (upload instanceof Transaction) {
+      if (!data) {
+        data = upload.data;
+      }
+
+      if (!(data instanceof Uint8Array)) {
+        throw new Error("Data format is invalid");
+      }
+
+      if (!upload.chunks) {
+        await upload.prepareChunks(data);
+      }
+
       uploader = new TransactionUploader(this.api, upload);
+
+      if (!uploader.data || uploader.data.length === 0) {
+        uploader.data = data;
+      }
     } else {
-      if (data instanceof ArrayBuffer) {
-        data = new Uint8Array(data);
+      if (typeof upload === "string") {
+        upload = await TransactionUploader.fromTransactionId(this.api, upload);
       }
 
       if (!data || !(data instanceof Uint8Array)) {
         throw new Error(`Must provide data when resuming upload`);
-      }
-
-      if (typeof upload === "string") {
-        upload = await TransactionUploader.fromTransactionId(this.api, upload);
       }
 
       // upload should be a serialized upload.
@@ -374,7 +374,7 @@ export default class Transactions {
    */
   public async *upload(
     upload: Transaction | SerializedUploader | string,
-    data?: Uint8Array
+    data: Uint8Array
   ) {
     const uploader = await this.getUploader(upload, data);
 
@@ -386,53 +386,3 @@ export default class Transactions {
     return uploader;
   }
 }
-
-/**
- * Arweave wallet declarations
- */
-declare global {
-  interface Window {
-    arweaveWallet: {
-      connect(permissions: PermissionType[]): Promise<void>;
-      disconnect(): Promise<void>;
-      getActiveAddress(): Promise<string>;
-      getAllAddresses(): Promise<string[]>;
-      getWalletNames(): Promise<{ [addr: string]: string }>;
-      sign(
-        transaction: Transaction,
-        options?: SignatureOptions
-      ): Promise<Transaction>;
-      getPermissions(): Promise<PermissionType[]>;
-      encrypt(
-        data: string,
-        options: {
-          algorithm: string;
-          hash: string;
-          salt?: string;
-        }
-      ): Promise<Uint8Array>;
-      decrypt(
-        data: Uint8Array,
-        options: {
-          algorithm: string;
-          hash: string;
-          salt?: string;
-        }
-      ): Promise<string>;
-    };
-  }
-  interface WindowEventMap {
-    walletSwitch: CustomEvent<{ address: string }>;
-    arweaveWalletLoaded: CustomEvent<{}>;
-  }
-}
-
-/**
- * Arweave wallet permission types
- */
- export type PermissionType =
-  | "ACCESS_ADDRESS"
-  | "ACCESS_ALL_ADDRESSES"
-  | "SIGN_TRANSACTION"
-  | "ENCRYPT"
-  | "DECRYPT";

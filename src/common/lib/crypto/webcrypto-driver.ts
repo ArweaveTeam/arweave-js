@@ -30,7 +30,7 @@ export default class WebCryptoDriver implements CryptoInterface {
       ["sign"]
     );
 
-    let jwk = await this.driver.exportKey("jwk", cryptoKey.privateKey);
+    let jwk = await this.driver.exportKey("jwk", cryptoKey.privateKey!);
 
     return {
       kty: jwk.kty!,

@@ -22,9 +22,9 @@ export function arweaveInstance() {
 
 export function arweaveInstanceDirectNode() {
   return initInstance({
-    host: "lon-1.eu-west-1.arweave.net",
-    protocol: "http",
-    port: 1984,
+    host: "arweave.net",
+    protocol: "https",
+    port: 443,
     logging: false,
     timeout: 15000,
   });
