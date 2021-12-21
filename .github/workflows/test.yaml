@@ -1,5 +1,15 @@
 name: Test
-on: [push, pull_request, workflow_dispatch]
+on: 
+  workflow_dispatch:
+  push: 
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
 jobs:
   build:
     name: Install deps ${{ matrix.os }}. Build only ubuntu
