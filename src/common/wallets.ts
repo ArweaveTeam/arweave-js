@@ -45,9 +45,9 @@ export default class Wallets {
   /**
    * Get the last transaction ID for the given wallet address.
    *
-   * @param {string} address - The arweave address to get the balance for.
+   * @param {string} address - The arweave address to get the transaction for.
    *
-   * @returns {Promise<string>} - Promise which resolves with a winston string balance.
+   * @returns {Promise<string>} - Promise which resolves with a transaction ID.
    */
   public getLastTransactionID(address: string): Promise<string> {
     return this.api.get(`wallet/${address}/last_tx`).then((response) => {
