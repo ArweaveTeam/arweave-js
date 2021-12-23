@@ -5,3 +5,5 @@
 /bundles
 /debug-cli/testfiles/**/*
 .idea
+package-lock.json
+yarn.lock
