@@ -44,9 +44,11 @@ export default class Transactions {
      * However, this introduces a problem with ardrive-js, so we will enforce
      * config =  {transformReponse: []} where we do not require a transform
      */
-    return this.api.get(`tx_anchor`, { transformResponse: [] }).then((response) => {
-      return response.data;
-    });
+    return this.api
+      .get(`tx_anchor`, { transformResponse: [] })
+      .then((response) => {
+        return response.data;
+      });
   }
 
   public getPrice(byteSize: number, targetAddress?: string): Promise<string> {
@@ -145,32 +147,14 @@ export default class Transactions {
     id: string,
     options?: { decode?: boolean; string?: boolean }
   ): Promise<string | Uint8Array> {
-    // Attempt to download from /txid, fall back to downloading chunks.
+    // Only download from chunks, while /{txid} may work
+    // it may give false positive about the data being seeded
+    // if getData is problematic, please consider fetch-ing
+    // an arweave gateway directly!
 
-    const resp = await this.api.get(`${id}`, { responseType: "arraybuffer" });
-    let data: Uint8Array | undefined = undefined;
-    if (resp.status === 200) {
-      data = new Uint8Array(resp.data);
-    }
-
-    if (resp.status === 400 && getError(resp) === "tx_data_too_big") {
-      data = await this.chunks.downloadChunkedData(id);
-    }
-
-    // If we don't have data, throw an exception. Previously we
-    // just returned an empty data object.
-
-    if (!data) {
-      if (resp.status == 404) {
-        throw new ArweaveError(ArweaveErrorType.TX_NOT_FOUND);
-      }
-
-      if (resp.status == 410) {
-        throw new ArweaveError(ArweaveErrorType.TX_FAILED);
-      }
-
-      throw new Error(`Unable to get data: ${resp.status} - ${getError(resp)}`);
-    }
+    const data: Uint8Array | undefined = await this.chunks.downloadChunkedData(
+      id
+    );
 
     if (options && options.decode && !options.string) {
       return data;
@@ -187,7 +171,6 @@ export default class Transactions {
     jwk?: JWKInterface | "use_wallet",
     options?: SignatureOptions
   ): Promise<void> {
-    // @ts-ignore
     if (!jwk && (typeof window === "undefined" || !window.arweaveWallet)) {
       throw new Error(
         `A new Arweave transaction must provide the jwk parameter.`
@@ -210,6 +193,7 @@ export default class Transactions {
       transaction.setSignature({
         id: signedTransaction.id,
         owner: signedTransaction.owner,
+        reward: signedTransaction.reward,
         tags: signedTransaction.tags,
         signature: signedTransaction.signature,
       });
@@ -328,7 +312,7 @@ export default class Transactions {
    */
   public async getUploader(
     upload: Transaction | SerializedUploader | string,
-    data: Uint8Array | ArrayBuffer
+    data?: Uint8Array | ArrayBuffer
   ) {
     let uploader!: TransactionUploader;
 
@@ -336,11 +320,15 @@ export default class Transactions {
       data = new Uint8Array(data);
     }
 
-    if (!data || !(data instanceof Uint8Array)) {
-      throw new Error(`Must provide data when resuming upload`);
-    }
-
     if (upload instanceof Transaction) {
+      if (!data) {
+        data = upload.data;
+      }
+
+      if (!(data instanceof Uint8Array)) {
+        throw new Error("Data format is invalid");
+      }
+
       if (!upload.chunks) {
         await upload.prepareChunks(data);
       }
@@ -353,6 +341,10 @@ export default class Transactions {
     } else {
       if (typeof upload === "string") {
         upload = await TransactionUploader.fromTransactionId(this.api, upload);
+      }
+
+      if (!data || !(data instanceof Uint8Array)) {
+        throw new Error(`Must provide data when resuming upload`);
       }
 
       // upload should be a serialized upload.

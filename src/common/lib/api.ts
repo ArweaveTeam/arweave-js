@@ -47,7 +47,7 @@ export default class Api {
   ): Promise<AxiosResponse<T>> {
     try {
       return await this.request().get<T>(endpoint, config);
-    } catch (error) {
+    } catch (error: any) {
       if (error.response && error.response.status) {
         return error.response;
       }
@@ -62,8 +62,8 @@ export default class Api {
     config?: AxiosRequestConfig
   ): Promise<AxiosResponse<T>> {
     try {
-      return await this.request().post<T>(endpoint, body, config);
-    } catch (error) {
+      return await this.request().post(endpoint, body, config);
+    } catch (error: any) {
       if (error.response && error.response.status) {
         return error.response;
       }

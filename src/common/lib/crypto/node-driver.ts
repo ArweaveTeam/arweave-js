@@ -1,9 +1,7 @@
 import { JWKInterface } from "../wallet";
 import CryptoInterface, { SignatureOptions } from "./crypto-interface";
-
+import crypto from "crypto";
 import { pemTojwk, jwkTopem } from "./pem";
-
-import * as crypto from "crypto";
 import * as constants from "constants";
 
 export default class NodeCryptoDriver implements CryptoInterface {

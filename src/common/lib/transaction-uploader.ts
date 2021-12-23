@@ -87,7 +87,7 @@ export class TransactionUploader {
    * itself and on any subsequent calls uploads the
    * next chunk until it completes.
    */
-  public async uploadChunk(): Promise<void> {
+  public async uploadChunk(chunkIndex_?: number): Promise<void> {
     if (this.isComplete) {
       throw new Error(`Upload is already complete`);
     }
@@ -127,7 +127,14 @@ export class TransactionUploader {
       return;
     }
 
-    const chunk = this.transaction.getChunk(this.chunkIndex, this.data);
+    if (chunkIndex_) {
+      this.chunkIndex = chunkIndex_;
+    }
+
+    const chunk = this.transaction.getChunk(
+      chunkIndex_ || this.chunkIndex,
+      this.data
+    );
 
     const chunkOk = await validatePath(
       this.transaction.chunks!.data_root,
@@ -190,10 +197,7 @@ export class TransactionUploader {
       await transaction.prepareChunks(data);
     }
 
-    const upload = new TransactionUploader(
-      api,
-      transaction
-    );
+    const upload = new TransactionUploader(api, transaction);
 
     // Copy the serialized upload information, and data passed in.
     upload.chunkIndex = serialized.chunkIndex;
@@ -202,8 +206,6 @@ export class TransactionUploader {
     upload.lastResponseStatus = serialized.lastResponseStatus;
     upload.txPosted = serialized.txPosted;
     upload.data = data;
-
-    
 
     if (upload.transaction.data_root !== serialized.transaction.data_root) {
       throw new Error(`Data mismatch: Uploader doesn't match provided data.`);

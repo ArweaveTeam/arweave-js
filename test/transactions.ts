@@ -235,7 +235,7 @@ describe("Transactions", function () {
   });
 
   it("should get transaction data > 12MiB from a gateway", async function () {
-    this.timeout(20000);
+    this.timeout(150000);
     const data = (await arweave.transactions.getData(liveDataTxidLarge, {
       decode: true,
     })) as Uint8Array;
@@ -270,9 +270,6 @@ describe("Transactions", function () {
     const data = arweave.utils.b64UrlToBuffer(unsignedV2TxFixture.data);
     const expectedSignature = signedV2TxFixture.signature;
     const expectedDataRoot = signedV2TxFixture.data_root;
-
-    console.log(unsignedV2TxFixture);
-    console.log(signedV2TxFixture);
 
     const tx = await arweave.createTransaction(
       {
