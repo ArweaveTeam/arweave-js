@@ -195,19 +195,6 @@ describe("Chunks", function () {
     const rootNode = await generateTree(data);
 
     expect(bufferTob64Url(rootNode.id)).to.equal(rootB64Url);
-    // const sortedProofs = await Promise.all(
-    //   proofs.map(async (item) => {
-    //     return {
-    //       ...item,
-    //       proof: item.proof,
-    //       proofb64: bufferTob64Url(item.proof),
-    //       debug: await debug(item.proof),
-    //     };
-    //   })
-    // );
-    // console.log("Root hash", bufferTob64Url(rootHash));
-    // console.log(inspect(sortedProofs, false, null, true));
-    // const toTest = sortedProofs[0];
   });
 
   it("should build valid proofs from tree", async function () {

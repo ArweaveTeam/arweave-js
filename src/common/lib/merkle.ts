@@ -3,7 +3,6 @@
  */
 import Arweave from "../common";
 import { concatBuffers } from "./utils";
-import { inspect } from "util";
 
 export interface Chunk {
   dataHash: Uint8Array;
@@ -375,40 +374,4 @@ export async function validatePath(
   }
 
   return false;
-}
-
-/**
- * Inspect an arweave chunk proof.
- * Takes proof, parses, reads and displays the values for console logging.
- * One proof section per line
- * Format: left,right,offset => hash
- */
-export async function debug(proof: Uint8Array, output = ""): Promise<string> {
-  if (proof.byteLength < 1) {
-    return output;
-  }
-
-  const left = proof.slice(0, HASH_SIZE);
-  const right = proof.slice(left.length, left.length + HASH_SIZE);
-  const offsetBuffer = proof.slice(
-    left.length + right.length,
-    left.length + right.length + NOTE_SIZE
-  );
-  const offset = bufferToInt(offsetBuffer);
-
-  const remainder = proof.slice(
-    left.length + right.length + offsetBuffer.length
-  );
-
-  const pathHash = await hash([
-    await hash(left),
-    await hash(right),
-    await hash(offsetBuffer),
-  ]);
-
-  const updatedOutput = `${output}\n${inspect(Buffer.from(left))},${inspect(
-    Buffer.from(right)
-  )},${offset} => ${inspect(pathHash)}`;
-
-  return debug(remainder, updatedOutput);
 }
