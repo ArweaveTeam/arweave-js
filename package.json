@@ -16,7 +16,7 @@
     "bundle:web-prod": "npx webpack --config-name web-prod",
     "profile:web": "npx webpack --config-name web --json > ./web.profile.json && npx webpack-bundle-analyzer ./web.profile.json",
     "package": "mkdirp node web && ncp dist/node/common/ dist/node/node/ && ncp dist/node/node/ node && ncp dist/web/common/ dist/web/web/ && ncp dist/web/web/ web && npm run clean:dist",
-    "build": "npm run compile:node && npm run compile:web && npm run package && npm run bundle:web && npm run bundle:web-prod",
+    "build": "npm run clean && npm run compile:node && npm run compile:web && npm run package && npm run bundle:web && npm run bundle:web-prod",
     "clean:dist": "rimraf dist",
     "clean:package": "rimraf node web",
     "clean:bundle": "rimraf bundles",

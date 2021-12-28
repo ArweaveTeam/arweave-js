@@ -194,7 +194,7 @@ describe("Transactions", function () {
     expect(verifiedWithModififedTags).to.be.false;
   });
 
-  it("should create and sign transactions using wallet", async function () {
+  it("should create and sign transactions using external implicit wallet", async function () {
     this.timeout(120000);
 
     const transaction = await arweave.createTransaction({ data: "test" });
