@@ -153,9 +153,9 @@ export async function buildLayers(
   nodes: MerkelNode[],
   level = 0
 ): Promise<MerkelNode> {
-  // If there are only 2 nodes left, this is going to be the root node
+  // If there is only 1 node left, this is going to be the root node
   if (nodes.length < 2) {
-    const root = await hashBranch(nodes[0], nodes[1]);
+    const root = nodes[0];
 
     // console.log("Root layer", root);
 
@@ -405,9 +405,11 @@ export async function debug(proof: Uint8Array, output = ""): Promise<string> {
     await hash(offsetBuffer),
   ]);
 
-  const updatedOutput = `${output}\n${JSON.stringify(Buffer.from(left))},${JSON.stringify(
-    Buffer.from(right)
-  )},${offset} => ${JSON.stringify(pathHash)}`;
+  const updatedOutput = `${output}\n${JSON.stringify(
+    Buffer.from(left)
+  )},${JSON.stringify(Buffer.from(right))},${offset} => ${JSON.stringify(
+    pathHash
+  )}`;
 
   return debug(remainder, updatedOutput);
 }
