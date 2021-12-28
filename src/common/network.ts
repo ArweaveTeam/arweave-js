@@ -1,7 +1,7 @@
 import Api from "./lib/api";
 
 export interface NetworkInfoInterface {
-  hosnetworkt: string;
+  network: string;
   version: number;
   release: number;
   height: number;
