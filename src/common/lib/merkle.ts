@@ -3,7 +3,6 @@
  */
 import Arweave from "../common";
 import { concatBuffers } from "./utils";
-import { inspect } from "util";
 
 export interface Chunk {
   dataHash: Uint8Array;
@@ -406,9 +405,9 @@ export async function debug(proof: Uint8Array, output = ""): Promise<string> {
     await hash(offsetBuffer),
   ]);
 
-  const updatedOutput = `${output}\n${inspect(Buffer.from(left))},${inspect(
+  const updatedOutput = `${output}\n${JSON.stringify(Buffer.from(left))},${JSON.stringify(
     Buffer.from(right)
-  )},${offset} => ${inspect(pathHash)}`;
+  )},${offset} => ${JSON.stringify(pathHash)}`;
 
   return debug(remainder, updatedOutput);
 }
