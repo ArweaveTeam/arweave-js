@@ -149,13 +149,13 @@ export async function generateTransactionChunks(data: Uint8Array) {
  * and then recurse, building up the tree to it's root, where the
  * layer only consists of two items.
  */
- export async function buildLayers(
+export async function buildLayers(
   nodes: MerkelNode[],
   level = 0
 ): Promise<MerkelNode> {
   // If there is only 1 node left, this is going to be the root node
   if (nodes.length < 2) {
-    const root = nodes[0]
+    const root = nodes[0];
 
     // console.log("Root layer", root);
 
@@ -405,9 +405,11 @@ export async function debug(proof: Uint8Array, output = ""): Promise<string> {
     await hash(offsetBuffer),
   ]);
 
-  const updatedOutput = `${output}\n${JSON.stringify(Buffer.from(left))},${JSON.stringify(
-    Buffer.from(right)
-  )},${offset} => ${JSON.stringify(pathHash)}`;
+  const updatedOutput = `${output}\n${JSON.stringify(
+    Buffer.from(left)
+  )},${JSON.stringify(Buffer.from(right))},${offset} => ${JSON.stringify(
+    pathHash
+  )}`;
 
   return debug(remainder, updatedOutput);
 }
