@@ -79,7 +79,7 @@ export default class Wallets {
       }
 
       // @ts-ignore
-      return window.arweaveWallet.getActiveAddress();
+      return await window.arweaveWallet.getActiveAddress();
     } else {
       return this.ownerToAddress(jwk.n);
     }
