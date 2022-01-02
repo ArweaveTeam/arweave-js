@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "esModuleInterop": true,
         "outDir": "./dist/web/",
         "sourceMap": true,
         "strict": true,
