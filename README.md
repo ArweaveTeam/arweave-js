@@ -407,7 +407,7 @@ let resumeTxId = 'mytxid' // a transaction id for a mined transaction that didn'
 
 let uploader = await arweave.transactions.getUploader(resumeTxId, data);
 while (!uploader.isComplete) {
-  await uploader.uploadChunks();
+  await uploader.uploadChunk();
   console.log(`${progress.pctComplete}% complete`);
 }
 ```
