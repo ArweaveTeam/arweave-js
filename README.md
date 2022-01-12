@@ -1,4 +1,4 @@
-# Arweave JS
+# Arweave JS 
 
 Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave network and uploading data to the permaweb. It works in latest browsers and Node JS.
 
@@ -407,8 +407,8 @@ let resumeTxId = 'mytxid' // a transaction id for a mined transaction that didn'
 
 let uploader = await arweave.transactions.getUploader(resumeTxId, data);
 while (!uploader.isComplete) {
-  await uploader.uploadChunks();
-  console.log(`${progress.pctComplete}% complete`);
+  await uploader.uploadChunk();
+  console.log(`${uploader.pctComplete}% complete`);
 }
 ```
 
