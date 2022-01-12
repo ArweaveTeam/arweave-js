@@ -1,4 +1,4 @@
-# Arweave JS
+# Arweave JS 
 
 Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave network and uploading data to the permaweb. It works in latest browsers and Node JS.
 
@@ -184,7 +184,7 @@ arweave.wallets.getLastTransactionID('1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKl
 
 Transactions are the building blocks of the Arweave permaweb. They can send [AR](https://docs.arweave.org/developers/server/http-api#ar-and-winston) between wallet addresses or store data on the Arweave network.
 
-The create transaction methods create and return an unsigned transaction object. You must sign the transaction and submit it separeately using the `transactions.sign` and `transactions.submit` methods.
+The create transaction methods create and return an unsigned transaction object. You must sign the transaction and submit it separately using the `transactions.sign` and `transactions.submit` methods.
 
 If you don't pass in a `key` argument when creating a transaction, Arweave.js will attempt to use a browser-based wallet extension, such as [ArConnect](https://arconnect.io) or [Finnie](https://koii.network/getFinnie), to sign the transaction.
 
@@ -407,8 +407,8 @@ let resumeTxId = 'mytxid' // a transaction id for a mined transaction that didn'
 
 let uploader = await arweave.transactions.getUploader(resumeTxId, data);
 while (!uploader.isComplete) {
-  await uploader.uploadChunks();
-  console.log(`${progress.pctComplete}% complete`);
+  await uploader.uploadChunk();
+  console.log(`${uploader.pctComplete}% complete`);
 }
 ```
 
