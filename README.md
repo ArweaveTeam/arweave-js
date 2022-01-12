@@ -1,4 +1,4 @@
-# Arweave JS
+# Arweave JS 
 
 Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave network and uploading data to the permaweb. It works in latest browsers and Node JS.
 
