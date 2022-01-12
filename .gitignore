@@ -4,3 +4,4 @@
 /web
 /bundles
 /debug-cli/testfiles/**/*
+.idea

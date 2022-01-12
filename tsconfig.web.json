@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "esModuleInterop": true,
         "outDir": "./dist/web/",
         "sourceMap": true,
         "strict": true,
@@ -9,9 +10,10 @@
         "rootDirs": [
             "src/common",
             "src/web"
-        ]
+        ],
     },
     "include": [
+        "src/modules.d.ts",
         "src/common",
         "src/web"
     ]

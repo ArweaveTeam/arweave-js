@@ -11,9 +11,10 @@
             "src/node"
         ],
         "esModuleInterop": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
     },
     "include": [
+        "src/modules.d.ts",
         "src/common",
         "src/node"
     ]

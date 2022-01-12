@@ -2,6 +2,7 @@ import Api from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
 import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
+import "arconnect";
 
 export default class Wallets {
   private api: Api;

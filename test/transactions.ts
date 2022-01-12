@@ -18,9 +18,8 @@ const liveDataTxidLarge = "KDKSOaecDl_IM4E0_0XiApwdrElvb9TnwOzeHt65Sno";
 
 describe("Transactions", function () {
   this.timeout(10000);
-  it("should create and sign data transactions", async function () {
-    this.timeout(10000);
 
+  it("should create and sign data transactions", async function () {
     const wallet = await arweave.wallets.generate();
 
     const transaction = await arweave.createTransaction(
@@ -106,8 +105,6 @@ describe("Transactions", function () {
   });
 
   it("should create and sign ar transactions", async function () {
-    this.timeout(10000);
-
     const wallet = await arweave.wallets.generate();
 
     const transaction = await arweave.createTransaction(
@@ -128,7 +125,7 @@ describe("Transactions", function () {
   });
 
   it("should work with buffers", async function () {
-    this.timeout(5000);
+    this.timeout(10000);
 
     const wallet = await arweave.wallets.generate();
 
@@ -177,8 +174,6 @@ describe("Transactions", function () {
   });
 
   it("should get transaction info", async function () {
-    this.timeout(5000);
-
     const transactionStatus = await arweave.transactions.getStatus(
       liveDataTxid
     );
@@ -240,7 +235,7 @@ describe("Transactions", function () {
   });
 
   it("should get transaction data > 12MiB from a gateway", async function () {
-    this.timeout(20000);
+    this.timeout(150000);
     const data = (await arweave.transactions.getData(liveDataTxidLarge, {
       decode: true,
     })) as Uint8Array;
