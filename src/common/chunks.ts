@@ -66,7 +66,7 @@ export default class Chunks {
           `[chunk] Failed to fetch chunk at offset ${startOffset + byte}`
         );
         console.error(
-          `[chunk] This could indicate that the chunk wasn't uploaded or hasn't yet seeded properly to a particular gatway/node`
+          `[chunk] This could indicate that the chunk wasn't uploaded or hasn't yet seeded properly to a particular gateway/node`
         );
       }
 
@@ -74,7 +74,7 @@ export default class Chunks {
         data.set(chunkData, byte);
         byte += chunkData.length;
       } else {
-        throw new Error(`Coudn't complete data download at ${byte}/${size}`);
+        throw new Error(`Couldn't complete data download at ${byte}/${size}`);
       }
     }
 

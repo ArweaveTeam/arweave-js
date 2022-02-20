@@ -42,7 +42,7 @@ export default class Transactions {
      * in order to overcome some other issue in:  https://github.com/axios/axios/issues/983
      *
      * However, this introduces a problem with ardrive-js, so we will enforce
-     * config =  {transformReponse: []} where we do not require a transform
+     * config =  {transformResponse: []} where we do not require a transform
      */
     return this.api
       .get(`tx_anchor`, { transformResponse: [] })
@@ -61,7 +61,7 @@ export default class Transactions {
         transformResponse: [
           /**
            * We need to specify a response transformer to override
-           * the default JSON.parse behaviour, as this causes
+           * the default JSON.parse behavior, as this causes
            * winston to be converted to a number and we want to
            * return it as a winston string.
            * @param data
@@ -268,7 +268,7 @@ export default class Transactions {
 
     const uploader = await this.getUploader(transaction, transaction.data);
 
-    // Emulate existing error & return value behaviour.
+    // Emulate existing error & return value behavior.
     try {
       while (!uploader.isComplete) {
         await uploader.uploadChunk();
