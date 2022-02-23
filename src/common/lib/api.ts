@@ -7,6 +7,7 @@ export interface ApiConfig {
   timeout?: number;
   logging?: boolean;
   logger?: Function;
+  network?: string;
 }
 
 export default class Api {
@@ -38,6 +39,7 @@ export default class Api {
       timeout: config.timeout || 20000,
       logging: config.logging || false,
       logger: config.logger || console.log,
+      network: config.network,
     };
   }
 
@@ -77,10 +79,15 @@ export default class Api {
    * a request to the network.
    */
   public request(): AxiosInstance {
+    const headers : any = {};
+    if (this.config.network) {
+      headers["x-network"] = this.config.network;
+    }
     let instance = Axios.create({
       baseURL: `${this.config.protocol}://${this.config.host}:${this.config.port}`,
       timeout: this.config.timeout,
       maxContentLength: 1024 * 1024 * 512,
+      headers,
     });
 
     if (this.config.logging) {
