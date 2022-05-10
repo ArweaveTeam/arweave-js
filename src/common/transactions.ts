@@ -12,6 +12,7 @@ import {
 } from "./lib/transaction-uploader";
 import Chunks from "./chunks";
 import "arconnect";
+import { allowedNodeEnvironmentFlags } from "process";
 
 export interface TransactionConfirmedData {
   block_indep_hash: string;
@@ -145,16 +146,35 @@ export default class Transactions {
 
   public async getData(
     id: string,
-    options?: { decode?: boolean; string?: boolean }
+    options?: {
+      decode?: boolean;
+      string?: boolean;
+    }
   ): Promise<string | Uint8Array> {
-    // Only download from chunks, while /{txid} may work
-    // it may give false positive about the data being seeded
-    // if getData is problematic, please consider fetch-ing
-    // an arweave gateway directly!
+    let data: Uint8Array | undefined = undefined;
 
-    const data: Uint8Array | undefined = await this.chunks.downloadChunkedData(
-      id
-    );
+    try {
+      data = await this.chunks.downloadChunkedData(id);
+    } catch (error) {
+      console.error(`Error while trying to download chunked data for ${id}`);
+      console.error(error);
+    }
+
+    if (!data) {
+      console.warn(`Falling back to gatway cache for ${id}`);
+      try {
+        data = (await this.api.get(`/${id}`)).data;
+      } catch (error) {
+        console.error(
+          `Error while trying to download contiguous data from gateway cache for ${id}`
+        );
+        console.error(error);
+      }
+    }
+
+    if (!data) {
+      throw new Error(`${id} was not found!`);
+    }
 
     if (options && options.decode && !options.string) {
       return data;
