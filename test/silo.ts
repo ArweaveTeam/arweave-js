@@ -26,8 +26,6 @@ describe("Silo", function () {
   });
 
   it("should read and write encrypted data", async function () {
-    this.timeout(5000);
-
     const siloURI = "some-secret.1";
 
     const wallet = await arweave.wallets.generate();
