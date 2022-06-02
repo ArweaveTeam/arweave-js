@@ -1,9 +1,5 @@
-import * as chai from "chai";
-import * as crypto from "crypto";
-import Transaction from "../src/common/lib/transaction";
-import { arweaveInstance, arweaveInstanceDirectNode } from "./_arweave";
-
-const expect = chai.expect;
+import { expect } from "chai";
+import { arweaveInstance } from "./_arweave";
 
 const arweave = arweaveInstance();
 
@@ -15,8 +11,6 @@ const externalTransaction = "DheCVCoV7HcZHu5qxQUAlJJRYdfeOkP4oVgFJok2pWg";
 describe("External Transactions", function () {
   it("should verify transactions created without arweave-js", async function () {
     this.timeout(10000);
-
-    const wallet = await arweave.wallets.generate();
 
     // get the transaction created externally
     const transaction = await arweave.transactions.get(

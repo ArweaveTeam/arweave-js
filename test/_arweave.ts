@@ -21,6 +21,7 @@ export function arweaveInstance() {
 }
 
 export function arweaveInstanceDirectNode() {
+  console.log(`in function ${arweaveInstanceDirectNode.name} : 'arweave.net' is not a direct node`)
   return initInstance({
     host: "arweave.net",
     protocol: "https",

@@ -1,12 +1,12 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
 import Transaction from "../src/common/lib/transaction";
-import { arweaveInstance, arweaveInstanceDirectNode } from "./_arweave";
+import { arweaveInstance } from "./_arweave";
 
 const expect = chai.expect;
 
 const arweave = arweaveInstance();
-const arweaveDirectNode = arweaveInstanceDirectNode();
+// const arweaveDirectNode = arweaveInstanceDirectNode();
 
 const digestRegex = /^[a-z0-9-_]{43}$/i;
 const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
@@ -234,7 +234,7 @@ describe("Transactions", function () {
       .which.contain("<title>ARWEAVE / PEER EXPLORER</title>");
   });
 
-  it("should get transaction data > 12MiB from a gateway", async function () {
+  it("should get transaction data > 12MiB from chunks or gateway", async function () {
     this.timeout(150000);
     const data = (await arweave.transactions.getData(liveDataTxidLarge, {
       decode: true,
@@ -242,14 +242,14 @@ describe("Transactions", function () {
     expect(data.byteLength).to.equal(14166765);
   });
 
-  it("should get transaction data > 12MiB from a node", async function () {
-    this.timeout(150000);
-    const data = (await arweaveDirectNode.transactions.getData(
-      liveDataTxidLarge,
-      { decode: true }
-    )) as Uint8Array;
-    expect(data.byteLength).to.equal(14166765);
-  });
+  // it("should get transaction data > 12MiB from a node", async function () {
+  //   this.timeout(150000);
+  //   const data = (await arweaveDirectNode.transactions.getData(
+  //     liveDataTxidLarge,
+  //     { decode: true }
+  //   )) as Uint8Array;
+  //   expect(data.byteLength).to.equal(14166765);
+  // });
 
   it("should find transactions", async function () {
     const results = await arweave.transactions.search(
