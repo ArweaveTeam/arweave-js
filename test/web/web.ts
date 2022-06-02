@@ -44,7 +44,7 @@ describe("Initialization", function () {
 
 describe("Network Info", function () {
   it("should get network info", async function () {
-    this.timeout(3000);
+    this.timeout(10000);
 
     const info = await arweave.network.getInfo();
     const peers = await arweave.network.getPeers();
