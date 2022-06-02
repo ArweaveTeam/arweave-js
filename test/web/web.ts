@@ -395,7 +395,7 @@ describe("GraphQL", function () {
   });
 
   it("should return an empty list when no results are found", async function () {
-    this.timeout(5000)
+    this.timeout(5000);
     const txs = (
       await arweave.api.post("/graphql", {
         query: `
