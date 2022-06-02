@@ -6,11 +6,12 @@
     "target": "es2017",
     "moduleResolution": "node",
     "module": "commonjs",
+    "baseUrl": "src/common",
     "rootDirs": ["src/common", "src/node"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "paths": {
-      "@crypto/*": ["./src/common/lib/crypto/*"]
+      "@crypto/*": ["lib/crypto/*"]
     }
   },
   "include": ["src/modules.d.ts", "src/common", "src/node"]

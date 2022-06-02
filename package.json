@@ -1,6 +1,6 @@
 {
   "name": "arweave",
-  "version": "1.11.2",
+  "version": "1.11.3",
   "description": "Arweave JS client library",
   "main": "./node/index.js",
   "browser": "./web/index.js",
@@ -10,48 +10,48 @@
     "bundles"
   ],
   "scripts": {
-    "compile:node": "tsc --declaration -project tsconfig.node.json",
-    "compile:web": "tsc --declaration -project tsconfig.web.json",
-    "bundle:web": "npx webpack --config-name web",
-    "bundle:web-prod": "npx webpack --config-name web-prod",
-    "profile:web": "npx webpack --config-name web --json > ./web.profile.json && npx webpack-bundle-analyzer ./web.profile.json",
-    "package": "mkdirp node web && ncp dist/node/common/ dist/node/node/ && ncp dist/node/node/ node && ncp dist/web/common/ dist/web/web/ && ncp dist/web/web/ web && npm run clean:dist",
-    "build": "npm run clean && npm run compile:node && npm run compile:web && npm run package && npm run bundle:web && npm run bundle:web-prod",
-    "clean:dist": "rimraf dist",
-    "clean:package": "rimraf node web",
-    "clean:bundle": "rimraf bundles",
-    "clean": "npm run clean:dist && npm run clean:package && npm  run clean:bundle",
-    "prepublishOnly": "npm run clean && npm run build",
-    "test": "mocha -r ts-node/register -r tsconfig-paths/register test/*.ts && echo \"NOW RUN => 'npm run test:web' <= \" ",
-    "test:web": "npm run bundle:web && npx webpack --config-name web-tests && opener test/web/web.html",
-    "prettier:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
-    "prettier:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "preversion": "npm run test",
-    "version": "npm run prettier:write && git add -A src && git add -A test",
-    "postversion": "git push && git push --tags"
+      "compile:node": "tsc --declaration -project tsconfig.node.json && resolve-tspaths -p tsconfig.node.json",
+      "compile:web": "tsc --declaration -project tsconfig.web.json",
+      "bundle:web": "npx webpack --config-name web",
+      "bundle:web-prod": "npx webpack --config-name web-prod",
+      "profile:web": "npx webpack --config-name web --json > ./web.profile.json && npx webpack-bundle-analyzer ./web.profile.json",
+      "package": "mkdirp node web && ncp dist/node/common/ dist/node/node/ && ncp dist/node/node/ node && ncp dist/web/common/ dist/web/web/ && ncp dist/web/web/ web && npm run clean:dist",
+      "build": "npm run clean && npm run compile:node && npm run compile:web && npm run package && npm run bundle:web && npm run bundle:web-prod",
+      "clean:dist": "rimraf dist",
+      "clean:package": "rimraf node web",
+      "clean:bundle": "rimraf bundles",
+      "clean": "npm run clean:dist && npm run clean:package && npm  run clean:bundle",
+      "prepublishOnly": "npm run clean && npm run build",
+      "test": "mocha -r ts-node/register -r tsconfig-paths/register test/*.ts && echo \"NOW RUN => 'npm run test:web' <= \" ",
+      "test:web": "npm run bundle:web && npx webpack --config-name web-tests && opener test/web/web.html",
+      "prettier:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
+      "prettier:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+      "preversion": "npm run test",
+      "version": "npm run prettier:write && git add -A src && git add -A test",
+      "postversion": "git push && git push --tags"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ArweaveTeam/arweave-js.git"
-  },
-  "keywords": [
-    "arweave",
-    "js",
-    "blockchain",
-    "crypto",
-    "data",
-    "permanence",
-    "http"
-  ],
-  "author": "Arweave Team <team@arweave.org>",
-  "contributors": [
-    "Kyle Beckles <kyle@arweave.org>",
-    "Aidan O'Kelly <aidan@arweave.org>",
-    "Ros McMahon <ros@arweave.org>",
-    "Cedrik Boudreau <cedrik@arweave.org>"
-  ],
-  "license": "MIT",
-  "bugs": {
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ArweaveTeam/arweave-js.git"
+    },
+    "keywords": [
+        "arweave",
+        "js",
+        "blockchain",
+        "crypto",
+        "data",
+        "permanence",
+        "http"
+    ],
+    "author": "Arweave Team <team@arweave.org>",
+    "contributors": [
+        "Kyle Beckles <kyle@arweave.org>",
+        "Aidan O'Kelly <aidan@arweave.org>",
+        "Ros McMahon <ros@arweave.org>",
+        "Cedrik Boudreau <cedrik@arweave.org>"
+    ],
+    "license": "MIT",
+    "bugs": {
     "url": "https://github.com/ArweaveTeam/arweave-js/issues"
   },
   "homepage": "https://github.com/ArweaveTeam/arweave-js#readme",
@@ -69,6 +69,7 @@
     "opener": "^1.5.2",
     "prettier": "2.6.2",
     "process": "^0.11.10",
+    "resolve-tspaths": "^0.6.0",
     "rimraf": "^3.0.2",
     "stream-browserify": "^3.0.0",
     "terser-webpack-plugin": "^5.3.3",

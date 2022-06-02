@@ -1,19 +1,16 @@
 {
-    "compilerOptions": {
-        "outDir": "./dist/web/",
-        "sourceMap": true,
-        "strict": true,
-        "target": "es2017",
-        "moduleResolution": "node",
-        "module": "commonjs",
-        "rootDirs": [
-            "src/common",
-            "src/web"
-        ],
-    },
-    "include": [
-        "src/modules.d.ts",
-        "src/common",
-        "src/web"
-    ]
+  "compilerOptions": {
+    "outDir": "./dist/web/",
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2017",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "baseUrl": "src/common",
+    "rootDirs": ["src/common", "src/web"],
+    "paths": {
+      "@crypto/*": ["lib/crypto/*"]
+    }
+  },
+  "include": ["src/modules.d.ts", "src/common", "src/web"]
 }
