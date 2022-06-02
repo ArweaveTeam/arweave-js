@@ -1,14 +1,10 @@
 {
   "name": "arweave",
-  "version": "1.10.23",
+  "version": "1.10.24",
   "description": "Arweave JS client library",
   "main": "./node/index.js",
   "browser": "./web/index.js",
-  "files": [
-    "node",
-    "web",
-    "bundles"
-  ],
+  "files": ["node", "web", "bundles"],
   "scripts": {
     "compile:node": "tsc --declaration -project tsconfig.node.json",
     "compile:web": "tsc --declaration -project tsconfig.web.json",
