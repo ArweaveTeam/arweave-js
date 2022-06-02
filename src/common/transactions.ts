@@ -161,7 +161,7 @@ export default class Transactions {
     }
 
     if (!data) {
-      console.warn(`Falling back to gatway cache for ${id}`);
+      console.warn(`Falling back to gateway cache for ${id}`);
       try {
         data = (await this.api.get(`/${id}`)).data;
       } catch (error) {
