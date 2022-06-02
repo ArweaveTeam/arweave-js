@@ -1,6 +1,7 @@
 import Ar from "./ar";
 import Api, { ApiConfig } from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
+import CryptoDriver from "@crypto/node-driver";
 import Network from "./network";
 import Transactions from "./transactions";
 import Wallets from "./wallets";
@@ -48,7 +49,7 @@ export default class Arweave {
 
   public static init: (apiConfig: ApiConfig) => Arweave;
 
-  public static crypto: CryptoInterface;
+  public static crypto: CryptoInterface = new CryptoDriver();
 
   public static utils = ArweaveUtils;
 

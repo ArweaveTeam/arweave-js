@@ -10,30 +10,35 @@ config.web = {
   target: "web",
   devtool: "inline-source-map",
   devServer: {
-    contentBase: "./dist"
+    contentBase: "./dist",
   },
   resolve: {
     alias: {
       process: "process/browser",
       crypto: "crypto-browserify",
-      stream: "stream-browserify"
+      stream: "stream-browserify",
+      "@crypto/node-driver": path.resolve(
+        __dirname,
+        "./web/lib/crypto/webcrypto-driver"
+      ),
     },
     fallback: {
-      "util": require.resolve("util"),
-      "process": require.resolve("process/browser"),
-      "crypto": require.resolve("crypto-browserify"),
-      "stream": require.resolve("stream-browserify")
-    }
+      util: require.resolve("util"),
+      process: require.resolve("process/browser"),
+      crypto: require.resolve("crypto-browserify"),
+      stream: require.resolve("stream-browserify"),
+    },
+    extensions: [".ts", ".js"],
   },
   plugins: [
     new webpack.ProvidePlugin({
-      process: 'process/browser'
+      process: "process/browser",
     }),
   ],
   output: {
     filename: "web.bundle.js",
-    path: path.resolve(__dirname, "bundles")
-  }
+    path: path.resolve(__dirname, "bundles"),
+  },
 };
 
 config.webprod = {
@@ -42,24 +47,29 @@ config.webprod = {
   mode: "production",
   target: "web",
   devServer: {
-    contentBase: "./dist"
+    contentBase: "./dist",
   },
   resolve: {
     alias: {
       process: "process/browser",
       crypto: "crypto-browserify",
-      stream: "stream-browserify"
+      stream: "stream-browserify",
+      "@crypto/node-driver": path.resolve(
+        __dirname,
+        "./web/lib/crypto/webcrypto-driver"
+      ),
     },
     fallback: {
-      "util": require.resolve("util"),
-      "process": require.resolve("process/browser"),
-      "crypto": require.resolve("crypto-browserify"),
-      "stream": require.resolve("stream-browserify")
-    }
+      util: require.resolve("util"),
+      process: require.resolve("process/browser"),
+      crypto: require.resolve("crypto-browserify"),
+      stream: require.resolve("stream-browserify"),
+    },
+    extensions: [".ts", ".js"],
   },
   plugins: [
     new webpack.ProvidePlugin({
-      process: 'process/browser'
+      process: "process/browser",
     }),
   ],
   optimization: {
@@ -68,8 +78,8 @@ config.webprod = {
   },
   output: {
     filename: "web.bundle.min.js",
-    path: path.resolve(__dirname, "bundles")
-  }
+    path: path.resolve(__dirname, "bundles"),
+  },
 };
 
 config.webtests = {
@@ -81,37 +91,41 @@ config.webtests = {
     rules: [
       {
         test: /\.ts?$/,
-        use: "ts-loader"
-      }
-    ]
+        use: "ts-loader",
+      },
+    ],
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
     alias: {
-      process: "process/browser"
+      process: "process/browser",
+      "@crypto/node-driver": path.resolve(
+        __dirname,
+        "./web/lib/crypto/webcrypto-driver"
+      ),
     },
     fallback: {
-      "util": require.resolve("util"),
-      "process": require.resolve("process/browser"),
-      "crypto": require.resolve("crypto-browserify"),
-      "stream": require.resolve("stream-browserify")
-    }
+      util: require.resolve("util"),
+      process: require.resolve("process/browser"),
+      crypto: require.resolve("crypto-browserify"),
+      stream: require.resolve("stream-browserify"),
+    },
   },
   plugins: [
     new webpack.ProvidePlugin({
-      process: 'process/browser',
-      crypto: 'crypto-browserify',
-      stream: 'stream-browserify'
+      process: "process/browser",
+      crypto: "crypto-browserify",
+      stream: "stream-browserify",
     }),
   ],
   devtool: "inline-source-map",
   devServer: {
-    contentBase: "./dist"
+    contentBase: "./dist",
   },
   output: {
     filename: "webtests.bundle.js",
-    path: path.resolve(__dirname, "bundles")
-  }
+    path: path.resolve(__dirname, "bundles"),
+  },
 };
 
 module.exports = [config.web, config.webprod, config.webtests];
