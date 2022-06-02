@@ -13,7 +13,7 @@ const defaultInstance = initInstance({
   protocol: "https",
   port: 443,
   logging: false,
-  timeout: 15000,
+  timeout: 30000,
 });
 
 export function arweaveInstance() {
