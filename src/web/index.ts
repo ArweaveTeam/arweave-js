@@ -1,14 +1,11 @@
 import Arweave from "./common";
 import { ApiConfig } from "./lib/api";
-import WebCryptoDriver from "./lib/crypto/webcrypto-driver";
 
 declare global {
   interface Window {
     Arweave: typeof Arweave;
   }
 }
-
-Arweave.crypto = new WebCryptoDriver();
 
 Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
   function getDefaultConfig(): {
