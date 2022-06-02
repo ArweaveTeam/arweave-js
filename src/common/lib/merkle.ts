@@ -59,15 +59,8 @@ export async function chunkData(data: Uint8Array): Promise<Chunk[]> {
     }
 
     const chunk = rest.slice(0, chunkSize);
-    console.log(Arweave);
     const dataHash = await Arweave.crypto.hash(chunk);
-
     cursor += chunk.byteLength;
-    console.log({
-      dataHash,
-      minByteRange: cursor - chunk.byteLength,
-      maxByteRange: cursor,
-    });
     chunks.push({
       dataHash,
       minByteRange: cursor - chunk.byteLength,

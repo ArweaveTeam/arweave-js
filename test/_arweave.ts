@@ -13,7 +13,7 @@ const defaultInstance = initInstance({
   protocol: "https",
   port: 443,
   logging: false,
-  timeout: 15000,
+  timeout: 30000,
 });
 
 export function arweaveInstance() {
@@ -21,6 +21,9 @@ export function arweaveInstance() {
 }
 
 export function arweaveInstanceDirectNode() {
+  console.log(
+    `in function ${arweaveInstanceDirectNode.name} : 'arweave.net' is not a direct node`
+  );
   return initInstance({
     host: "arweave.net",
     protocol: "https",

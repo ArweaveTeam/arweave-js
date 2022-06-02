@@ -79,7 +79,7 @@ export default class Api {
    * a request to the network.
    */
   public request(): AxiosInstance {
-    const headers : any = {};
+    const headers: any = {};
     if (this.config.network) {
       headers["x-network"] = this.config.network;
     }
