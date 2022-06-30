@@ -50,7 +50,7 @@ export default class Api {
     try {
       return await this.request().get<T>(endpoint, config);
     } catch (error: any) {
-      if (error.response && error.response.status) {
+      if (error.response && error.response.status && error.response.status==200) {
         return error.response;
       }
 
