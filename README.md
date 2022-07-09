@@ -381,8 +381,8 @@ _This `200` response does not mean that the transaction has mined & confirmed, a
 
 ##### Chunked uploading advanced options
 
-You can resume an upload from a saved uploader object, that you have persisted in storage some using `JSO
-.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object and pass it to `getUploader()` along with the transactions data:
+You can resume an upload from a saved uploader object, that you have persisted in storage some using 
+`JSON.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object and pass it to `getUploader()` along with the transactions data:
 
 ```js
 
