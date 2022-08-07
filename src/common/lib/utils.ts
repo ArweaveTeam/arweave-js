@@ -28,13 +28,7 @@ export function concatBuffers(
 export function b64UrlToString(b64UrlString: string): string {
   let buffer = b64UrlToBuffer(b64UrlString);
 
-  // TextEncoder will be available in browsers, but not in node
-  if (typeof TextDecoder == "undefined") {
-    const TextDecoder = require("util").TextDecoder;
-    return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
-  }
-
-  return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
+  return bufferToString(buffer);
 }
 
 export function bufferToString(buffer: Uint8Array | ArrayBuffer): string {
