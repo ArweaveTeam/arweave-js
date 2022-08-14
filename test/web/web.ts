@@ -370,6 +370,7 @@ describe("Silo Web", function () {
 });
 
 describe("GraphQL", function () {
+  this.timeout(20000)
   it("should return a list of results", async function () {
     const txs = (
       await arweave.api.post("/graphql", {
@@ -395,7 +396,6 @@ describe("GraphQL", function () {
   });
 
   it("should return an empty list when no results are found", async function () {
-    this.timeout(5000);
     const txs = (
       await arweave.api.post("/graphql", {
         query: `
