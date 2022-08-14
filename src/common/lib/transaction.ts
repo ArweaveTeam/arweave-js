@@ -78,7 +78,8 @@ export interface TransactionInterface {
 
 export default class Transaction
   extends BaseObject
-  implements TransactionInterface {
+  implements TransactionInterface
+{
   public readonly format: number = 2;
   public id: string = "";
   public readonly last_tx: string = "";
