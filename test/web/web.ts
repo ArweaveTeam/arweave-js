@@ -321,8 +321,7 @@ describe("Silo Web", function () {
       ],
       target: "",
       quantity: "0",
-      data:
-        "0HgHqou5BTRNYJIsCciZb2-85Qlg9cYpiHO62KbRCEeX_cjSvn--Cex8uksInemd6FWWkczaqjs3SWzr7BRc0BSjHXxlVHkKuQp7WvRRJeNJPk_nC0KZrjkFSIPLIx_oOSeXigaPSEBSC4ry_5Iygt7z0Dgl7z1eFplIs6MlxKuBwiXfCtlwRDQK_fJlPWZhGjOpNLP5dyOLwMKrvG2dbAOeyAYbr117rn19CiDkTQAI3m2gAcJlXDZTNeA-1rJqb6X73u0AQt4Ao-OkktxdZ1UMfMfXnwdlsAEKK14NiKRbL1UbVRGh1nyWjUl90BP5Qj74L6_CKxQc_us7gxdeUhkzIKr4-LMY4LoCr-l0Law_tIGekkRsqb5oN7JiketqWazgsyo-Gq-0Blvhwh8nww",
+      data: "0HgHqou5BTRNYJIsCciZb2-85Qlg9cYpiHO62KbRCEeX_cjSvn--Cex8uksInemd6FWWkczaqjs3SWzr7BRc0BSjHXxlVHkKuQp7WvRRJeNJPk_nC0KZrjkFSIPLIx_oOSeXigaPSEBSC4ry_5Iygt7z0Dgl7z1eFplIs6MlxKuBwiXfCtlwRDQK_fJlPWZhGjOpNLP5dyOLwMKrvG2dbAOeyAYbr117rn19CiDkTQAI3m2gAcJlXDZTNeA-1rJqb6X73u0AQt4Ao-OkktxdZ1UMfMfXnwdlsAEKK14NiKRbL1UbVRGh1nyWjUl90BP5Qj74L6_CKxQc_us7gxdeUhkzIKr4-LMY4LoCr-l0Law_tIGekkRsqb5oN7JiketqWazgsyo-Gq-0Blvhwh8nww",
       reward: "349612332",
       signature:
         "DJ6V8zXFMvkyNS4nNHxdFgXx1cbMuzQfWdtP_navPG1STMUarYKHWnJvFQqNkFl5CekNql0xTOjY5hWLt2AVxfMWgvvi5498vNUpbFoWxjrVl6fk86ARx2lzYB7iQK4YFIuIQ7MdR0w8Dy836hW7c8gXe_FPRAqOI7J_l8fqUSzaUtlcwLSfvhXJM-2a3WmoGLcg8Gvj53B8-RizvM3BrKQQWrcat78zeOgb-Fzl3PQ_Ej3CiRIDgAYnTxmd7M6jI84uck1gBRjMql42n0F8pQuTgMqzDbeXW2iBuvIE5tYVmUgnNrPjkDedLWe0Hp4KLDQyDY9lO-zIJLpiYCbc7kUfDBontxCCJIy9N8XM9gHqQofCItYAEO4v3B7sXgdSAQzcibnM3j6EhB9-mhiDcKKRuTSvyJh3sBTWHFrnWylfq84JOJLNhR4aZA_UfjkccA7Z-yqoiMI0mOB0HaAEmsa6ZsoLs5C-6vDnGaBCqYeVKKqKizfOQGsc9IuzdsSQwY7yTE-C3Xb3eAgnq0BLn6iUNqFU-mkwHi-c_hpxoR0lY91k98Ra9UhrgFS5m_9x3BhCXNhDaUXb16p0fHKGYSggqgqS3FbEcdOnsQlhw3IFEccFOTvuv1xEoE1zYeZ06q6NkFKMik6soXl9LXXgJgZvpEut_2LaHKtojbWqSkc",
@@ -370,7 +369,7 @@ describe("Silo Web", function () {
 });
 
 describe("GraphQL", function () {
-  this.timeout(20000)
+  this.timeout(20000);
   it("should return a list of results", async function () {
     const txs = (
       await arweave.api.post("/graphql", {
