@@ -5,6 +5,9 @@ declare global {
   interface Window {
     Arweave: typeof Arweave;
   }
+  module globalThis {
+    var Arweave: unknown;
+  }
 }
 
 Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
