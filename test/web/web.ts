@@ -7,17 +7,15 @@ const expect = chai.expect;
 
 let globals = <any>global;
 
-// globals.window = { Arweave: {} };
-
 //@ts-ignore
-const arweave: Arweave = window.Arweave.init({
+const arweave: Arweave = self.Arweave.init({
   host: "arweave.net",
   protocol: "https",
   logging: false,
 });
 
 //@ts-ignore
-window.arweave = arweave;
+self.arweave = arweave;
 
 const digestRegex = /^[a-z0-9-_]{43}$/i;
 const liveAddressBalance = "498557055636";
