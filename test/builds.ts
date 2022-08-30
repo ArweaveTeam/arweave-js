@@ -17,7 +17,7 @@ globals.crypto = {
   },
 };
 
-globals.self = {};
+globals.self = global;
 
 describe("Node distribution", function () {
   it("should initialize from compiled node dist", async function () {
