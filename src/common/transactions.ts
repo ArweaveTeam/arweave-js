@@ -1,3 +1,5 @@
+/// <reference path="../modules.d.ts" />
+
 import Api from "./lib/api";
 import CryptoInterface, {
   SignatureOptions,
