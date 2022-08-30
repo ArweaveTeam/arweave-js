@@ -2,7 +2,6 @@ import { JWKInterface } from "../wallet";
 import CryptoInterface, { SignatureOptions } from "./crypto-interface";
 import { pemTojwk, jwkTopem } from "./pem";
 import * as crypto from "crypto";
-import * as constants from "constants";
 
 export default class NodeCryptoDriver implements CryptoInterface {
   public readonly keyLength = 4096;
@@ -51,7 +50,7 @@ export default class NodeCryptoDriver implements CryptoInterface {
           .update(data)
           .sign({
             key: this.jwkToPem(jwk),
-            padding: constants.RSA_PKCS1_PSS_PADDING,
+            padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
             saltLength,
           })
       );
@@ -76,7 +75,7 @@ export default class NodeCryptoDriver implements CryptoInterface {
         crypto.createVerify(this.hashAlgorithm).update(data).verify(
           {
             key: pem,
-            padding: constants.RSA_PKCS1_PSS_PADDING,
+            padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
           },
           signature
         )
