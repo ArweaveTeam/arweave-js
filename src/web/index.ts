@@ -5,6 +5,9 @@ declare global {
   interface Window {
     Arweave: typeof Arweave;
   }
+  module globalThis {
+    var Arweave: unknown;
+  }
 }
 
 Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
@@ -20,19 +23,18 @@ Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
     };
 
     if (
-      !window ||
-      !window.location ||
-      !window.location.protocol ||
-      !window.location.hostname
+      typeof location !== "object" ||
+      !location.protocol ||
+      !location.hostname
     ) {
       return defaults;
     }
 
     // window.location.protocol has a trailing colon (http:, https:, file: etc)
-    const currentProtocol = window.location.protocol.replace(":", "");
-    const currentHost = window.location.hostname;
-    const currentPort = window.location.port
-      ? parseInt(window.location.port)
+    const currentProtocol = location.protocol.replace(":", "");
+    const currentHost = location.hostname;
+    const currentPort = location.port
+      ? parseInt(location.port)
       : currentProtocol == "https"
       ? 443
       : 80;
@@ -68,7 +70,11 @@ Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
   });
 };
 
-window.Arweave = Arweave;
+if (typeof globalThis === "object") {
+  globalThis.Arweave = Arweave;
+} else if (typeof self === "object") {
+  self.Arweave = Arweave;
+}
 
 export * from "./common";
 export default Arweave;
