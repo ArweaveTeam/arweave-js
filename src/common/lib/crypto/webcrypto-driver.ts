@@ -84,7 +84,7 @@ export default class WebCryptoDriver implements CryptoInterface {
 
     const key = await this.jwkToPublicCryptoKey(publicKey);
 
-    const verifyWith32 = this.driver.verify(
+    const verifyWith32 = await this.driver.verify(
       {
         name: "RSA-PSS",
         saltLength: 32,
@@ -94,7 +94,7 @@ export default class WebCryptoDriver implements CryptoInterface {
       data
     );
 
-    const verifyWith0 = this.driver.verify(
+    const verifyWith0 = await this.driver.verify(
       {
         name: "RSA-PSS",
         saltLength: 0,
