@@ -90,6 +90,7 @@
     "node": ">=12"
   },
   "dependencies": {
+    "@vespaiach/axios-fetch-adapter": "^0.3.1",
     "arconnect": "^0.4.2",
     "asn1.js": "^5.4.1",
     "axios": "^0.27.2",

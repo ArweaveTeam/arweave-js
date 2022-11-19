@@ -1,3 +1,4 @@
+import fetchAdapter from "@vespaiach/axios-fetch-adapter";
 import Axios, { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios";
 
 export interface ApiConfig {
@@ -88,6 +89,7 @@ export default class Api {
       timeout: this.config.timeout,
       maxContentLength: 1024 * 1024 * 512,
       headers,
+      adapter: fetchAdapter
     });
 
     if (this.config.logging) {
