@@ -89,7 +89,7 @@ export default class Api {
       timeout: this.config.timeout,
       maxContentLength: 1024 * 1024 * 512,
       headers,
-      adapter: fetchAdapter
+      adapter: (!XMLHttpRequest && fetchAdapter) || undefined
     });
 
     if (this.config.logging) {
