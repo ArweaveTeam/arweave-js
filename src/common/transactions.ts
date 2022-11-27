@@ -193,7 +193,7 @@ export default class Transactions {
     jwk?: JWKInterface | "use_wallet",
     options?: SignatureOptions
   ): Promise<void> {
-    if (!jwk && (typeof arweaveWallet !== "object")) {
+    if (!jwk && typeof arweaveWallet !== "object") {
       throw new Error(
         `A new Arweave transaction must provide the jwk parameter.`
       );
@@ -207,10 +207,7 @@ export default class Transactions {
         // Permission is already granted
       }
 
-      const signedTransaction = await arweaveWallet.sign(
-        transaction,
-        options
-      );
+      const signedTransaction = await arweaveWallet.sign(transaction, options);
 
       transaction.setSignature({
         id: signedTransaction.id,
