@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true,
     "outDir": "./dist/web/",
     "sourceMap": true,
     "strict": true,
