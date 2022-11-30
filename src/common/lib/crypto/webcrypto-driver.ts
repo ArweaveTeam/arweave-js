@@ -85,9 +85,29 @@ export default class WebCryptoDriver implements CryptoInterface {
     const key = await this.jwkToPublicCryptoKey(publicKey);
     const digest = await this.driver.digest("SHA-256", data);
 
-    // salt-length is derived from a formula described here
+    const salt0 = await this.driver.verify(
+      {
+        name: "RSA-PSS",
+        saltLength: 0,
+      },
+      key,
+      signature,
+      data
+    );
+
+    const salt32 = await this.driver.verify(
+      {
+        name: "RSA-PSS",
+        saltLength: 32,
+      },
+      key,
+      signature,
+      data
+    );
+
+    // saltN's salt-length is derived from a formula described here
     // https://developer.mozilla.org/en-US/docs/Web/API/RsaPssParams
-    return await this.driver.verify(
+    const saltN = await this.driver.verify(
       {
         name: "RSA-PSS",
         saltLength:
@@ -101,6 +121,8 @@ export default class WebCryptoDriver implements CryptoInterface {
       signature,
       data
     );
+
+    return salt0 || salt32 || saltN;
   }
 
   private async jwkToCryptoKey(jwk: JWKInterface): Promise<CryptoKey> {

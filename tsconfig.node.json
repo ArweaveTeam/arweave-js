@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true,
     "outDir": "./dist/node/",
     "sourceMap": true,
     "strict": true,

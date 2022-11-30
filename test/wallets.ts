@@ -11,7 +11,7 @@ const liveAddress = "9_666Wkk2GzL0LGd3xhb0jY7HqNy71BaV4sULQlJsBQ";
 const liveTxid = "CE-1SFiXqWUEu0aSTebE6LC0-5JBAc3IAehYGwdF5iI";
 
 describe("Wallets and keys", function () {
-  this.timeout(10000);
+  this.timeout(20000);
   it("should generate valid JWKs", async function () {
     const walletA = await arweave.wallets.generate();
     const walletB = await arweave.wallets.generate();
