@@ -125,7 +125,7 @@ describe("Transactions", function () {
   });
 
   it("should work with buffers", async function () {
-    this.timeout(10000);
+    // this.timeout(10000);
 
     const wallet = await arweave.wallets.generate();
 

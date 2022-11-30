@@ -32,7 +32,7 @@ describe("Chunks", function () {
   const data = readFileSync("./test/rebar3");
 
   it("should validate all chunks from 1Mb.bin test file", async function () {
-    this.timeout(5000);
+    // this.timeout(5000);
     const data = readFileSync("./test/fixtures/1mb.bin");
 
     const key = await arweaveInstance().wallets.generate();
@@ -61,7 +61,7 @@ describe("Chunks", function () {
   });
 
   it("should validate all chunks from lotsofdata.bin test file", async function () {
-    this.timeout(5000);
+    // this.timeout(5000);
     const data = readFileSync("./test/fixtures/lotsofdata.bin");
 
     const key = await arweaveInstance().wallets.generate();
@@ -108,7 +108,7 @@ describe("Chunks", function () {
   });
 
   it("should infer the end offset when validating a chunk proof", async function () {
-    this.timeout(5000);
+    // this.timeout(5000);
     const key = await arweaveInstance().wallets.generate();
     const data = randomBytes(256 * 1024 * 3 - 128);
     const tx = await arweaveInstance().createTransaction(
@@ -138,7 +138,7 @@ describe("Chunks", function () {
   });
 
   it("should fail to validate a chunk proof when the offset is not within the chunk", async function () {
-    this.timeout(5000);
+    // this.timeout(5000);
     const key = await arweaveInstance().wallets.generate();
     const data = randomBytes(256 * 1024 + 256 * 50);
     const tx = await arweaveInstance().createTransaction(
@@ -161,7 +161,7 @@ describe("Chunks", function () {
   });
 
   it("should infer the chunk size when validating a chunk proof", async function () {
-    this.timeout(5000);
+    // this.timeout(5000);
     const key = await arweaveInstance().wallets.generate();
     const data = randomBytes(256 * 1024 * 2 - 128);
     const tx = await arweaveInstance().createTransaction(
