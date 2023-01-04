@@ -1,8 +1,3 @@
-import nodeFetch, {
-  RequestInit as NodeFetchRequestInit,
-  Response as NodeFetchResponse
-} from "node-fetch";
-
 export interface ApiConfig {
   host?: string;
   protocol?: string;
@@ -95,36 +90,18 @@ export default class Api {
       this.config.logger!(`Requesting: ${baseURL}/${endpoint}`);
     }
 
-    let res: Response | NodeFetchResponse | undefined = undefined;
+    let res = await fetch(
+      `${baseURL}/${endpoint}`,
+      {
+        ...(init || {}),
+        headers
+      }  
+    );
 
-    if (!!fetch) {
-      // web fetch
-      res = await fetch(
-        `${baseURL}/${endpoint}`,
-        {
-          ...(init || {}),
-          headers
-        }  
-      );
-    } else {
-      // node fetch
-      res = await nodeFetch(
-        `${baseURL}/${endpoint}`,
-        {
-          ...(init as NodeFetchRequestInit || {}),
-          headers
-        }  
-      );
-    }
-
-    if (this.config.logging && !!res) {
+    if (this.config.logging) {
       this.config.logger!(
         `Response:   ${res.url} - ${res.status}`
       );
-    }
-
-    if (typeof res === "undefined") {
-      throw new Error("Undefined response");
     }
 
     const contentType = res.headers.get("content-type");
