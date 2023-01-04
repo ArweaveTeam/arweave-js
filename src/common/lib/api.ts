@@ -13,7 +13,7 @@ export interface ApiConfig {
   network?: string;
 }
 
-export interface ResponseWithData<T> extends Response {
+export interface ResponseWithData<T = any> extends Response {
   data: T;
 }
 

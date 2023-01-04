@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios";
+import { ResponseWithData } from "./api";
 
 export const enum ArweaveErrorType {
   TX_NOT_FOUND = "TX_NOT_FOUND",
@@ -9,11 +9,11 @@ export const enum ArweaveErrorType {
 
 export default class ArweaveError extends Error {
   public readonly type: ArweaveErrorType;
-  public readonly response?: AxiosResponse;
+  public readonly response?: ResponseWithData;
 
   constructor(
     type: ArweaveErrorType,
-    optional: { message?: string; response?: AxiosResponse } = {}
+    optional: { message?: string; response?: ResponseWithData } = {}
   ) {
     if (optional.message) {
       super(optional.message);
@@ -30,20 +30,20 @@ export default class ArweaveError extends Error {
   }
 }
 
-type AxiosResponseLite = {
+type ResponseLite = {
   status: number;
   statusText?: string;
   data: { error: string } | any;
 };
 
 // Safely get error string
-// from an axios response, falling back to
+// from a response, falling back to
 // resp.data, statusText or 'unknown'.
 // Note: a wrongly set content-type can
 // cause what is a json response to be interepted
 // as a string or Buffer, so we handle that too.
 
-export function getError(resp: AxiosResponseLite) {
+export function getError(resp: ResponseLite) {
   let data = resp.data;
 
   if (typeof resp.data === "string") {
