@@ -63,14 +63,14 @@ export default class Api {
     const headers = new Headers(config?.headers || {});
 
     headers.append("content-type", "application/json");
-    headers.append("accept", "application/json");
+    headers.append("accept", "application/json, text/plain, */*");
 
     return await this.request(
       endpoint,
       {
         ...config,
         method: this.METHOD_POST,
-        body,
+        body: JSON.stringify(body),
         headers
       }
     );
@@ -97,7 +97,7 @@ export default class Api {
       {
         ...(init || {}),
         headers
-      }  
+      }
     );
 
     if (this.config.logging) {
