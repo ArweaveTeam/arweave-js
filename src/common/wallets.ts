@@ -23,20 +23,7 @@ export default class Wallets {
    */
   public getBalance(address: string): Promise<string> {
     return this.api
-      .get(`wallet/${address}/balance`, {
-        transformResponse: [
-          /**
-           * We need to specify a response transformer to override
-           * the default JSON.parse behaviour, as this causes
-           * balances to be converted to a number and we want to
-           * return it as a winston string.
-           * @param data
-           */
-          function (data): string {
-            return data;
-          },
-        ],
-      })
+      .get(`wallet/${address}/balance`)
       .then((response) => {
         return response.data;
       });

@@ -56,7 +56,7 @@ export default class Api {
   ): Promise<ResponseWithData<T>> {
     return await this.request(
       endpoint,
-      { ...config, method: "GET" }
+      { ...config, method: this.METHOD_GET }
     );
   }
 
@@ -65,9 +65,17 @@ export default class Api {
     body: any,
     config?: RequestInit
   ): Promise<ResponseWithData<T>> {
+    const headers = new Headers(config?.headers || {});
+    headers.append("content-type", "application/json");
+
     return await this.request(
       endpoint,
-      { ...config, method: "POST", body }
+      {
+        ...config,
+        method: this.METHOD_POST,
+        body,
+        headers
+      }
     );
   }
 
