@@ -52,113 +52,32 @@ export default class Api {
 
   public async get<T = any>(
     endpoint: string,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<T>> {
-    try {
-      if (!!fetch) {
-        if (endpoint.startsWith("/")) {
-          endpoint = endpoint.replace("/", "")
-        }
-
-        const res = await fetch(
-          `${this.config.protocol}://${this.config.host}:${this.config.port}/${endpoint}`,
-          {
-            method: "GET",
-            headers: this.config.network ? [["x-network", this.config.network]] : undefined
-          }
-        );
-
-        let data;
-
-        try {
-          data = await res.clone().json()
-        } catch {
-          try {
-            data = await res.clone().text()
-          } catch {}
-        }
-
-        return {
-          status: res.status,
-          statusText: res.statusText,
-          data,
-          headers: Object.fromEntries(res.headers.entries()),
-          config: undefined as any
-        };
-      }
-
-      return await this.request().get<T>(endpoint, config);
-    } catch (error: any) {
-      if (error.response && error.response.status) {
-        return error.response;
-      }
-
-      throw error;
-    }
+    config?: RequestInit
+  ): Promise<ResponseWithData<T>> {
+    return await this.request(
+      endpoint,
+      { ...config, method: "GET" }
+    );
   }
 
   public async post<T = any>(
     endpoint: string,
-    body: object,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<T>> {
-    if (endpoint.startsWith("/")) {
-      endpoint = endpoint.replace("/", "")
-    }
-
-    try {
-      if (!!fetch) {
-        if (endpoint.startsWith("/")) {
-          endpoint = endpoint.replace("/", "")
-        }
-
-        const headers: [string, string][] = [["content-type", "application/json"]];
-
-        if (this.config.network) {
-          headers.push(["x-network", this.config.network]);
-        }
-
-        const res = await fetch(
-          `${this.config.protocol}://${this.config.host}:${this.config.port}/${endpoint}`,
-          {
-            method: "POST",
-            body: JSON.stringify(body),
-            headers
-          }
-        );
-
-        let data;
-
-        try {
-          data = await res.clone().json()
-        } catch {
-          try {
-            data = await res.clone().text()
-          } catch {}
-        }
-  
-        return {
-          status: res.status,
-          statusText: res.statusText,
-          data,
-          headers: Object.fromEntries(res.headers.entries()),
-          config: undefined as any
-        };
-      }
-
-      return await this.request().post(endpoint, body, config);
-    } catch (error: any) {
-      if (error.response && error.response.status) {
-        return error.response;
-      }
-
-      throw error;
-    }
+    body: any,
+    config?: RequestInit
+  ): Promise<ResponseWithData<T>> {
+    return await this.request(
+      endpoint,
+      { ...config, method: "POST", body }
+    );
   }
 
   public async request<T = unknown>(endpoint: string, init?: RequestInit): Promise<ResponseWithData<T>> {
     const headers = new Headers(init?.headers || {});
     const baseURL = `${this.config.protocol}://${this.config.host}:${this.config.port}`;
+
+    if (endpoint.startsWith("/")) {
+      endpoint = endpoint.replace("/", "")
+    }
 
     if (this.config.network) {
       headers.append("x-network", this.config.network);
@@ -211,10 +130,6 @@ export default class Api {
       } catch {
         response.data = await res.clone().arrayBuffer() as T;
       }
-    }
-
-    if (response.status && (response.status >= 300 || response.status < 200)) {
-      throw response;
     }
     
     return response as ResponseWithData<T>;
