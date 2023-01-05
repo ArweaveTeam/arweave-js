@@ -107,10 +107,10 @@ export default class Api {
     }
 
     const contentType = res.headers.get("content-type");
-    const response: Partial<ResponseWithData<T>> = res as any;
+    const response: Partial<ResponseWithData<T>> = res;
 
     if (contentType?.startsWith("application/json")) {
-      response.data = await res.clone().json();
+      response.data = await res.clone().json() as T;
     } else {
       try {
         response.data = await res.clone().text() as T;
