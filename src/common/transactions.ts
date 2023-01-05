@@ -48,7 +48,7 @@ export default class Transactions {
      * config =  {transformResponse: []} where we do not require a transform
      */
     return this.api
-      .get(`tx_anchor`, { transformResponse: [] })
+      .get(`tx_anchor`)
       .then((response) => {
         return response.data;
       });
@@ -60,20 +60,7 @@ export default class Transactions {
       : `price/${byteSize}`;
 
     return this.api
-      .get(endpoint, {
-        transformResponse: [
-          /**
-           * We need to specify a response transformer to override
-           * the default JSON.parse behavior, as this causes
-           * winston to be converted to a number and we want to
-           * return it as a winston string.
-           * @param data
-           */
-          function (data: any): string {
-            return data;
-          },
-        ],
-      })
+      .get(endpoint)
       .then((response) => {
         return response.data;
       });

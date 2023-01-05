@@ -1,5 +1,3 @@
-import Axios, { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios";
-
 export interface ApiConfig {
   host?: string;
   protocol?: string;
@@ -8,6 +6,10 @@ export interface ApiConfig {
   logging?: boolean;
   logger?: Function;
   network?: string;
+}
+
+export interface ResponseWithData<T = any> extends Response {
+  data: T;
 }
 
 export default class Api {
@@ -45,65 +47,78 @@ export default class Api {
 
   public async get<T = any>(
     endpoint: string,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<T>> {
-    try {
-      return await this.request().get<T>(endpoint, config);
-    } catch (error: any) {
-      if (error.response && error.response.status) {
-        return error.response;
-      }
-
-      throw error;
-    }
+    config?: RequestInit
+  ): Promise<ResponseWithData<T>> {
+    return await this.request(
+      endpoint,
+      { ...config, method: this.METHOD_GET }
+    );
   }
 
   public async post<T = any>(
     endpoint: string,
-    body: Buffer | string | object,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<T>> {
-    try {
-      return await this.request().post(endpoint, body, config);
-    } catch (error: any) {
-      if (error.response && error.response.status) {
-        return error.response;
-      }
+    body: any,
+    config?: RequestInit
+  ): Promise<ResponseWithData<T>> {
+    const headers = new Headers(config?.headers || {});
 
-      throw error;
-    }
+    headers.append("content-type", "application/json");
+    headers.append("accept", "application/json, text/plain, */*");
+
+    return await this.request(
+      endpoint,
+      {
+        ...config,
+        method: this.METHOD_POST,
+        body: JSON.stringify(body),
+        headers
+      }
+    );
   }
 
-  /**
-   * Get an AxiosInstance with the base configuration setup to fire off
-   * a request to the network.
-   */
-  public request(): AxiosInstance {
-    const headers: any = {};
-    if (this.config.network) {
-      headers["x-network"] = this.config.network;
+  public async request<T = unknown>(endpoint: string, init?: RequestInit): Promise<ResponseWithData<T>> {
+    const headers = new Headers(init?.headers || {});
+    const baseURL = `${this.config.protocol}://${this.config.host}:${this.config.port}`;
+
+    if (endpoint.startsWith("/")) {
+      endpoint = endpoint.replace("/", "")
     }
-    let instance = Axios.create({
-      baseURL: `${this.config.protocol}://${this.config.host}:${this.config.port}`,
-      timeout: this.config.timeout,
-      maxContentLength: 1024 * 1024 * 512,
-      headers,
-    });
+
+    if (this.config.network) {
+      headers.append("x-network", this.config.network);
+    }
 
     if (this.config.logging) {
-      instance.interceptors.request.use((request) => {
-        this.config.logger!(`Requesting: ${request.baseURL}/${request.url}`);
-        return request;
-      });
-
-      instance.interceptors.response.use((response) => {
-        this.config.logger!(
-          `Response:   ${response.config.url} - ${response.status}`
-        );
-        return response;
-      });
+      this.config.logger!(`Requesting: ${baseURL}/${endpoint}`);
     }
 
-    return instance;
+    let res = await fetch(
+      `${baseURL}/${endpoint}`,
+      {
+        ...(init || {}),
+        headers
+      }
+    );
+
+    if (this.config.logging) {
+      this.config.logger!(
+        `Response:   ${res.url} - ${res.status}`
+      );
+    }
+
+    const contentType = res.headers.get("content-type");
+    const response: Partial<ResponseWithData<T>> = res;
+
+    if (contentType?.startsWith("application/json")) {
+      response.data = await res.clone().json() as T;
+    } else {
+      try {
+        response.data = await res.clone().text() as T;
+      } catch {
+        response.data = await res.clone().arrayBuffer() as T;
+      }
+    }
+    
+    return response as ResponseWithData<T>;
   }
 }
