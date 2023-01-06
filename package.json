@@ -89,7 +89,7 @@
     "node": "12"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=16.15.0"
   },
   "dependencies": {
     "arconnect": "^0.4.2",
