@@ -235,7 +235,7 @@ describe("Transactions", function () {
   });
 
   it("should get transaction data > 12MiB from chunks or gateway", async function () {
-    this.timeout(150000);
+    this.timeout(300_000);
     const data = (await arweave.transactions.getData(liveDataTxidLarge, {
       decode: true,
     })) as Uint8Array;
