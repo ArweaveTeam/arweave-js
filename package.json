@@ -94,7 +94,6 @@
   "dependencies": {
     "arconnect": "^0.4.2",
     "asn1.js": "^5.4.1",
-    "axios": "^0.27.2",
     "base64-js": "^1.5.1",
     "bignumber.js": "^9.0.2",
     "util": "^0.12.4"
