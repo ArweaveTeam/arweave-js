@@ -8,8 +8,7 @@
   "files": [
     "node",
     "web",
-    "bundles",
-    ".npmrc"
+    "bundles"
   ],
   "scripts": {
     "compile:node": "cross-env NODE_OPTIONS='--experimental-fetch' tsc --declaration -project tsconfig.node.json && resolve-tspaths -p tsconfig.node.json",
@@ -86,7 +85,7 @@
   },
   "targets": {
     "chrome": "70",
-    "node": "12"
+    "node": "16"
   },
   "engines": {
     "node": ">=16.15.0"
