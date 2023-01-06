@@ -23,7 +23,6 @@ config.web = {
       ),
     },
     fallback: {
-      util: require.resolve("util"),
       process: require.resolve("process/browser"),
       crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
@@ -60,7 +59,6 @@ config.webprod = {
       ),
     },
     fallback: {
-      util: require.resolve("util"),
       process: require.resolve("process/browser"),
       crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
@@ -105,7 +103,6 @@ config.webtests = {
       ),
     },
     fallback: {
-      util: require.resolve("util"),
       process: require.resolve("process/browser"),
       crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
