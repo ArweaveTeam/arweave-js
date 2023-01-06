@@ -49,10 +49,7 @@ export default class Api {
     endpoint: string,
     config?: RequestInit
   ): Promise<ResponseWithData<T>> {
-    return await this.request(
-      endpoint,
-      { ...config, method: this.METHOD_GET }
-    );
+    return await this.request(endpoint, { ...config, method: this.METHOD_GET });
   }
 
   public async post<T = any>(
@@ -65,23 +62,23 @@ export default class Api {
     headers.append("content-type", "application/json");
     headers.append("accept", "application/json, text/plain, */*");
 
-    return await this.request(
-      endpoint,
-      {
-        ...config,
-        method: this.METHOD_POST,
-        body: JSON.stringify(body),
-        headers
-      }
-    );
+    return await this.request(endpoint, {
+      ...config,
+      method: this.METHOD_POST,
+      body: JSON.stringify(body),
+      headers,
+    });
   }
 
-  public async request<T = unknown>(endpoint: string, init?: RequestInit): Promise<ResponseWithData<T>> {
+  public async request<T = unknown>(
+    endpoint: string,
+    init?: RequestInit
+  ): Promise<ResponseWithData<T>> {
     const headers = new Headers(init?.headers || {});
     const baseURL = `${this.config.protocol}://${this.config.host}:${this.config.port}`;
 
     if (endpoint.startsWith("/")) {
-      endpoint = endpoint.replace("/", "")
+      endpoint = endpoint.replace("/", "");
     }
 
     if (this.config.network) {
@@ -92,33 +89,28 @@ export default class Api {
       this.config.logger!(`Requesting: ${baseURL}/${endpoint}`);
     }
 
-    let res = await fetch(
-      `${baseURL}/${endpoint}`,
-      {
-        ...(init || {}),
-        headers
-      }
-    );
+    let res = await fetch(`${baseURL}/${endpoint}`, {
+      ...(init || {}),
+      headers,
+    });
 
     if (this.config.logging) {
-      this.config.logger!(
-        `Response:   ${res.url} - ${res.status}`
-      );
+      this.config.logger!(`Response:   ${res.url} - ${res.status}`);
     }
 
     const contentType = res.headers.get("content-type");
     const response: Partial<ResponseWithData<T>> = res;
 
     if (contentType?.startsWith("application/json")) {
-      response.data = await res.clone().json() as T;
+      response.data = (await res.clone().json()) as T;
     } else {
       try {
-        response.data = await res.clone().text() as T;
+        response.data = (await res.clone().text()) as T;
       } catch {
-        response.data = await res.clone().arrayBuffer() as T;
+        response.data = (await res.clone().arrayBuffer()) as T;
       }
     }
-    
+
     return response as ResponseWithData<T>;
   }
 }

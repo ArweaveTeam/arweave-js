@@ -22,11 +22,9 @@ export default class Wallets {
    * @returns {Promise<string>} - Promise which resolves with a winston string balance.
    */
   public getBalance(address: string): Promise<string> {
-    return this.api
-      .get(`wallet/${address}/balance`)
-      .then((response) => {
-        return response.data;
-      });
+    return this.api.get(`wallet/${address}/balance`).then((response) => {
+      return response.data;
+    });
   }
 
   /**

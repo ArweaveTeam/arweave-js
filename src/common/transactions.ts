@@ -47,11 +47,9 @@ export default class Transactions {
      * However, this introduces a problem with ardrive-js, so we will enforce
      * config =  {transformResponse: []} where we do not require a transform
      */
-    return this.api
-      .get(`tx_anchor`)
-      .then((response) => {
-        return response.data;
-      });
+    return this.api.get(`tx_anchor`).then((response) => {
+      return response.data;
+    });
   }
 
   public getPrice(byteSize: number, targetAddress?: string): Promise<string> {
@@ -59,11 +57,9 @@ export default class Transactions {
       ? `price/${byteSize}/${targetAddress}`
       : `price/${byteSize}`;
 
-    return this.api
-      .get(endpoint)
-      .then((response) => {
-        return response.data;
-      });
+    return this.api.get(endpoint).then((response) => {
+      return response.data;
+    });
   }
 
   public async get(id: string): Promise<Transaction> {

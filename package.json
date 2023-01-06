@@ -1,6 +1,6 @@
 {
   "name": "arweave",
-  "version": "1.11.8",
+  "version": "1.12.2",
   "description": "Arweave JS client library",
   "main": "./node/index.js",
   "react-native": "./node/index.js",
@@ -8,7 +8,8 @@
   "files": [
     "node",
     "web",
-    "bundles"
+    "bundles",
+    ".npmrc"
   ],
   "scripts": {
     "compile:node": "cross-env NODE_OPTIONS='--experimental-fetch' tsc --declaration -project tsconfig.node.json && resolve-tspaths -p tsconfig.node.json",
@@ -88,7 +89,7 @@
     "node": "12"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=16.15.0"
   },
   "dependencies": {
     "arconnect": "^0.4.2",
