@@ -8,7 +8,8 @@
   "files": [
     "node",
     "web",
-    "bundles"
+    "bundles",
+    ".npmrc"
   ],
   "scripts": {
     "compile:node": "cross-env NODE_OPTIONS='--experimental-fetch' tsc --declaration -project tsconfig.node.json && resolve-tspaths -p tsconfig.node.json",
