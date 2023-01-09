@@ -32,21 +32,10 @@ export function b64UrlToString(b64UrlString: string): string {
 }
 
 export function bufferToString(buffer: Uint8Array | ArrayBuffer): string {
-  // TextEncoder will be available in browsers, but not in node
-  if (typeof TextDecoder == "undefined") {
-    const TextDecoder = require("util").TextDecoder;
-    return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
-  }
-
   return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
 }
 
 export function stringToBuffer(string: string): Uint8Array {
-  // TextEncoder will be available in browsers, but not in node
-  if (typeof TextEncoder == "undefined") {
-    const TextEncoder = require("util").TextEncoder;
-    return new TextEncoder().encode(string);
-  }
   return new TextEncoder().encode(string);
 }
 
