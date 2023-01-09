@@ -11,7 +11,7 @@
     "bundles"
   ],
   "scripts": {
-    "compile:node": "cross-env NODE_OPTIONS='--experimental-fetch' tsc --declaration -project tsconfig.node.json && resolve-tspaths -p tsconfig.node.json",
+    "compile:node": "tsc --declaration -project tsconfig.node.json && resolve-tspaths -p tsconfig.node.json",
     "compile:web": "tsc --declaration -project tsconfig.web.json && resolve-tspaths -p tsconfig.web.json",
     "bundle:web": "webpack --config-name web",
     "bundle:web-prod": "webpack --config-name web-prod",
@@ -23,7 +23,7 @@
     "clean:bundle": "rimraf bundles",
     "clean": "npm run clean:dist && npm run clean:package && npm  run clean:bundle",
     "prepublishOnly": "npm run clean && npm run build",
-    "test": "cross-env NODE_OPTIONS='--experimental-fetch' mocha -r ts-node/register -r tsconfig-paths/register test/*.ts && echo \"NOW RUN => 'npm run test:web' <= \" ",
+    "test": "mocha -r ts-node/register -r tsconfig-paths/register test/*.ts && echo \"NOW RUN => 'npm run test:web' <= \" ",
     "test:web": "npm run bundle:web && webpack --config-name web-tests && opener test/web/web.html",
     "prettier:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "prettier:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -63,7 +63,6 @@
     "@types/node": "^18.11.18",
     "buffer": "^6.0.3",
     "chai": "^4.3.6",
-    "cross-env": "^7.0.3",
     "crypto-browserify": "^3.12.0",
     "mkdirp": "^1.0.4",
     "mocha": "^10.0.0",
