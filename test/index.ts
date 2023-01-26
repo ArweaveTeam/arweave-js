@@ -66,3 +66,9 @@ describe("Network Info", function () {
     expect(peers).to.be.an("array");
   });
 });
+
+// describe('API ', ()=> {
+//   it('tests that API can POST requests', async function(){
+
+//   })
+// })
