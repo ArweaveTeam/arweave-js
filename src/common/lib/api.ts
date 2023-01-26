@@ -59,7 +59,9 @@ export default class Api {
   ): Promise<ResponseWithData<T>> {
     const headers = new Headers(config?.headers || {});
 
-    headers.append("content-type", "application/json");
+    if(!headers.get('content-type')?.includes('application/json')){
+      headers.append("content-type", "application/json");
+    }
     headers.append("accept", "application/json, text/plain, */*");
 
     return await this.request(endpoint, {
