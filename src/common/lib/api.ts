@@ -65,7 +65,7 @@ export default class Api {
     return await this.request(endpoint, {
       ...config,
       method: this.METHOD_POST,
-      body: JSON.stringify(body),
+      body: (typeof body !== 'string' ? JSON.stringify(body) : body ),
       headers,
     });
   }
@@ -78,7 +78,7 @@ export default class Api {
     const baseURL = `${this.config.protocol}://${this.config.host}:${this.config.port}`;
 
     if (endpoint.startsWith("/")) {
-      endpoint = endpoint.replace("/", "");
+      endpoint = endpoint.slice(1);
     }
 
     if (this.config.network) {
