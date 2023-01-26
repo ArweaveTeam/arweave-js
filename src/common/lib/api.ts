@@ -65,7 +65,7 @@ export default class Api {
     return await this.request(endpoint, {
       ...config,
       method: this.METHOD_POST,
-      body: (typeof body !== 'string' ? JSON.stringify(body) : body ),
+      body: typeof body !== "string" ? JSON.stringify(body) : body,
       headers,
     });
   }
