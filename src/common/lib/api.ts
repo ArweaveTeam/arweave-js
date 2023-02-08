@@ -13,7 +13,7 @@ export interface ResponseWithData<T = any> extends Response {
 }
 
 export interface RequestInitWithAxios extends RequestInit {
-  responseType?: ('arraybuffer' | 'json' | 'text') 
+  responseType?: "arraybuffer" | "json" | "text";
 }
 
 export default class Api {
@@ -84,8 +84,8 @@ export default class Api {
     const baseURL = `${this.config.protocol}://${this.config.host}:${this.config.port}`;
 
     /* responseType is purely for backwards compatibility with external apps */
-    const responseType = init?.responseType
-    delete init?.responseType
+    const responseType = init?.responseType;
+    delete init?.responseType;
 
     if (endpoint.startsWith("/")) {
       endpoint = endpoint.slice(1);
@@ -111,20 +111,18 @@ export default class Api {
     const contentType = res.headers.get("content-type");
     const response: Partial<ResponseWithData<T>> = res;
 
-    if(responseType === 'arraybuffer'){
+    if (responseType === "arraybuffer") {
       response.data = (await res.arrayBuffer()) as T;
-    }else if(responseType === 'text'){
+    } else if (responseType === "text") {
       response.data = (await res.text()) as T;
-    } 
-    else if(contentType?.startsWith('application/json')){
+    } else if (contentType?.startsWith("application/json")) {
       try {
-        await res.clone().json() //the test
+        await res.clone().json(); //the test
         response.data = (await res.json()) as T;
       } catch {
         response.data = (await res.text()) as T;
       }
-    }
-    else{
+    } else {
       response.data = (await res.text()) as T;
     }
 
