@@ -40,4 +40,30 @@ describe("API", function () {
     expect(res.headers.get("content-type")).eq("text/html; charset=utf-8");
     expect(typeof res.data).eq("string");
   });
-}).timeout(10_000);
+
+  it("check API can POST GQL queries return a list of results", async function () {
+    const txs = (
+      await arweave.api.post("/graphql", {
+        query: `
+      {
+        transactions(
+          tags: [
+            { name: "App-Name", values: ["CommunityXYZ"] }
+          ]
+        ) {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }`,
+      })
+    ).data.data.transactions.edges;
+
+    expect(txs).to.be.an("array");
+    expect(txs.length).to.be.greaterThan(0);
+  });
+
+
+})
