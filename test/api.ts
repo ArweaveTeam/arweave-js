@@ -64,6 +64,4 @@ describe("API", function () {
     expect(txs).to.be.an("array");
     expect(txs.length).to.be.greaterThan(0);
   });
-
-
-})
+});
