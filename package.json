@@ -23,13 +23,22 @@
     "clean:bundle": "rimraf bundles",
     "clean": "npm run clean:dist && npm run clean:package && npm  run clean:bundle",
     "prepublishOnly": "npm run clean && npm run build",
-    "test": "mocha -r ts-node/register -r tsconfig-paths/register test/*.ts && echo \"NOW RUN => 'npm run test:web' <= \" ",
+    "test": "mocha test/*.ts && echo \"NOW RUN => 'npm run test:web' <= \" ",
     "test:web": "npm run bundle:web && webpack --config-name web-tests && opener test/web/web.html",
     "prettier:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "prettier:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "preversion": "npm run test",
     "version": "npm run prettier:write && git add -A src && git add -A test",
     "postversion": "git push && git push --tags"
+  },
+  "mocha": {
+    "extension": [
+      "ts"
+    ],
+    "node-option": [
+      "require=ts-node/register",
+      "require=tsconfig-paths/register"
+    ]
   },
   "repository": {
     "type": "git",
