@@ -12,6 +12,10 @@ export interface ResponseWithData<T = any> extends Response {
   data: T;
 }
 
+export interface RequestInitWithAxios extends RequestInit {
+  responseType?: "arraybuffer" | "json" | "text";
+}
+
 export default class Api {
   public readonly METHOD_GET = "GET";
   public readonly METHOD_POST = "POST";
@@ -47,7 +51,7 @@ export default class Api {
 
   public async get<T = any>(
     endpoint: string,
-    config?: RequestInit
+    config?: RequestInitWithAxios
   ): Promise<ResponseWithData<T>> {
     return await this.request(endpoint, { ...config, method: this.METHOD_GET });
   }
@@ -55,7 +59,7 @@ export default class Api {
   public async post<T = any>(
     endpoint: string,
     body: any,
-    config?: RequestInit
+    config?: RequestInitWithAxios
   ): Promise<ResponseWithData<T>> {
     const headers = new Headers(config?.headers || {});
 
@@ -74,10 +78,14 @@ export default class Api {
 
   public async request<T = unknown>(
     endpoint: string,
-    init?: RequestInit
+    init?: RequestInitWithAxios
   ): Promise<ResponseWithData<T>> {
     const headers = new Headers(init?.headers || {});
     const baseURL = `${this.config.protocol}://${this.config.host}:${this.config.port}`;
+
+    /* responseType is purely for backwards compatibility with external apps */
+    const responseType = init?.responseType;
+    delete init?.responseType;
 
     if (endpoint.startsWith("/")) {
       endpoint = endpoint.slice(1);
@@ -103,14 +111,19 @@ export default class Api {
     const contentType = res.headers.get("content-type");
     const response: Partial<ResponseWithData<T>> = res;
 
-    if (contentType?.startsWith("application/json")) {
-      response.data = (await res.clone().json()) as T;
-    } else {
+    if (responseType === "arraybuffer") {
+      response.data = (await res.arrayBuffer()) as T;
+    } else if (responseType === "text") {
+      response.data = (await res.text()) as T;
+    } else if (contentType?.startsWith("application/json")) {
       try {
-        response.data = (await res.clone().text()) as T;
+        await res.clone().json(); //the test
+        response.data = (await res.json()) as T;
       } catch {
-        response.data = (await res.clone().arrayBuffer()) as T;
+        response.data = (await res.text()) as T;
       }
+    } else {
+      response.data = (await res.text()) as T;
     }
 
     return response as ResponseWithData<T>;

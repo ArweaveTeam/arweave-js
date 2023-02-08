@@ -2,9 +2,9 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "outDir": "./dist/web/",
-    "sourceMap": true,
+    // "sourceMap": true,
     "strict": true,
-    "target": "es2017",
+    "target": "ES2022",
     "moduleResolution": "node",
     "module": "commonjs",
     "baseUrl": "src/common",
