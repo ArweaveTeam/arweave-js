@@ -10,7 +10,7 @@ const idJson = "t4B9Dufi14vTWl7nS9eiFfxojeNvmNzBwoUZ0IQMar8"; //json file
 describe("API", function () {
   this.timeout(10_000);
 
-  it("check API can GET json requests", async function () {
+  it("should GET json requests", async function () {
     const res = await arweave.api.get(idJson);
     expect(res.ok).true;
     expect(res.bodyUsed).true;
@@ -23,7 +23,7 @@ describe("API", function () {
     expect(typeof res.data).eq("object");
     expect(res.data).not.instanceof(ArrayBuffer);
   });
-  it('check API can GET binary requests, using "axios" responseType', async function () {
+  it('should GET binary requests, using "axios" responseType', async function () {
     const res = await arweave.api.get(idBinary, {
       responseType: "arraybuffer",
     });
@@ -33,7 +33,7 @@ describe("API", function () {
     expect(typeof res.data).eq("object");
     expect(res.data).instanceof(ArrayBuffer);
   });
-  it("check API can GET text requests", async function () {
+  it("should GET text requests", async function () {
     const res = await arweave.api.get(idText);
     expect(res.ok).true;
     expect(res.bodyUsed).true;
@@ -41,7 +41,7 @@ describe("API", function () {
     expect(typeof res.data).eq("string");
   });
 
-  it("check API can POST GQL queries return a list of results", async function () {
+  it("should POST GQL queries return a list of results", async function () {
     const txs = (
       await arweave.api.post("/graphql", {
         query: `

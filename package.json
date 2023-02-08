@@ -36,7 +36,9 @@
     ],
     "node-option": [
       "require=ts-node/register",
-      "require=tsconfig-paths/register"
+      "require=tsconfig-paths/register",
+      "experimental-fetch",
+      "no-warnings"
     ]
   },
   "repository": {
