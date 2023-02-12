@@ -6,12 +6,12 @@ export interface NetConfig {
 
 /** exhaustive localhost testing */
 const isLocal = (protocol: string, hostname: string)=>{
-	const regexLocalIp = /^(127|10)(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+	const regexLocalIp = /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
 
 	const split = hostname.split('.')
 	const tld = split[split.length - 1]	// check if subdomain on the localhost
 
-	const localStrings = ["localhost", "[::1]"] 
+	const localStrings = ["localhost", "[::1]"]
 
 	return localStrings.includes(hostname) || protocol == "file" 
 		|| localStrings.includes(tld) || !!hostname.match(regexLocalIp) || !!tld.match(regexLocalIp)
@@ -25,11 +25,15 @@ const hasTxidPath = (pathname: string)=>{
 	return !!test.match(digestRegex)
 }
 
-/** matches any ipv4 address */
+/** simplified tests for ip addresses */
 const isIpAdress = (host: string)=> {
-	const regexMatchIp = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/ 
+	// an IPv6 location.hostname (and only IPv6 hostnames) must be surrounded by square brackets
+	const isIpv6 = host.charAt(0) === '['
+	// Potential speed-up for IPv4 detection:
+	// the tld of a domain name cannot be a number (IDN location.hostnames appear to be converted, needs further clarification)
+	const regexMatchIpv4 = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/ 
 	
-	return !!host.match(regexMatchIp)
+	return !!host.match(regexMatchIpv4) || isIpv6
 }
 
 export const getDefaultConfig = (protocol: string, host: string, pathname: string): NetConfig=>{
