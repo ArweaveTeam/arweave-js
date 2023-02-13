@@ -32,13 +32,13 @@ Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
 
 	// window.location.protocol has a trailing colon (http:, https:, file: etc)
 	const locationProtocol = location.protocol.replace(":", "");
-	const locationPathname = location.pathname.replace(/\//g,'')
 	const locationHost = location.hostname;
 	const locationPort = location.port
 		? parseInt(location.port)
 		: locationProtocol == "https"
 		? 443
 		: 80;
+  const locationPathname = location.pathname
 
   const defaultConfig = getDefaultConfig(locationProtocol, locationHost, locationPathname);
 

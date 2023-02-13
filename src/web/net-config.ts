@@ -19,7 +19,7 @@ const isLocal = (protocol: string, hostname: string)=>{
 
 const hasTxidPath = (pathname: string)=>{
 	let test = pathname
-	test = test.replace(/\//g,'')
+	test = test.replace(/^\/|\/$/g, '') // remove root and trailing `/`s
 	console.log(`to match`, test)
 	const digestRegex = /^[a-z0-9-_]{43}$/i
 	return !!test.match(digestRegex)
