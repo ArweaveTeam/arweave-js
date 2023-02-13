@@ -28,7 +28,7 @@ const isIpAdress = (host: string)=> {
 	return !!host.match(regexMatchIpv4) || isIpv6
 }
 
-export const getDefaultConfig = (protocol: string, host: string, pathname: string): NetConfig=>{
+export const getDefaultConfig = (protocol: string, host: string): NetConfig=>{
 
 	// If we're running in what looks like a local dev environment
 	// then default to using arweave.net

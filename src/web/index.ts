@@ -38,9 +38,8 @@ Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
 		: locationProtocol == "https"
       ? 443
       : 80;
-  const locationPathname = location.pathname;
 
-  const defaultConfig = getDefaultConfig(locationProtocol, locationHost, locationPathname);
+  const defaultConfig = getDefaultConfig(locationProtocol, locationHost);
 
   const protocol = apiConfig.protocol || defaultConfig.protocol;
   const host = apiConfig.host || defaultConfig.host;
