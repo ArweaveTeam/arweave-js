@@ -1,4 +1,4 @@
-/// <reference path="../modules.d.ts" />
+declare const arweaveWallet: Window["arweaveWallet"];
 
 import Api from "./lib/api";
 import CryptoInterface, {
