@@ -17,14 +17,6 @@ const isLocal = (protocol: string, hostname: string)=>{
 		|| localStrings.includes(tld) || !!hostname.match(regexLocalIp) || !!tld.match(regexLocalIp)
 } 
 
-const hasTxidPath = (pathname: string)=>{
-	let test = pathname
-	test = test.replace(/^\/|\/$/g, '') // remove root and trailing `/`s
-	console.log(`to match`, test)
-	const digestRegex = /^[a-z0-9-_]{43}$/i
-	return !!test.match(digestRegex)
-}
-
 /** simplified tests for ip addresses */
 const isIpAdress = (host: string)=> {
 	// an IPv6 location.hostname (and only IPv6 hostnames) must be surrounded by square brackets
@@ -48,24 +40,15 @@ export const getDefaultConfig = (protocol: string, host: string, pathname: strin
 		};
 	}
 
-	// No ArNS
-	if(hasTxidPath(pathname)){
-		return {
-			protocol, 
-			host,
-		};
-	}
-
-	//check if hostname is an IP address
+	//check if hostname is an IP address before removing first subdomain
 	if(!isIpAdress(host)){
 		let split = host.split('.')
 		if(split.length >=3){
-			//if we got this far we must have an arns domain or non-GW domain (see note below)
 			split.shift()
-			const arnsHost = split.join('.')
+			const parentDomain = split.join('.')
 			return {
 				protocol,
-				host: arnsHost,
+				host: parentDomain,
 			}
 		}
 	}
@@ -73,6 +56,7 @@ export const getDefaultConfig = (protocol: string, host: string, pathname: strin
 	// there are 2 potential garbage returns here: 
 	// a non-GW ip address & a non-GW hostname without ArNS. garbage in, garbage out.
 	// they should be overridden with user inputs in apiConfig.
+	// otherwise we have a valid ip based GW address.
 	return {
 		protocol,
 		host,
