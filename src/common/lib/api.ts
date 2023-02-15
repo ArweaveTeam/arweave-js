@@ -13,7 +13,7 @@ export interface ResponseWithData<T = any> extends Response {
 }
 
 export interface RequestInitWithAxios extends RequestInit {
-  responseType?: "arraybuffer" | "json" | "text";
+  responseType?: "arraybuffer" | "json" | "text" | "webstream";
 }
 
 export default class Api {
@@ -115,6 +115,8 @@ export default class Api {
       response.data = (await res.arrayBuffer()) as T;
     } else if (responseType === "text") {
       response.data = (await res.text()) as T;
+    } else if (responseType === "webstream"){
+      response.data = response.body as T; 
     } else if (contentType?.startsWith("application/json")) {
       try {
         await res.clone().json(); //the test
