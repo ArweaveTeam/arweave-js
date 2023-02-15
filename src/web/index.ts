@@ -1,6 +1,6 @@
 import Arweave from "./common";
 import { ApiConfig } from "./lib/api";
-import { getDefaultConfig } from './net-config'
+import { getDefaultConfig } from "./net-config";
 
 declare global {
   interface Window {
@@ -12,32 +12,31 @@ declare global {
 }
 
 Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
-
   const defaults = {
-		host: "arweave.net",
-		port: 443,
-		protocol: "https",
-	};
+    host: "arweave.net",
+    port: 443,
+    protocol: "https",
+  };
 
-	if(
-		typeof location !== "object" 
-    || !location.protocol 
-    || !location.hostname
-	){
-		return new Arweave({
+  if (
+    typeof location !== "object" ||
+    !location.protocol ||
+    !location.hostname
+  ) {
+    return new Arweave({
       ...apiConfig,
       ...defaults,
     });
-	}
+  }
 
-	// window.location.protocol has a trailing colon (http:, https:, file: etc)
-	const locationProtocol = location.protocol.replace(":", "");
-	const locationHost = location.hostname;
-	const locationPort = location.port
-		? parseInt(location.port)
-		: locationProtocol == "https"
-      ? 443
-      : 80;
+  // window.location.protocol has a trailing colon (http:, https:, file: etc)
+  const locationProtocol = location.protocol.replace(":", "");
+  const locationHost = location.hostname;
+  const locationPort = location.port
+    ? parseInt(location.port)
+    : locationProtocol == "https"
+    ? 443
+    : 80;
 
   const defaultConfig = getDefaultConfig(locationProtocol, locationHost);
 
