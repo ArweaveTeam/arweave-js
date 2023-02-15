@@ -1,5 +1,6 @@
 import Arweave from "./common";
 import { ApiConfig } from "./lib/api";
+import { getDefaultConfig } from './net-config'
 
 declare global {
   interface Window {
@@ -11,56 +12,38 @@ declare global {
 }
 
 Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
-  function getDefaultConfig(): {
-    protocol: string;
-    host: string;
-    port: number;
-  } {
-    const defaults = {
-      host: "arweave.net",
-      port: 443,
-      protocol: "https",
-    };
 
-    if (
-      typeof location !== "object" ||
-      !location.protocol ||
-      !location.hostname
-    ) {
-      return defaults;
-    }
+  const defaults = {
+		host: "arweave.net",
+		port: 443,
+		protocol: "https",
+	};
 
-    // window.location.protocol has a trailing colon (http:, https:, file: etc)
-    const currentProtocol = location.protocol.replace(":", "");
-    const currentHost = location.hostname;
-    const currentPort = location.port
-      ? parseInt(location.port)
-      : currentProtocol == "https"
+	if(
+		typeof location !== "object" 
+    || !location.protocol 
+    || !location.hostname
+	){
+		return new Arweave({
+      ...apiConfig,
+      ...defaults,
+    });
+	}
+
+	// window.location.protocol has a trailing colon (http:, https:, file: etc)
+	const locationProtocol = location.protocol.replace(":", "");
+	const locationHost = location.hostname;
+	const locationPort = location.port
+		? parseInt(location.port)
+		: locationProtocol == "https"
       ? 443
       : 80;
 
-    const isLocal =
-      ["localhost", "127.0.0.1"].includes(currentHost) ||
-      currentProtocol == "file";
-
-    // If we're running in what looks like a local dev environment
-    // then default to using arweave.net
-    if (isLocal) {
-      return defaults;
-    }
-
-    return {
-      host: currentHost,
-      port: currentPort,
-      protocol: currentProtocol,
-    };
-  }
-
-  const defaultConfig = getDefaultConfig();
+  const defaultConfig = getDefaultConfig(locationProtocol, locationHost);
 
   const protocol = apiConfig.protocol || defaultConfig.protocol;
   const host = apiConfig.host || defaultConfig.host;
-  const port = apiConfig.port || defaultConfig.port;
+  const port = apiConfig.port || defaultConfig.port || locationPort;
 
   return new Arweave({
     ...apiConfig,
