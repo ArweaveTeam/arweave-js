@@ -148,7 +148,7 @@ export default class Transactions {
     if (!data) {
       console.warn(`Falling back to gateway cache for ${id}`);
       try {
-        data = (await this.api.get(`/${id}`)).data;
+        data = (await this.api.get(`/${id}`, {responseType: 'arraybuffer'})).data;
       } catch (error) {
         console.error(
           `Error while trying to download contiguous data from gateway cache for ${id}`
