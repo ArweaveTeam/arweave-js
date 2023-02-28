@@ -115,8 +115,8 @@ export default class Api {
       response.data = (await res.arrayBuffer()) as T;
     } else if (responseType === "text") {
       response.data = (await res.text()) as T;
-    } else if (responseType === "webstream") {
-      response.data = response.body as T;
+    } else if (responseType === "webstream") { 
+      response.data = addAsyncIterator(res.body as ReadableStream) as T
     } else if (contentType?.startsWith("application/json")) {
       try {
         await res.clone().json(); //the test
@@ -129,5 +129,32 @@ export default class Api {
     }
 
     return response as ResponseWithData<T>;
+  }
+}
+
+/** 
+ * *** To be removed when browsers catch up with the whatwg standard. ***
+ * [Symbol.AsyncIterator] is needed to use `for-await` on the returned ReadableStream (web stream).
+ * Feature is available in nodejs, and should be available in browsers eventually.
+ */
+const addAsyncIterator = (body: ReadableStream) => {
+  const bodyWithIter = body as ReadableStream<Uint8Array> & AsyncIterable<Uint8Array>
+  if(typeof bodyWithIter[Symbol.asyncIterator] === 'undefined'){
+    bodyWithIter[Symbol.asyncIterator] = webIiterator<Uint8Array>(body)
+    return bodyWithIter;
+  }
+  return body;
+}
+
+const webIiterator = function<T>(stream: ReadableStream) {
+  return async function* iteratorGenerator<T>() {
+    const reader = stream.getReader() //lock 
+    try{
+      const {done, value} = await reader.read()
+      if(done) return;
+      yield value as T;
+    }finally{
+      reader.releaseLock() //unlock
+    }
   }
 }
