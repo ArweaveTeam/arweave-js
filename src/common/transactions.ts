@@ -173,14 +173,24 @@ export default class Transactions {
 
   public async sign(
     transaction: Transaction,
-    jwk?: JWKInterface | "use_wallet",
+    jwk?: JWKInterface | "use_wallet", //"use_wallet" for backwards compatibility only
     options?: SignatureOptions
   ): Promise<void> {
-    if (!jwk && typeof arweaveWallet !== "object") {
+
+    /** Non-exhaustive (only checks key names), but previously no jwk checking was done */
+    const isJwk = (obj: object): boolean => {
+      let valid = true;
+      ["n", "e", "d", "p", "q", "dp", "dq", "qi"].map(key => !(key in obj) && (valid = false))
+      return valid;
+    }
+    const validJwk = typeof jwk === 'object' && isJwk(jwk)
+    const externalWallet = typeof arweaveWallet === 'object'
+
+    if (!validJwk && !externalWallet) {
       throw new Error(
-        `A new Arweave transaction must provide the jwk parameter.`
+        `No valid JWK or external wallet found to sign transaction.`
       );
-    } else if (!jwk || jwk === "use_wallet") {
+    } else if (externalWallet) {
       try {
         const existingPermissions = await arweaveWallet.getPermissions();
 
@@ -199,7 +209,7 @@ export default class Transactions {
         tags: signedTransaction.tags,
         signature: signedTransaction.signature,
       });
-    } else {
+    } else if(validJwk) {
       transaction.setOwner(jwk.n);
 
       let dataToSign = await transaction.getSignatureData();
@@ -211,6 +221,9 @@ export default class Transactions {
         owner: jwk.n,
         signature: ArweaveUtils.bufferTob64Url(rawSignature),
       });
+    } else {
+      //can't get here, but for sanity we'll throw an error.
+      throw new Error(`An error occurred while signing. Check wallet is valid`)
     }
   }
 
