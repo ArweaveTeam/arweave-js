@@ -39,17 +39,14 @@ export default class Transactions {
     this.chunks = chunks;
   }
 
-  public getTransactionAnchor(): Promise<string> {
-    /**
-     * Maintain compatibility with erdjs which sets a global axios.defaults.transformResponse
-     * in order to overcome some other issue in:  https://github.com/axios/axios/issues/983
-     *
-     * However, this introduces a problem with ardrive-js, so we will enforce
-     * config =  {transformResponse: []} where we do not require a transform
-     */
-    return this.api.get(`tx_anchor`).then((response) => {
-      return response.data;
-    });
+  public async getTransactionAnchor(): Promise<string> {
+    const res = await this.api.get<string>(`tx_anchor`)
+    if(!res.data.match(/^[a-z0-9_-]{43,}/i) || !res.ok){
+      throw new Error(
+        `Could not getTransactionAnchor. Received: ${res.data}. Status: ${res.status}, ${res.statusText}`
+      )
+    }
+    return res.data;
   }
 
   public async getPrice(
@@ -64,7 +61,7 @@ export default class Transactions {
 
     if (!/^\d+$/.test(res.data) || !res.ok) {
       throw new Error(
-        `Could not getPrice. Received ${res.data}. Status: ${res.status}, ${res.statusText}`
+        `Could not getPrice. Received: ${res.data}. Status: ${res.status}, ${res.statusText}`
       );
     }
 
