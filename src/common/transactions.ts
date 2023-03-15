@@ -40,11 +40,11 @@ export default class Transactions {
   }
 
   public async getTransactionAnchor(): Promise<string> {
-    const res = await this.api.get<string>(`tx_anchor`)
-    if(!res.data.match(/^[a-z0-9_-]{43,}/i) || !res.ok){
+    const res = await this.api.get<string>(`tx_anchor`);
+    if (!res.data.match(/^[a-z0-9_-]{43,}/i) || !res.ok) {
       throw new Error(
         `Could not getTransactionAnchor. Received: ${res.data}. Status: ${res.status}, ${res.statusText}`
-      )
+      );
     }
     return res.data;
   }
