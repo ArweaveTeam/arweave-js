@@ -109,25 +109,29 @@ export default class Api {
     }
 
     const contentType = res.headers.get("content-type");
-    const charset = contentType?.match(/charset=([^()<>@,;:\"/[\]?.=\s]*)/i)?.[1]
+    const charset = contentType?.match(
+      /charset=([^()<>@,;:\"/[\]?.=\s]*)/i
+    )?.[1];
     const response: Partial<ResponseWithData<T>> = res;
 
-    const decodeText = async()=> {
+    const decodeText = async () => {
       if (charset) {
         try {
-          response.data = (new TextDecoder(charset)).decode(await res.arrayBuffer()) as T
-        } catch(e){
+          response.data = new TextDecoder(charset).decode(
+            await res.arrayBuffer()
+          ) as T;
+        } catch (e) {
           response.data = (await res.text()) as T;
         }
       } else {
         response.data = (await res.text()) as T;
       }
-    }
+    };
 
     if (responseType === "arraybuffer") {
       response.data = (await res.arrayBuffer()) as T;
     } else if (responseType === "text") {
-        await decodeText()
+      await decodeText();
     } else if (responseType === "webstream") {
       response.data = addAsyncIterator(res.body as ReadableStream) as T;
     } else if (contentType?.startsWith("application/json")) {
@@ -136,10 +140,10 @@ export default class Api {
         await res.clone().json(); //the test
         response.data = (await res.json()) as T;
       } catch {
-        await decodeText()
+        await decodeText();
       }
     } else {
-      await decodeText()
+      await decodeText();
     }
 
     return response as ResponseWithData<T>;

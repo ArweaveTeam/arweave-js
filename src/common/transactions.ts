@@ -52,17 +52,22 @@ export default class Transactions {
     });
   }
 
-  public async getPrice(byteSize: number, targetAddress?: string): Promise<string> {
+  public async getPrice(
+    byteSize: number,
+    targetAddress?: string
+  ): Promise<string> {
     let endpoint = targetAddress
       ? `price/${byteSize}/${targetAddress}`
       : `price/${byteSize}`;
 
-    const res = await this.api.get(endpoint)
+    const res = await this.api.get(endpoint);
 
-    if(!/^\d+$/.test(res.data) || !res.ok){
-      throw new Error(`Could not getPrice. Received ${res.data}. Status: ${res.status}, ${res.statusText}`)
+    if (!/^\d+$/.test(res.data) || !res.ok) {
+      throw new Error(
+        `Could not getPrice. Received ${res.data}. Status: ${res.status}, ${res.statusText}`
+      );
     }
-    
+
     return res.data;
   }
 
@@ -152,7 +157,8 @@ export default class Transactions {
     if (!data) {
       console.warn(`Falling back to gateway cache for ${id}`);
       try {
-        data = (await this.api.get(`/${id}`, {responseType: 'arraybuffer'})).data;
+        data = (await this.api.get(`/${id}`, { responseType: "arraybuffer" }))
+          .data;
       } catch (error) {
         console.error(
           `Error while trying to download contiguous data from gateway cache for ${id}`
@@ -180,15 +186,16 @@ export default class Transactions {
     jwk?: JWKInterface | "use_wallet", //"use_wallet" for backwards compatibility only
     options?: SignatureOptions
   ): Promise<void> {
-
     /** Non-exhaustive (only checks key names), but previously no jwk checking was done */
     const isJwk = (obj: object): boolean => {
       let valid = true;
-      ["n", "e", "d", "p", "q", "dp", "dq", "qi"].map(key => !(key in obj) && (valid = false))
+      ["n", "e", "d", "p", "q", "dp", "dq", "qi"].map(
+        (key) => !(key in obj) && (valid = false)
+      );
       return valid;
-    }
-    const validJwk = typeof jwk === 'object' && isJwk(jwk)
-    const externalWallet = typeof arweaveWallet === 'object'
+    };
+    const validJwk = typeof jwk === "object" && isJwk(jwk);
+    const externalWallet = typeof arweaveWallet === "object";
 
     if (!validJwk && !externalWallet) {
       throw new Error(
@@ -213,7 +220,7 @@ export default class Transactions {
         tags: signedTransaction.tags,
         signature: signedTransaction.signature,
       });
-    } else if(validJwk) {
+    } else if (validJwk) {
       transaction.setOwner(jwk.n);
 
       let dataToSign = await transaction.getSignatureData();
@@ -227,7 +234,7 @@ export default class Transactions {
       });
     } else {
       //can't get here, but for sanity we'll throw an error.
-      throw new Error(`An error occurred while signing. Check wallet is valid`)
+      throw new Error(`An error occurred while signing. Check wallet is valid`);
     }
   }
 
