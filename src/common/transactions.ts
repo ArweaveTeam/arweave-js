@@ -52,14 +52,18 @@ export default class Transactions {
     });
   }
 
-  public getPrice(byteSize: number, targetAddress?: string): Promise<string> {
+  public async getPrice(byteSize: number, targetAddress?: string): Promise<string> {
     let endpoint = targetAddress
       ? `price/${byteSize}/${targetAddress}`
       : `price/${byteSize}`;
 
-    return this.api.get(endpoint).then((response) => {
-      return response.data;
-    });
+    const res = await this.api.get(endpoint)
+
+    if(!/^\d+$/.test(res.data) || !res.ok){
+      throw new Error(`Could not getPrice. Received ${res.data}. Status: ${res.status}, ${res.statusText}`)
+    }
+    
+    return res.data;
   }
 
   public async get(id: string): Promise<Transaction> {
