@@ -39,27 +39,33 @@ export default class Transactions {
     this.chunks = chunks;
   }
 
-  public getTransactionAnchor(): Promise<string> {
-    /**
-     * Maintain compatibility with erdjs which sets a global axios.defaults.transformResponse
-     * in order to overcome some other issue in:  https://github.com/axios/axios/issues/983
-     *
-     * However, this introduces a problem with ardrive-js, so we will enforce
-     * config =  {transformResponse: []} where we do not require a transform
-     */
-    return this.api.get(`tx_anchor`).then((response) => {
-      return response.data;
-    });
+  public async getTransactionAnchor(): Promise<string> {
+    const res = await this.api.get<string>(`tx_anchor`);
+    if (!res.data.match(/^[a-z0-9_-]{43,}/i) || !res.ok) {
+      throw new Error(
+        `Could not getTransactionAnchor. Received: ${res.data}. Status: ${res.status}, ${res.statusText}`
+      );
+    }
+    return res.data;
   }
 
-  public getPrice(byteSize: number, targetAddress?: string): Promise<string> {
+  public async getPrice(
+    byteSize: number,
+    targetAddress?: string
+  ): Promise<string> {
     let endpoint = targetAddress
       ? `price/${byteSize}/${targetAddress}`
       : `price/${byteSize}`;
 
-    return this.api.get(endpoint).then((response) => {
-      return response.data;
-    });
+    const res = await this.api.get(endpoint);
+
+    if (!/^\d+$/.test(res.data) || !res.ok) {
+      throw new Error(
+        `Could not getPrice. Received: ${res.data}. Status: ${res.status}, ${res.statusText}`
+      );
+    }
+
+    return res.data;
   }
 
   public async get(id: string): Promise<Transaction> {
@@ -148,7 +154,8 @@ export default class Transactions {
     if (!data) {
       console.warn(`Falling back to gateway cache for ${id}`);
       try {
-        data = (await this.api.get(`/${id}`, {responseType: 'arraybuffer'})).data;
+        data = (await this.api.get(`/${id}`, { responseType: "arraybuffer" }))
+          .data;
       } catch (error) {
         console.error(
           `Error while trying to download contiguous data from gateway cache for ${id}`
@@ -173,14 +180,25 @@ export default class Transactions {
 
   public async sign(
     transaction: Transaction,
-    jwk?: JWKInterface | "use_wallet",
+    jwk?: JWKInterface | "use_wallet", //"use_wallet" for backwards compatibility only
     options?: SignatureOptions
   ): Promise<void> {
-    if (!jwk && typeof arweaveWallet !== "object") {
-      throw new Error(
-        `A new Arweave transaction must provide the jwk parameter.`
+    /** Non-exhaustive (only checks key names), but previously no jwk checking was done */
+    const isJwk = (obj: object): boolean => {
+      let valid = true;
+      ["n", "e", "d", "p", "q", "dp", "dq", "qi"].map(
+        (key) => !(key in obj) && (valid = false)
       );
-    } else if (!jwk || jwk === "use_wallet") {
+      return valid;
+    };
+    const validJwk = typeof jwk === "object" && isJwk(jwk);
+    const externalWallet = typeof arweaveWallet === "object";
+
+    if (!validJwk && !externalWallet) {
+      throw new Error(
+        `No valid JWK or external wallet found to sign transaction.`
+      );
+    } else if (externalWallet) {
       try {
         const existingPermissions = await arweaveWallet.getPermissions();
 
@@ -199,7 +217,7 @@ export default class Transactions {
         tags: signedTransaction.tags,
         signature: signedTransaction.signature,
       });
-    } else {
+    } else if (validJwk) {
       transaction.setOwner(jwk.n);
 
       let dataToSign = await transaction.getSignatureData();
@@ -211,6 +229,9 @@ export default class Transactions {
         owner: jwk.n,
         signature: ArweaveUtils.bufferTob64Url(rawSignature),
       });
+    } else {
+      //can't get here, but for sanity we'll throw an error.
+      throw new Error(`An error occurred while signing. Check wallet is valid`);
     }
   }
 
