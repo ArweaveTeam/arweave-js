@@ -154,8 +154,18 @@ export default class Transactions {
     if (!data) {
       console.warn(`Falling back to gateway cache for ${id}`);
       try {
-        data = (await this.api.get(`/${id}`, { responseType: "arraybuffer" }))
-          .data;
+        const {
+          data: resData,
+          ok,
+          status,
+          statusText,
+        } = await this.api.get(`/${id}`, { responseType: "arraybuffer" });
+        if (!ok) {
+          throw new Error(`Bad http status code`, {
+            cause: { status, statusText },
+          });
+        }
+        data = resData;
       } catch (error) {
         console.error(
           `Error while trying to download contiguous data from gateway cache for ${id}`
@@ -165,7 +175,7 @@ export default class Transactions {
     }
 
     if (!data) {
-      throw new Error(`${id} was not found!`);
+      throw new Error(`${id} data was not found!`);
     }
 
     if (options && options.decode && !options.string) {
