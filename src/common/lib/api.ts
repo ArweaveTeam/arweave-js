@@ -134,16 +134,19 @@ export default class Api {
       await decodeText();
     } else if (responseType === "webstream") {
       response.data = addAsyncIterator(res.body as ReadableStream) as T;
-    } else if (contentType?.startsWith("application/json")) {
-      /** axios defaults to text instead of error, we mimic the behaviour */
+    } else {
+      /** axios defaults to JSON, and then text, we mimic the behaviour */
       try {
-        await res.clone().json(); //the test
-        response.data = (await res.json()) as T;
+        let test = await res.clone().json();
+        if (typeof test !== "object") {
+          await decodeText();
+        } else {
+          response.data = (await res.json()) as T;
+        }
+        test = null;
       } catch {
         await decodeText();
       }
-    } else {
-      await decodeText();
     }
 
     return response as ResponseWithData<T>;
