@@ -138,16 +138,16 @@ export default class Api {
       /** axios defaults to JSON, and then text, we mimic the behaviour */
       try {
         let test = await res.clone().json();
-        if(typeof test !== "object"){
+        if (typeof test !== "object") {
           await decodeText();
-        }else{
+        } else {
           response.data = (await res.json()) as T;
         }
         test = null;
       } catch {
         await decodeText();
       }
-    } 
+    }
 
     return response as ResponseWithData<T>;
   }
