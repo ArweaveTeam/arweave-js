@@ -538,7 +538,7 @@ arweave.transactions.getData('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U', {dec
 ```js
 const transaction = arweave.transactions.get('bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U').then(transaction => {
 
-  transaction.get('tags').forEach(tag => {
+  transaction['tags'].forEach(tag => {
     let key = tag.get('name', {decode: true, string: true});
     let value = tag.get('value', {decode: true, string: true});
     console.log(`${key} : ${value}`);

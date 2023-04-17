@@ -38,6 +38,16 @@ class BaseObject {
       return ArweaveUtils.bufferTob64Url(this[field]);
     }
 
+    if (this[field] instanceof Array) {
+      if (options?.decode !== undefined || options?.string !== undefined) {
+        if (field === "tags") {
+          console.warn(`Did you mean to use 'transaction["tags"]' ?`);
+        }
+        throw new Error(`Cannot decode or stringify an array.`);
+      }
+      return this[field];
+    }
+
     if (options && options.decode == true) {
       if (options && options.string) {
         return ArweaveUtils.b64UrlToString(this[field]);
