@@ -39,10 +39,10 @@ class BaseObject {
     }
 
     if (this[field] instanceof Array) {
-      if(options?.decode !== undefined || options?.string !== undefined) {
-        if(field === "tags") {
+      if (options?.decode !== undefined || options?.string !== undefined) {
+        if (field === "tags") {
           console.warn(`Did you mean to use 'transaction["tags"]' ?`);
-        } 
+        }
         throw new Error(`Cannot decode or stringify an array.`);
       }
       return this[field];
