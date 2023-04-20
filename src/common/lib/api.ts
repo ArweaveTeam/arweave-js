@@ -172,9 +172,11 @@ const webIiterator = function <T>(stream: ReadableStream) {
   return async function* iteratorGenerator<T>() {
     const reader = stream.getReader(); //lock
     try {
-      const { done, value } = await reader.read();
-      if (done) return;
-      yield value as T;
+      while(true){
+        const { done, value } = await reader.read();
+        if (done) return;
+        yield value as T;
+      }
     } finally {
       reader.releaseLock(); //unlock
     }
