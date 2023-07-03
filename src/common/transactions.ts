@@ -208,6 +208,18 @@ export default class Transactions {
       throw new Error(
         `No valid JWK or external wallet found to sign transaction.`
       );
+    } else if (validJwk) {
+      transaction.setOwner(jwk.n);
+
+      let dataToSign = await transaction.getSignatureData();
+      let rawSignature = await this.crypto.sign(jwk, dataToSign, options);
+      let id = await this.crypto.hash(rawSignature);
+
+      transaction.setSignature({
+        id: ArweaveUtils.bufferTob64Url(id),
+        owner: jwk.n,
+        signature: ArweaveUtils.bufferTob64Url(rawSignature),
+      });
     } else if (externalWallet) {
       try {
         const existingPermissions = await arweaveWallet.getPermissions();
@@ -227,19 +239,7 @@ export default class Transactions {
         tags: signedTransaction.tags,
         signature: signedTransaction.signature,
       });
-    } else if (validJwk) {
-      transaction.setOwner(jwk.n);
-
-      let dataToSign = await transaction.getSignatureData();
-      let rawSignature = await this.crypto.sign(jwk, dataToSign, options);
-      let id = await this.crypto.hash(rawSignature);
-
-      transaction.setSignature({
-        id: ArweaveUtils.bufferTob64Url(id),
-        owner: jwk.n,
-        signature: ArweaveUtils.bufferTob64Url(rawSignature),
-      });
-    } else {
+    }  else {
       //can't get here, but for sanity we'll throw an error.
       throw new Error(`An error occurred while signing. Check wallet is valid`);
     }
