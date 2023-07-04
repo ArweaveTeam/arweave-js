@@ -87,6 +87,9 @@ export default class NodeCryptoDriver implements CryptoInterface {
     data: Uint8Array,
     algorithm: string = "SHA-256"
   ): Promise<Uint8Array> {
+    if (typeof data === "string") {
+      throw new TypeError("Data must be a Uint8Array");
+    }
     return new Promise((resolve, reject) => {
       resolve(
         crypto
