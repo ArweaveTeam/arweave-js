@@ -239,7 +239,7 @@ export default class Transactions {
         tags: signedTransaction.tags,
         signature: signedTransaction.signature,
       });
-    }  else {
+    } else {
       //can't get here, but for sanity we'll throw an error.
       throw new Error(`An error occurred while signing. Check wallet is valid`);
     }
