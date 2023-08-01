@@ -26,7 +26,8 @@ export interface BlockData {
 }
 
 export default class Blocks {
-  private static readonly ENDPOINT = "block/hash/";
+  private static readonly HASH_ENDPOINT = "block/hash/";
+  private static readonly HEIGHT_ENDPOINT = "block/height/";
 
   constructor(private readonly api: Api, private readonly network: Network) {}
 
@@ -35,7 +36,25 @@ export default class Blocks {
    */
   public async get(indepHash: string): Promise<BlockData> {
     const response = await this.api.get<BlockData>(
-      `${Blocks.ENDPOINT}${indepHash}`
+      `${Blocks.HASH_ENDPOINT}${indepHash}`
+    );
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      if (response.status === 404) {
+        throw new ArweaveError(ArweaveErrorType.BLOCK_NOT_FOUND);
+      } else {
+        throw new Error(`Error while loading block data: ${response}`);
+      }
+    }
+  }
+
+  /**
+   * Gets a block by its "height"
+   */
+  public async getByHeight(height: number): Promise<BlockData> {
+    const response = await this.api.get<BlockData>(
+      `${Blocks.HEIGHT_ENDPOINT}${height}`
     );
     if (response.status === 200) {
       return response.data;
