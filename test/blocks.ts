@@ -42,4 +42,17 @@ describe("Blocks", function () {
     // then
     expect(expectedResult).to.deep.equal(result);
   });
+
+  it("should get block's data by its height", async function () {
+    // given
+    // https://arweave.net/block/height/1000000
+    const blockHeight = 1000000;
+    const expectedResult = require(`./fixtures/block_height_${blockHeight}.json`);
+
+    // when
+    const result = (await arweave.blocks.getByHeight(blockHeight)) as any; // note: any to be able to access object values by keys.
+
+    // then
+    expect(expectedResult).to.deep.equal(result);
+  });
 });
