@@ -99,4 +99,15 @@ describe("Wallets and keys", function () {
       .to.be.a("string")
       .and.equal("fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw");
   });
+
+  it("should throw on bad JWK", async function () {
+    const jwk = await arweave.wallets.generate();
+    jwk.n = jwk.n.slice(0, -1);
+    try {
+      await arweave.wallets.jwkToAddress(jwk);
+    } catch (e: any) {
+      expect(e).to.be.an("error");
+      expect(e.message).to.equal("The JWK is not valid.");
+    }
+  });
 });

@@ -3,6 +3,10 @@ import CryptoInterface from "./lib/crypto/crypto-interface";
 import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
 import "arconnect";
+import Transaction from "lib/transaction";
+import Transactions from "transactions";
+import Chunks from "chunks";
+import Arweave from "./common";
 
 export default class Wallets {
   private api: Api;
@@ -66,13 +70,23 @@ export default class Wallets {
       // @ts-ignore
       return arweaveWallet.getActiveAddress();
     } else {
+      // verify the JWK produces valid transactions
+      const isValid = await new Arweave(this.api.getConfig()).validateJWK(jwk);
+      if (!isValid) {
+        throw new Error("The JWK is not valid.");
+      }
       return this.ownerToAddress(jwk.n);
     }
   }
 
   public async ownerToAddress(owner: string): Promise<string> {
+    const buffer = await ArweaveUtils.b64UrlToBuffer(owner);
+    // RSA 4096 keys have an n length of 512 bytes. Validate JWK should handle this, so this is just a sanity check.
+    if (buffer.byteLength !== 512) {
+      throw new Error("Invalid JWK");
+    }
     return ArweaveUtils.bufferTob64Url(
-      await this.crypto.hash(ArweaveUtils.b64UrlToBuffer(owner))
+      await this.crypto.hash(buffer)
     );
   }
 }
