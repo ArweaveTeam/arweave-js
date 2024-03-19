@@ -94,10 +94,10 @@
   },
   "targets": {
     "chrome": "70",
-    "node": "16"
+    "node": "18"
   },
   "engines": {
-    "node": ">=16.15.0"
+    "node": ">=18"
   },
   "dependencies": {
     "arconnect": "^0.4.2",
