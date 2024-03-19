@@ -1,6 +1,6 @@
 {
   "name": "arweave",
-  "version": "1.14.4",
+  "version": "1.15.0",
   "description": "Arweave JS client library",
   "main": "./node/index.js",
   "react-native": "./node/index.js",
@@ -94,10 +94,10 @@
   },
   "targets": {
     "chrome": "70",
-    "node": "16"
+    "node": "18"
   },
   "engines": {
-    "node": ">=16.15.0"
+    "node": ">=18"
   },
   "dependencies": {
     "arconnect": "^0.4.2",
