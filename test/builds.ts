@@ -7,17 +7,19 @@ let globals = <any>global;
 // The web distro will attach to the browser's global object so we just
 // need to mock a global self object with a subtle crypto stub
 // to make this test work.
-globals.crypto = {
-  subtle: {
-    generateKey: async () => {},
-    importKey: async () => {},
-    exportKey: async () => {},
-    digest: async () => {},
-    sign: async () => {},
-  },
-};
+if (!globals.crypto) {
+  globals.crypto = {
+    subtle: {
+      generateKey: async () => { },
+      importKey: async () => { },
+      exportKey: async () => { },
+      digest: async () => { },
+      sign: async () => { },
+    },
+  };
 
-globals.self = global;
+  globals.self = global;
+}
 
 describe("Node distribution", function () {
   it("should initialize from compiled node dist", async function () {
@@ -47,7 +49,7 @@ describe("Web distribution", function () {
   it("should initialize from web compiled dist", async function () {
     require("../web");
 
-    const dist = globals.self.Arweave;
+    const dist = globals.Arweave;
 
     expect(dist).to.be.a("function");
 
@@ -76,7 +78,7 @@ describe("Web distribution", function () {
   it("should initialize from web bundle", async function () {
     require("../bundles/web.bundle");
 
-    const dist = globals.self.Arweave;
+    const dist = globals.Arweave;
 
     expect(dist).to.be.a("function");
 
@@ -105,7 +107,7 @@ describe("Web distribution", function () {
   it("should initialize from minified web bundle", async function () {
     require("../bundles/web.bundle.min");
 
-    const dist = globals.self.Arweave;
+    const dist = globals.Arweave;
 
     expect(dist).to.be.a("function");
 
