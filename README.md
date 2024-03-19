@@ -4,7 +4,7 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
 
 > **Notes:** 
 > 1. If you are planning to upload large batches of data transactions to the Arweave network, it is strongly advised that you use [ArBundles](https://github.com/Bundler-Network/arbundles) instead of transactions with Arweave.js. You can read about bundles and their advantages on the [Arwiki](https://arwiki.wiki/#/en/bundles).
-> 2. When working with NodeJS a minimum version of 18+ is required, with some exceptions. See these [release notes](https://github.com/ArweaveTeam/arweave-js/releases/tag/v1.12.4) for more details.
+> 2. When working with NodeJS a minimum version of 18+ is required.
 
 - [Arweave JS](#arweave-js)
   - [Installation](#installation)
