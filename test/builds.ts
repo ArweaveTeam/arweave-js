@@ -10,11 +10,11 @@ let globals = <any>global;
 if (!globals.crypto) {
   globals.crypto = {
     subtle: {
-      generateKey: async () => { },
-      importKey: async () => { },
-      exportKey: async () => { },
-      digest: async () => { },
-      sign: async () => { },
+      generateKey: async () => {},
+      importKey: async () => {},
+      exportKey: async () => {},
+      digest: async () => {},
+      sign: async () => {},
     },
   };
 
