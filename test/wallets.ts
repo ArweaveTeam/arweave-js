@@ -36,6 +36,16 @@ describe("Wallets and keys", function () {
 
     expect(walletA.n).to.match(/^[a-z0-9-_]{683}$/i);
 
+    /** extra tests that private matches public */
+    const sigA = await arweave.crypto.sign(walletA, new Uint8Array([1, 2, 3, 4]));
+    const verifyA = await arweave.crypto.verify(walletA.n, new Uint8Array([1, 2, 3, 4]), sigA);
+    expect(verifyA).true;
+    const sigB = await arweave.crypto.sign(walletB, new Uint8Array([1, 2, 3, 4]));
+    const verifyB = await arweave.crypto.verify(walletB.n, new Uint8Array([1, 2, 3, 4]), sigB);
+    expect(verifyB).true;
+
+
+    expect(walletA.d?.length).to.equal(683);
     expect(walletA.d).to.match(/^[a-z0-9-_]{683}$/i);
 
     const addressA = await arweave.wallets.jwkToAddress(walletA);
