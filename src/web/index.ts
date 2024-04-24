@@ -1,4 +1,4 @@
-import Arweave from "./common";
+import DefaultArweave, { BaseArweave } from "./common";
 import { ApiConfig } from "./lib/api";
 import { getDefaultConfig } from "./net-config";
 
@@ -11,8 +11,13 @@ declare global {
   }
 }
 
-Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
-  const defaults = {
+export class WebArweave extends BaseArweave {
+  constructor(apiConfig: ApiConfig = {}) {
+    super(apiConfig);
+  }
+
+  public static init(apiConfig: ApiConfig = {}): WebArweave {
+    const defaults = {
     host: "arweave.net",
     port: 443,
     protocol: "https",
@@ -23,7 +28,7 @@ Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
     !location.protocol ||
     !location.hostname
   ) {
-    return new Arweave({
+    return new WebArweave({
       ...apiConfig,
       ...defaults,
     });
@@ -44,19 +49,22 @@ Arweave.init = function (apiConfig: ApiConfig = {}): Arweave {
   const host = apiConfig.host || defaultConfig.host;
   const port = apiConfig.port || defaultConfig.port || locationPort;
 
-  return new Arweave({
-    ...apiConfig,
-    host,
-    protocol,
-    port,
-  });
-};
-
-if (typeof globalThis === "object") {
-  globalThis.Arweave = Arweave;
-} else if (typeof self === "object") {
-  self.Arweave = Arweave;
+    return new WebArweave({
+       ...apiConfig,
+      host,
+      protocol,
+      port,
+    });
+  }
 }
 
+if (typeof globalThis === "object") {
+  globalThis.Arweave = WebArweave;
+} else if (typeof self === "object") {
+  self.Arweave = WebArweave;
+}
+
+// for backwards compatibility
+DefaultArweave.init = WebArweave.init;
 export * from "./common";
-export default Arweave;
+export default DefaultArweave;

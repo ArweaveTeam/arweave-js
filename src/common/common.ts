@@ -217,3 +217,10 @@ export default class Arweave {
       .then((response) => response.data || []);
   }
 }
+
+// abstract class so we can make environment specific implementations
+export abstract class BaseArweave extends Arweave {
+  constructor(apiConfig: ApiConfig = {}) {
+    super(apiConfig);
+  }
+}
