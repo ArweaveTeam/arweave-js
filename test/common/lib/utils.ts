@@ -13,7 +13,6 @@ describe("Common Utils", function () {
         } catch (error) {
           expect(error).to.have.property("message");
           expect(error).to.have.property("cause");
-          expect((error as Error).name).to.be.string("UtilsError");
           expect((error as Error).message).to.be.string(testCase.message);
         }
       });
@@ -29,7 +28,6 @@ describe("Common Utils", function () {
         } catch (error) {
           expect(error).to.have.property("message");
           expect(error).to.have.property("cause");
-          expect((error as Error).name).to.be.string("UtilsError");
           expect((error as Error).message).to.be.string(testCase.message);
         }
       });

@@ -1,12 +1,5 @@
 import * as B64js from "base64-js";
 
-class UtilsError extends Error {
-  constructor(...args: ConstructorParameters<typeof Error>) {
-    super(...args);
-    this.name = "UtilsError";
-  }
-}
-
 export type Base64UrlString = string;
 
 export function concatBuffers(
@@ -69,7 +62,7 @@ export function b64UrlEncode(b64UrlString: string): string {
       .replace(/\//g, "_")
       .replace(/\=/g, "");
   } catch (error) {
-    throw new UtilsError("Failed to encode string", { cause: error });
+    throw new Error("Failed to encode string", { cause: error });
   }
 }
 
@@ -82,6 +75,6 @@ export function b64UrlDecode(b64UrlString: string): string {
       : (padding = 4 - (b64UrlString.length % 4));
     return b64UrlString.concat("=".repeat(padding));
   } catch (error) {
-    throw new UtilsError("Failed to decode string", { cause: error });
+    throw new Error("Failed to decode string", { cause: error });
   }
 }
