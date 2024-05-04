@@ -1,6 +1,5 @@
 import * as B64js from "base64-js";
 
-
 export type Base64UrlString = string;
 
 export function concatBuffers(
