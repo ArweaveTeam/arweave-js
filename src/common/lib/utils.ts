@@ -1,5 +1,12 @@
 import * as B64js from "base64-js";
 
+class UtilsError extends Error {
+  constructor(...args: ConstructorParameters<typeof Error>) {
+    super(...args);
+    this.name = "UtilsError";
+  }
+}
+
 export type Base64UrlString = string;
 
 export function concatBuffers(
@@ -56,17 +63,25 @@ export function bufferTob64Url(buffer: Uint8Array): string {
 }
 
 export function b64UrlEncode(b64UrlString: string): string {
-  return b64UrlString
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/\=/g, "");
+  try {
+    return b64UrlString
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/\=/g, "");
+  } catch (error) {
+    throw new UtilsError("Failed to encode string", { cause: error });
+  }
 }
 
 export function b64UrlDecode(b64UrlString: string): string {
-  b64UrlString = b64UrlString.replace(/\-/g, "+").replace(/\_/g, "/");
-  let padding;
-  b64UrlString.length % 4 == 0
-    ? (padding = 0)
-    : (padding = 4 - (b64UrlString.length % 4));
-  return b64UrlString.concat("=".repeat(padding));
+  try {
+    b64UrlString = b64UrlString.replace(/\-/g, "+").replace(/\_/g, "/");
+    let padding;
+    b64UrlString.length % 4 == 0
+      ? (padding = 0)
+      : (padding = 4 - (b64UrlString.length % 4));
+    return b64UrlString.concat("=".repeat(padding));
+  } catch (error) {
+    throw new UtilsError("Failed to decode string", { cause: error });
+  }
 }
