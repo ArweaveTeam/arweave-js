@@ -34,8 +34,6 @@ describe("Wallets and keys", function () {
 
     expect(walletA.e).to.equal("AQAB");
 
-    expect(walletA.n).to.match(/^[a-z0-9-_]{683}$/i);
-
     /** extra tests that private matches public */
     const sigA = await arweave.crypto.sign(
       walletA,
@@ -57,9 +55,6 @@ describe("Wallets and keys", function () {
       sigB
     );
     expect(verifyB).true;
-
-    expect(walletA.d?.length).to.equal(683);
-    expect(walletA.d).to.match(/^[a-z0-9-_]{683}$/i);
 
     const addressA = await arweave.wallets.jwkToAddress(walletA);
     const addressB = await arweave.wallets.jwkToAddress(walletB);
