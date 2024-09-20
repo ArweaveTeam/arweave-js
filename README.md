@@ -3,7 +3,7 @@
 Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave network and uploading data to the permaweb. It works in latest browsers and Node JS.
 
 > **Notes:** 
-> 1. If you are planning to upload large batches of data transactions to the Arweave network, it is strongly advised that you use [ArBundles](https://github.com/DHA-Team/arbundles) instead of transactions with Arweave.js. You can read about bundles and their advantages on the [Arwiki](https://arwiki.wiki/#/en/bundles).
+> 1. If you are planning to upload large batches of data transactions to the Arweave network, it is strongly advised that you use [@DHA-Team/ArBundles](https://github.com/DHA-Team/arbundles) instead of transactions with Arweave.js. You can read about bundles and their advantages on the [Arwiki](https://arwiki.wiki/#/en/bundles).
 > 2. When working with NodeJS a minimum version of 18+ is required. Bun/Deno not currently working.
 
 - [Arweave JS](#arweave-js)
