@@ -133,7 +133,7 @@ export default class Api {
     } else if (responseType === "text") {
       await decodeText();
     } else if (responseType === "webstream") {
-      response.data = addAsyncIterator(res.body as ReadableStream) as T;
+      response.data = addAsyncIterator(res.body as AsyncIterableReadableStream) as T;
     } else {
       /** axios defaults to JSON, and then text, we mimic the behaviour */
       try {
@@ -158,18 +158,20 @@ export default class Api {
  * [Symbol.AsyncIterator] is needed to use `for-await` on the returned ReadableStream (web stream).
  * Feature is available in nodejs, and should be available in browsers eventually.
  */
-const addAsyncIterator = (body: ReadableStream) => {
-  const bodyWithIter = body as ReadableStream<Uint8Array> &
-    AsyncIterable<Uint8Array>;
+type AsyncIterableReadableStream =
+  (ReadableStream<Uint8Array> & AsyncIterable<Uint8Array>)
+// | ReadableStream<Uint8Array>
+
+const addAsyncIterator = (body: ReadableStream<Uint8Array>): AsyncIterableReadableStream => {
+  const bodyWithIter = body as ReadableStream<Uint8Array> & AsyncIterable<Uint8Array>;
   if (typeof bodyWithIter[Symbol.asyncIterator] === "undefined") {
     bodyWithIter[Symbol.asyncIterator] = webIiterator<Uint8Array>(body);
-    return bodyWithIter;
   }
-  return body;
+  return bodyWithIter;
 };
 
-const webIiterator = function <T>(stream: ReadableStream) {
-  return async function* iteratorGenerator<T>() {
+const webIiterator = function <T>(stream: ReadableStream<T>) {
+  return async function* iteratorGenerator(): AsyncIterableIterator<T> {
     const reader = stream.getReader(); //lock
     try {
       while (true) {
