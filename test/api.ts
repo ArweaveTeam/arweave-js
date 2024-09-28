@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import {} from "mocha";
+import "mocha";
 import { arweaveInstance } from "./_arweave";
 const arweave = arweaveInstance();
 
