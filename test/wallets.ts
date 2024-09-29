@@ -64,8 +64,8 @@ describe("Wallets and keys", function () {
     expect(addressB).to.match(digestRegex);
     expect(addressA).to.not.equal(addressB);
 
-    expect(arweave.utils.b64UrlToBuffer(walletA.n).byteLength).eq(4096 / 8)
-    expect(arweave.utils.b64UrlToBuffer(walletB.n).byteLength).eq(4096 / 8)
+    expect(arweave.utils.b64UrlToBuffer(walletA.n).byteLength).eq(4096 / 8);
+    expect(arweave.utils.b64UrlToBuffer(walletB.n).byteLength).eq(4096 / 8);
   });
 
   it("should get wallet info", async function () {

@@ -72,34 +72,32 @@ export default class NodeCryptoDriver implements CryptoInterface {
       const pem = this.jwkToPem(publicJwk); //?
       const keyObject = crypto.createPublicKey({
         key: pem,
-        format: 'pem',
-      })
+        format: "pem",
+      });
 
-      const verify = crypto.createVerify(this.hashAlgorithm)
-      verify.update(data)
+      const verify = crypto.createVerify(this.hashAlgorithm);
+      verify.update(data);
       const verifyResult = verify.verify(
         {
           key: keyObject,
           padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
         },
-        signature,
-      )
+        signature
+      );
 
       if (!verifyResult) {
         const details = {
           asymmetricKeyType: keyObject.asymmetricKeyType,
           modulusLength: keyObject.asymmetricKeyDetails?.modulusLength,
-        }
+        };
         console.warn(
           "Transaction Verification Failed! \n" +
-          `Details: ${JSON.stringify(details, null, 2)} \n` +
-          "N.B. ArweaveJS is only guaranteed to verify txs created using ArweaveJS."
-        )
+            `Details: ${JSON.stringify(details, null, 2)} \n` +
+            "N.B. ArweaveJS is only guaranteed to verify txs created using ArweaveJS."
+        );
       }
 
-      resolve(
-        verifyResult
-      );
+      resolve(verifyResult);
     });
   }
 
