@@ -105,6 +105,7 @@ export default class Transactions {
     return new Transaction(attributes);
   }
 
+  /** @deprecated use GQL https://gql-guide.arweave.net */
   public async search(tagName: string, tagValue: string): Promise<string[]> {
     return this.api
       .post(`arql`, {
