@@ -107,22 +107,40 @@ export default class WebCryptoDriver implements CryptoInterface {
 
     // saltN's salt-length is derived from a formula described here
     // https://developer.mozilla.org/en-US/docs/Web/API/RsaPssParams
+    const saltLengthN =
+      Math.ceil(
+        ((key.algorithm as RsaHashedKeyGenParams).modulusLength - 1) / 8
+      ) -
+      digest.byteLength -
+      2;
+
     const saltN = await this.driver.verify(
       {
         name: "RSA-PSS",
-        saltLength:
-          Math.ceil(
-            ((key.algorithm as RsaHashedKeyGenParams).modulusLength - 1) / 8
-          ) -
-          digest.byteLength -
-          2,
+        saltLength: saltLengthN,
       },
       key,
       signature,
       data
     );
 
-    return salt0 || salt32 || saltN;
+    const result = salt0 || salt32 || saltN;
+
+    if (!result) {
+      const details = {
+        algorithm: key.algorithm.name,
+        modulusLength: (key.algorithm as RsaHashedKeyAlgorithm).modulusLength,
+        keyUsages: key.usages,
+        saltLengthsAttempted: `0, 32, ${saltLengthN}`,
+      };
+      console.warn(
+        "Transaction Verification Failed! \n",
+        `Details: ${JSON.stringify(details, null, 2)} \n`,
+        "N.B. ArweaveJS is only guaranteed to verify txs created using ArweaveJS."
+      );
+    }
+
+    return result;
   }
 
   private async jwkToCryptoKey(jwk: JWKInterface): Promise<CryptoKey> {

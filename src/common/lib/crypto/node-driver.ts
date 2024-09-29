@@ -1,7 +1,7 @@
 import { JWKInterface } from "../wallet";
 import CryptoInterface, { SignatureOptions } from "./crypto-interface";
 import { pemTojwk, jwkTopem } from "./pem";
-import * as crypto from "crypto";
+import * as crypto from "node:crypto";
 
 export default class NodeCryptoDriver implements CryptoInterface {
   public readonly keyLength = 4096;
@@ -63,23 +63,41 @@ export default class NodeCryptoDriver implements CryptoInterface {
     signature: Uint8Array
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      const publicKey = {
+      const publicJwk = {
         kty: "RSA",
         e: "AQAB",
         n: publicModulus,
       };
 
-      const pem = this.jwkToPem(publicKey);
+      const pem = this.jwkToPem(publicJwk); //?
+      const keyObject = crypto.createPublicKey({
+        key: pem,
+        format: "pem",
+      });
 
-      resolve(
-        crypto.createVerify(this.hashAlgorithm).update(data).verify(
-          {
-            key: pem,
-            padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-          },
-          signature
-        )
+      const verify = crypto.createVerify(this.hashAlgorithm);
+      verify.update(data);
+      const verifyResult = verify.verify(
+        {
+          key: keyObject,
+          padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+        },
+        signature
       );
+
+      if (!verifyResult) {
+        const details = {
+          asymmetricKeyType: keyObject.asymmetricKeyType,
+          modulusLength: keyObject.asymmetricKeyDetails?.modulusLength,
+        };
+        console.warn(
+          "Transaction Verification Failed! \n" +
+            `Details: ${JSON.stringify(details, null, 2)} \n` +
+            "N.B. ArweaveJS is only guaranteed to verify txs created using ArweaveJS."
+        );
+      }
+
+      resolve(verifyResult);
     });
   }
 
