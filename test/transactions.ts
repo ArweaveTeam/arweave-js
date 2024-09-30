@@ -9,7 +9,7 @@ const arweave = arweaveInstance();
 // const arweaveDirectNode = arweaveInstanceDirectNode();
 
 const digestRegex = /^[a-z0-9-_]{43}$/i;
-const liveDataTxid = "bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U";
+const liveDataTxid = "s8saLXgvtZ9QO6GJAtVUFS1ROGMlx7IWeOcwGJfqAeo";
 
 // These are all identical data (test.mp4)
 // const liveDataTxidLarge = "8S0uH6EtRkJOG0b0Q2XsEBSZmbMLnxAwIlNAe_P7ZHg";
@@ -219,12 +219,12 @@ describe("Transactions", function () {
     const txRawData = await arweave.transactions.getData(liveDataTxid);
     expect(txRawData)
       .to.be.a("string")
-      .which.contain("CjwhRE9DVFlQRSBodG1sPgo");
+      .which.contain("eyJtZXNzYWdlIjoiSGVsbG8gV29ybGQifQ");
 
     const txDecodeData = await arweave.transactions.getData(liveDataTxid, {
       decode: true,
     });
-    expect(txDecodeData).to.be.a("Uint8Array").to.contain([10, 60, 33, 68]);
+    expect(txDecodeData).to.be.a("Uint8Array").to.contain([123, 34, 109, 101]);
 
     const txDecodeStringData = await arweave.transactions.getData(
       liveDataTxid,
@@ -232,7 +232,7 @@ describe("Transactions", function () {
     );
     expect(txDecodeStringData)
       .to.be.a("string")
-      .which.contain("<title>ARWEAVE / PEER EXPLORER</title>");
+      .which.contain('{"message":"Hello World"}');
   });
 
   it("should get transaction data > 12MiB from chunks or gateway", async function () {
