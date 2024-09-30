@@ -1,7 +1,7 @@
 import { JWKInterface } from "../wallet";
 import CryptoInterface, { SignatureOptions } from "./crypto-interface";
 import { pemTojwk, jwkTopem } from "./pem";
-import * as crypto from "node:crypto";
+import * as crypto from "crypto";
 
 export default class NodeCryptoDriver implements CryptoInterface {
   public readonly keyLength = 4096;
