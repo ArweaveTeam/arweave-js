@@ -60,7 +60,6 @@ export class SECP256k1PrivateKey extends PrivateKey {
         return  {
             ...(await this.publicKey.serialize()),
             d: bufferTob64Url(this.key),
-            key_ops: SECP256k1PrivateKey.usages,
         };
     }
 
@@ -116,8 +115,7 @@ export class SECP256k1PublicKey extends PublicKey {
             kty: "EC",
             crv: "secp256k1",
             x: bufferTob64Url(this.key.slice(1, 33)), 
-            y: bufferTob64Url(this.key.slice(33)),
-            key_ops: SECP256k1PublicKey.usages
+            y: bufferTob64Url(this.key.slice(33))
         };
     }
 }

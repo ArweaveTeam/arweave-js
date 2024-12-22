@@ -1,4 +1,4 @@
-
+import { readFileSync } from "fs";
 import * as chai from "chai";
 
 import { EllipticCurvePrivateKey, EllipticCurvePublicKey, SECP256k1PrivateKey, SECP256k1PublicKey } from "../../src/common/lib/crypto/keys";
@@ -7,9 +7,8 @@ import { subtle } from "crypto";
 
 const expect = chai.expect;
 
-
 describe("Crypto: EdwardsCurve 25519", function () {
-    it("test de/serialization sign/verify", async function() {
+    it("De/Serialization Sign/Verify", async function() {
         const privKeyA = await EllipticCurvePrivateKey.new();
         const privKeyAJWK = await privKeyA.serialize();
         const privKeyAA = await EllipticCurvePrivateKey.deserialize({format: "jwk", keyData: privKeyAJWK, type: KeyType.ED_25519});
@@ -48,9 +47,9 @@ describe("Crypto: EdwardsCurve 25519", function () {
 
         // add raw format serialziation tests
     });
-    it("test against Erlang crypto module fixtures", async function() {
+    it("Erlang Crypto Compatibility", async function() {
     });
-    it("test againstRustCrypto module fixtures", async function() {
+    it("RustCrypto-k256 Compatibility", async function() {
     });
 });
 
@@ -93,12 +92,47 @@ describe("Crypto: EllipticCurve secp256k1", function () {
         expect(sigB.length).length.be.equal(64); 
         expect(sigB).not.to.be.equal(sigA);
         expect(await pubKeyA.verify(digest, sigA)).true;
+        expect(await (await SECP256k1PublicKey.deserialize({format: "jwk", keyData: pubKeyAJWK})).verify(digest, sigA)).true;
         expect(await pubKeyA.verify(digest, sigB)).false;
-
+        
         // add raw format serialziation tests
     });
-    it("test against Erlang crypto module fixtures", async function() {
+    it("Erlang Crypto Compatibility", async function() {
+        const path = "./test/crypto/fixtures/erlang";
+        const sk = JSON.parse(readFileSync(`${path}/sk.json`).toString()) as JsonWebKey;
+        const pk = JSON.parse(readFileSync(`${path}/pk.json`).toString()) as JsonWebKey;
+
+        const privKey = await SECP256k1PrivateKey.deserialize({format: "jwk", keyData: sk});
+        const pubKey = await SECP256k1PublicKey.deserialize({format: "jwk", keyData: pk});
+        expect((await privKey.serialize())['d']).to.deep.equal(sk['d']);
+        expect((await pubKey.serialize())['x']).to.deep.equal(pk['x']);
+        expect((await pubKey.serialize())['y']).to.deep.equal(pk['y']);
+        expect((await (await privKey.public()).serialize())['x']).to.deep.equal(pk['x']);
+        expect((await (await privKey.public()).serialize())['y']).to.deep.equal(pk['y']);
+
+        const msg = readFileSync(`${path}/msg.bin`);
+        const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", msg));  
+        const sig = new Uint8Array(readFileSync(`${path}/sig.bin`));
+        expect(await (await privKey.public()).verify(digest, sig)).true
     });
-    it("test againstRustCrypto module fixtures", async function() {
+
+    it("RustCrypto-k256 Compatibility", async function() {
+        const path = "./test/crypto/fixtures/RustCrypto-k256";
+        const sk = JSON.parse(readFileSync(`${path}/sk.json`).toString()) as JsonWebKey;
+        const pk = JSON.parse(readFileSync(`${path}/pk.json`).toString()) as JsonWebKey;
+
+        const privKey = await SECP256k1PrivateKey.deserialize({format: "jwk", keyData: sk});
+        const pubKey = await SECP256k1PublicKey.deserialize({format: "jwk", keyData: pk});
+
+        expect((await privKey.serialize())['d']).to.deep.equal(sk['d']);
+        expect((await pubKey.serialize())['x']).to.deep.equal(pk['x']);
+        expect((await pubKey.serialize())['y']).to.deep.equal(pk['y']);
+        expect((await (await privKey.public()).serialize())['x']).to.deep.equal(pk['x']);
+        expect((await (await privKey.public()).serialize())['y']).to.deep.equal(pk['y']);
+
+        const msg = readFileSync(`${path}/msg.bin`);
+        const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", msg));  
+        const sig = new Uint8Array(readFileSync(`${path}/sig.bin`));
+        expect(await (await privKey.public()).verify(digest, sig)).true
     });
 });
