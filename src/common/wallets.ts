@@ -1,8 +1,10 @@
 import Api from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
+import { KeyType, PrivateKey, RSAPrivateKey, EllipticCurvePrivateKey, SECP256k1PrivateKey } from "./lib/crypto/keys";
 import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
 import "arconnect";
+
 
 export default class Wallets {
   private api: Api;
@@ -38,6 +40,19 @@ export default class Wallets {
     return this.api.get(`wallet/${address}/last_tx`).then((response) => {
       return response.data;
     });
+  }
+
+  public async generateWallet({type = KeyType.RSA_65537}: {type: KeyType} = {type: KeyType.RSA_65537}): Promise<PrivateKey> {
+    switch(type) {
+      case KeyType.RSA_65537:
+        return RSAPrivateKey.new();
+      case KeyType.ED_25519:
+        return EllipticCurvePrivateKey.new();
+      case KeyType.EC_SECP256K1:
+        return SECP256k1PrivateKey.new();
+      default:
+        throw new Error(`KeyType ${type} is not supported`);
+    }
   }
 
   public generate() {

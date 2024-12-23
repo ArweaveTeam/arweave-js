@@ -23,7 +23,7 @@ export class RSAPrivateKey extends PrivateKey {
     constructor({driver, key, type}: {driver: SubtleCrypto, key: CryptoKeyPair | CryptoKey, type: KeyType}) {
         super({type: type});
         this.driver = driver;
-        
+
         // initialized with CryptoKeyPair
         if ('publicKey' in key) {
             this.key = key.privateKey;
@@ -35,9 +35,9 @@ export class RSAPrivateKey extends PrivateKey {
             this.key = key;
             this.publicKey = null;
         }
-        
+
     }
-    
+
     public async sign(payload: Uint8Array): Promise<Uint8Array> {
         return new Uint8Array(await this.driver.sign(
             getSigningParameters(this.type),
@@ -70,9 +70,9 @@ export class RSAPublicKey extends PublicKey {
         }
         super({type: type});
         this.driver = driver;
-        this.key = key;        
+        this.key = key;
     }
-    
+
     static async deserialize({driver = crypto.subtle, format, keyData, type}: {driver?: SubtleCrypto, format: "jwk" | "raw" | "pkcs8" | "spki", keyData: JsonWebKey | ArrayBuffer, type: KeyType}): Promise<RSAPublicKey> {
         const key = await driver.importKey(format as any, keyData as any, getInitializationOptions(type), true, RSAPublicKey.usages);
         return new RSAPublicKey({driver, type, key});
@@ -96,7 +96,11 @@ export class RSAPublicKey extends PublicKey {
             }
             default:
                 throw new Error(`Unsupported RSA KeyType ${this.type}`);
-        }        
+        }
+    }
+
+    public async identifier(): Promise<Uint8Array> {
+        return await this.serialize({format: "raw"}) as Uint8Array;
     }
 }
 
@@ -113,7 +117,7 @@ const getDigestSize = (hashName: Algorithm | string) => {
         name = hashName;
     }
     switch(name) {
-        case "SHA-256": 
+        case "SHA-256":
             return 32;
         default:
             throw new Error(`Unsupported Hash Algorithm for RSA Key ${hashName}`);

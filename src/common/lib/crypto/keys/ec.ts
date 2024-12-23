@@ -1,4 +1,4 @@
-import { KeyType, PublicKey, PrivateKey, getInitializationOptions, getSigningParameters } from "./interface";
+import { KeyType, KeyTypeByte, PublicKey, PrivateKey, getInitializationOptions, getSigningParameters } from "./interface";
 
 export class EllipticCurvePrivateKey extends PrivateKey {
     static usages: Array<KeyUsage> = ["sign", "verify"];
@@ -25,8 +25,7 @@ export class EllipticCurvePrivateKey extends PrivateKey {
     constructor({driver, key, type}: {driver: SubtleCrypto, key: CryptoKeyPair | CryptoKey, type: KeyType}) {
         super({type: type});
         this.driver = driver;
-        
-        // initialized with CryptoKeyPair
+
         if ('publicKey' in key) {
             this.key = key.privateKey;
             this.publicKey = new EllipticCurvePublicKey({driver, type, key: key.publicKey});
@@ -37,9 +36,9 @@ export class EllipticCurvePrivateKey extends PrivateKey {
             this.key = key;
             this.publicKey = null;
         }
-        
+
     }
-    
+
     public async sign(payload: Uint8Array): Promise<Uint8Array> {
         return new Uint8Array(await this.driver.sign(
             getSigningParameters(this.type),
@@ -82,7 +81,7 @@ export class EllipticCurvePublicKey extends PublicKey {
         this.driver = driver;
         this.key = key;
     }
-    
+
     public async verify(payload: Uint8Array, signature: Uint8Array): Promise<boolean> {
         switch(this.type) {
             case KeyType.ED_25519:
@@ -94,10 +93,22 @@ export class EllipticCurvePublicKey extends PublicKey {
                 );
             default:
                 throw new Error(`Unsupported EC KeyType ${this.type}`);
-        }        
+        }
     }
 
-    public async serialize(): Promise<JsonWebKey> {
-        return this.driver.exportKey("jwk", this.key);
+    public async serialize({format = "jwk"}: {format: "jwk" | "raw"} = {format: "jwk"}): Promise<JsonWebKey | Uint8Array> {
+        switch(format) {
+            case "jwk":
+                return this.driver.exportKey("jwk", this.key);
+            case "raw":
+                return new Uint8Array(await this.driver.exportKey("raw", this.key));
+            default:
+                throw new Error(`Unsupported format ${format}`);
+        }
+    }
+
+    public async identifier(): Promise<Uint8Array> {
+        const raw = await this.serialize({format: "raw"}) as Uint8Array;
+        return new Uint8Array([KeyTypeByte[KeyType.ED_25519], ...raw]);
     }
 }

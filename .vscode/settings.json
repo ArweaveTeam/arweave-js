@@ -1,4 +1,6 @@
 {
   "ponicode.testSettings.testLocation.locationType": "Same folder as source file",
-  "ponicode.testSettings.testLocation.path": "{rootDir}/{filePath}/{fileName}.test.{ext}"
+  "ponicode.testSettings.testLocation.path": "{rootDir}/{filePath}/{fileName}.test.{ext}",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true
 }

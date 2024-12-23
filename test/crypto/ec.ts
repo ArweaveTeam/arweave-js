@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import * as chai from "chai";
 
 import { EllipticCurvePrivateKey, EllipticCurvePublicKey, SECP256k1PrivateKey, SECP256k1PublicKey } from "../../src/common/lib/crypto/keys";
-import { KeyType } from "../../src/common/lib/crypto/keys/interface";
+import { KeyType, KeyTypeByte } from "../../src/common/lib/crypto/keys/interface";
 import { subtle } from "crypto";
 
 const expect = chai.expect;
@@ -12,19 +12,19 @@ describe("Crypto: EdwardsCurve 25519", function () {
         const privKeyA = await EllipticCurvePrivateKey.new();
         const privKeyAJWK = await privKeyA.serialize();
         const privKeyAA = await EllipticCurvePrivateKey.deserialize({format: "jwk", keyData: privKeyAJWK, type: KeyType.ED_25519});
-        
+
         expect(privKeyA.type).to.be.equal(KeyType.ED_25519);
         expect(privKeyAJWK.crv).to.equal('Ed25519');
         expect(privKeyAJWK.kty).to.equal('OKP');
         expect(privKeyAJWK).to.have.property('d');
         expect(privKeyAJWK).to.have.property('x');
         expect(privKeyAJWK).to.deep.equal(await privKeyAA.serialize());
-        
-        
+
+
         const pubKeyA = await privKeyA.public();
-        const pubKeyAJWK = await pubKeyA.serialize();
+        const pubKeyAJWK = await pubKeyA.serialize() as JsonWebKey;
         const pubKeyAAJWK = await EllipticCurvePublicKey.deserialize({format: "jwk", keyData: pubKeyAJWK, type: KeyType.ED_25519});
-        
+
         expect(pubKeyA.type).to.equal(KeyType.ED_25519);
         expect(pubKeyAJWK.crv).to.equal('Ed25519');
         expect(pubKeyAJWK.kty).to.equal('OKP');
@@ -32,20 +32,26 @@ describe("Crypto: EdwardsCurve 25519", function () {
         expect(pubKeyAJWK).to.have.property('x');
         expect(pubKeyAJWK.x).to.equal(privKeyAJWK.x);
         expect(pubKeyAJWK).to.deep.equal(await pubKeyAAJWK.serialize());
-        
-        
+
+
         let payload = new Uint8Array(Math.random() * 1000);
         payload = crypto.getRandomValues(payload);
         const sigA = await privKeyA.sign(payload);
         const sigB = await (await EllipticCurvePrivateKey.new()).sign(payload);
-        
+
         expect(sigA.length).be.equal(64);
-        expect(sigB.length).length.be.equal(64); 
+        expect(sigB.length).length.be.equal(64);
         expect(sigB).not.to.be.equal(sigA);
         expect(await pubKeyA.verify(payload, sigA)).true;
         expect(await pubKeyA.verify(payload, sigB)).false;
 
-        // add raw format serialziation tests
+        const raw = await pubKeyA.serialize({format: "raw"}) as Uint8Array;
+        expect(raw.byteLength).to.equal(32);
+
+        const identifier = await pubKeyA.identifier();
+        expect(identifier.byteLength).to.equal(33);
+        expect(identifier[0]).to.equal(KeyTypeByte[KeyType.ED_25519]);
+        expect(identifier.slice(1)).to.deep.equal(raw);
     });
     it("Erlang Crypto Compatibility", async function() {
     });
@@ -68,9 +74,9 @@ describe("Crypto: EllipticCurve secp256k1", function () {
 
 
         const pubKeyA = await privKeyA.public();
-        const pubKeyAJWK = await pubKeyA.serialize();
+        const pubKeyAJWK = await pubKeyA.serialize() as JsonWebKey;
         const pubKeyAAJWK = await SECP256k1PublicKey.deserialize({format: "jwk", keyData: pubKeyAJWK});
-        
+
         expect(pubKeyA.type).to.equal(KeyType.EC_SECP256K1);
         expect(pubKeyAJWK.crv).to.equal('secp256k1');
         expect(pubKeyAJWK.kty).to.equal('EC');
@@ -80,7 +86,7 @@ describe("Crypto: EllipticCurve secp256k1", function () {
         expect(pubKeyAJWK.x).to.equal(privKeyAJWK.x);
         expect(pubKeyAJWK.y).to.equal(privKeyAJWK.y);
         expect(pubKeyAJWK).to.deep.equal(await pubKeyAAJWK.serialize());
-        
+
 
         let payload = new Uint8Array(Math.random() * 1000);
         payload = crypto.getRandomValues(payload);
@@ -89,13 +95,27 @@ describe("Crypto: EllipticCurve secp256k1", function () {
         const sigB = await (await SECP256k1PrivateKey.new()).sign(digest);
 
         expect(sigA.length).be.equal(64);
-        expect(sigB.length).length.be.equal(64); 
+        expect(sigB.length).length.be.equal(64);
         expect(sigB).not.to.be.equal(sigA);
         expect(await pubKeyA.verify(digest, sigA)).true;
         expect(await (await SECP256k1PublicKey.deserialize({format: "jwk", keyData: pubKeyAJWK})).verify(digest, sigA)).true;
         expect(await pubKeyA.verify(digest, sigB)).false;
-        
-        // add raw format serialziation tests
+
+        const raw = await pubKeyA.serialize({format: "raw"}) as Uint8Array;
+        expect(raw.byteLength).to.equal(65);
+
+        const identifier = await pubKeyA.identifier();
+        expect(identifier.byteLength).to.equal(35);
+        expect(identifier[0]).to.equal(KeyTypeByte[KeyType.EC_SECP256K1]);
+
+        if (raw[64] % 2 === 0) {
+            expect(identifier[1]).to.equal(2);
+        } else {
+            expect(identifier[1]).to.equal(3);
+        }
+        expect(identifier[1])
+        expect(identifier.slice(2, 34)).to.deep.equal(raw.slice(1, 33));
+        expect(identifier[34]).to.deep.equal(0);
     });
     it("Erlang Crypto Compatibility", async function() {
         const path = "./test/crypto/fixtures/erlang";
@@ -104,14 +124,14 @@ describe("Crypto: EllipticCurve secp256k1", function () {
 
         const privKey = await SECP256k1PrivateKey.deserialize({format: "jwk", keyData: sk});
         const pubKey = await SECP256k1PublicKey.deserialize({format: "jwk", keyData: pk});
-        expect((await privKey.serialize())['d']).to.deep.equal(sk['d']);
-        expect((await pubKey.serialize())['x']).to.deep.equal(pk['x']);
-        expect((await pubKey.serialize())['y']).to.deep.equal(pk['y']);
-        expect((await (await privKey.public()).serialize())['x']).to.deep.equal(pk['x']);
-        expect((await (await privKey.public()).serialize())['y']).to.deep.equal(pk['y']);
+        expect(((await privKey.serialize()) as JsonWebKey)['d']).to.deep.equal(sk['d']);
+        expect(((await pubKey.serialize()) as JsonWebKey)['x']).to.deep.equal(pk['x']);
+        expect(((await pubKey.serialize()) as JsonWebKey)['y']).to.deep.equal(pk['y']);
+        expect(((await (await privKey.public()).serialize()) as JsonWebKey)['x']).to.deep.equal(pk['x']);
+        expect(((await (await privKey.public()).serialize()) as JsonWebKey)['y']).to.deep.equal(pk['y']);
 
         const msg = readFileSync(`${path}/msg.bin`);
-        const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", msg));  
+        const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", msg));
         const sig = new Uint8Array(readFileSync(`${path}/sig.bin`));
         expect(await (await privKey.public()).verify(digest, sig)).true
     });
@@ -124,14 +144,14 @@ describe("Crypto: EllipticCurve secp256k1", function () {
         const privKey = await SECP256k1PrivateKey.deserialize({format: "jwk", keyData: sk});
         const pubKey = await SECP256k1PublicKey.deserialize({format: "jwk", keyData: pk});
 
-        expect((await privKey.serialize())['d']).to.deep.equal(sk['d']);
-        expect((await pubKey.serialize())['x']).to.deep.equal(pk['x']);
-        expect((await pubKey.serialize())['y']).to.deep.equal(pk['y']);
-        expect((await (await privKey.public()).serialize())['x']).to.deep.equal(pk['x']);
-        expect((await (await privKey.public()).serialize())['y']).to.deep.equal(pk['y']);
+        expect(((await privKey.serialize()) as JsonWebKey)['d']).to.deep.equal(sk['d']);
+        expect(((await pubKey.serialize()) as JsonWebKey)['x']).to.deep.equal(pk['x']);
+        expect(((await pubKey.serialize()) as JsonWebKey)['y']).to.deep.equal(pk['y']);
+        expect(((await (await privKey.public()).serialize()) as JsonWebKey)['x']).to.deep.equal(pk['x']);
+        expect(((await (await privKey.public()).serialize()) as JsonWebKey)['y']).to.deep.equal(pk['y']);
 
         const msg = readFileSync(`${path}/msg.bin`);
-        const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", msg));  
+        const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", msg));
         const sig = new Uint8Array(readFileSync(`${path}/sig.bin`));
         expect(await (await privKey.public()).verify(digest, sig)).true
     });

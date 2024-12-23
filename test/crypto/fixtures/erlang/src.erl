@@ -16,7 +16,7 @@ create_fixtures() ->
     PK = {ECPoint, {namedCurve, secp256k1}},
     public_key:verify(Msg, sha256, Signature_DER, PK).
 
-sign(Msg, PrivKey) -> 
+sign(Msg, PrivKey) ->
     Sig = public_key:sign(
 		Msg,
 		sha256,

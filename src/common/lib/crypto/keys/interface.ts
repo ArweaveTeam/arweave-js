@@ -3,7 +3,7 @@ export enum KeyType {
     EC_SECP256K1 = "ec_secp256k1",
     ED_25519 = "ed_25519",
 };
-  
+
 export const KeyTypeByte = {
     [KeyType.RSA_65537]: null,
     [KeyType.EC_SECP256K1]: 1,
@@ -16,7 +16,7 @@ export abstract class PrivateKey {
     constructor({type}: {type: KeyType}) {
         this.type = type;
     }
-    
+
     static async new(_parameters: any): Promise<PrivateKey> {
         throw new Error(`PrivateKey does not implement instantiation interface.`);
     }
@@ -24,9 +24,10 @@ export abstract class PrivateKey {
         throw new Error(`PrivateKey does not implement deserialization interface.`);
     }
 
-    serialize(): Promise<JsonWebKey> {
+    serialize({format}: {format: "jwk" | "raw"}): Promise<JsonWebKey | Uint8Array> {
         throw new Error(`Key ${this.type} does not provide serialization interface.`);
     }
+
     decrypt(_secret: Uint8Array): Promise<Uint8Array> {
         throw new Error(`PrivateKey ${this.type} does not provide encyrption interface.`);
     }
@@ -44,11 +45,11 @@ export abstract class PublicKey {
     constructor({type}: {type: KeyType}) {
         this.type = type;
     }
-    
+
     static async deserialize(_parameters: any): Promise<PublicKey> {
         throw new Error(`PublicKey does not implement deserialization interface.`);
     }
-    serialize(): Promise<JsonWebKey> {
+    serialize({format}: {format: "jwk" | "raw"} = {format: "jwk"}): Promise<JsonWebKey | Uint8Array> {
         throw new Error(`PublicKey ${this.type} does not provide serialization interface.`);
     }
     encrypt(_payload: Uint8Array): Promise<Uint8Array> {
@@ -57,6 +58,8 @@ export abstract class PublicKey {
     verify(_payload: Uint8Array, _signature: Uint8Array): Promise<boolean> {
         throw new Error(`PublicKey ${this.type} does not provide signing interface.`);
     }
+    abstract identifier(): Promise<Uint8Array>;
+
 }
 
 

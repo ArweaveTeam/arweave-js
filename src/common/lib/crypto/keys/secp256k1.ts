@@ -1,5 +1,5 @@
 import { Secp256k1, initWasmSecp256k1 } from "@solar-republic/wasm-secp256k1";
-import { KeyType, PrivateKey, PublicKey } from "./interface";
+import { KeyType, KeyTypeByte, PrivateKey, PublicKey } from "./interface";
 import { bufferTob64Url, b64UrlToBuffer } from "lib/utils";
 
 // TODO: build wasm module and internalize the dependency
@@ -39,7 +39,7 @@ export class SECP256k1PrivateKey extends PrivateKey {
                 throw new Error(`Invalid secp256k1 key size ${key.length}`);
             }
             return new SECP256k1PrivateKey({driver, key});
-        }   
+        }
     }
 
     private readonly driver: Secp256k1;
@@ -110,12 +110,34 @@ export class SECP256k1PublicKey extends PublicKey {
         return this.driver.verify(signature, payload, this.key);
     }
 
-    public async serialize(): Promise<JsonWebKey> {
-        return  {
-            kty: "EC",
-            crv: "secp256k1",
-            x: bufferTob64Url(this.key.slice(1, 33)), 
-            y: bufferTob64Url(this.key.slice(33))
-        };
+    public async serialize({format = "jwk"}: {format: "jwk" | "raw"} = {format: "jwk"}): Promise<JsonWebKey | Uint8Array> {
+        switch(format) {
+            case "jwk":
+                return  {
+                    kty: "EC",
+                    crv: "secp256k1",
+                    x: bufferTob64Url(this.key.slice(1, 33)),
+                    y: bufferTob64Url(this.key.slice(33))
+                };
+            case "raw":
+                return this.key;
+            default:
+                throw new Error(`Unsupported format ${format}`);
+        }
+    }
+
+    public async identifier(): Promise<Uint8Array> {
+        const raw = await this.serialize({format: "raw"}) as Uint8Array;
+        const x = this.key.slice(1, 33);
+        const y = this.key.slice(33);
+        const raw_compressed = new Uint8Array(33);
+        if ((y[31] & 1) === 1) {
+            raw_compressed[0] = 3;
+        } else {
+            raw_compressed[0] = 2;
+        }
+        raw_compressed.set(x, 1);
+
+        return new Uint8Array([KeyTypeByte[KeyType.EC_SECP256K1], ...raw_compressed, 0]);
     }
 }
