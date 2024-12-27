@@ -1,3 +1,5 @@
+import { Secp256k1 } from "@solar-republic/wasm-secp256k1";
+
 export enum KeyType {
     RSA_65537 = "rsa_65537",
     EC_SECP256K1 = "ec_secp256k1",
@@ -6,8 +8,31 @@ export enum KeyType {
 
 export const KeyTypeByte = {
     [KeyType.RSA_65537]: null,
-    [KeyType.EC_SECP256K1]: 1,
-    [KeyType.ED_25519]: 2
+    [KeyType.EC_SECP256K1]: 2,
+    [KeyType.ED_25519]: 3
+}
+
+export type Format = "jwk" | "raw";
+
+export interface SerializationParams<T extends Format = Format> {
+    format: T;
+}
+
+export interface SigningParams {
+    payload: Uint8Array;
+}
+
+export interface VerifyingParams {
+    payload: Uint8Array;
+    signature: Uint8Array;
+}
+
+export interface EncryptionParams {
+    secret: Uint8Array;
+}
+
+export interface DecryptionParams {
+    payload: Uint8Array;
 }
 
 export abstract class PrivateKey {
@@ -16,52 +41,35 @@ export abstract class PrivateKey {
     constructor({type}: {type: KeyType}) {
         this.type = type;
     }
-
-    static async new(_parameters: any): Promise<PrivateKey> {
+    static async new(_: any): Promise<PrivateKey> {
         throw new Error(`PrivateKey does not implement instantiation interface.`);
     }
-    static async deserialize(_parameters: any): Promise<PrivateKey> {
+    static async deserialize(_: any): Promise<PrivateKey> {
         throw new Error(`PrivateKey does not implement deserialization interface.`);
     }
-
-    serialize({format}: {format: "jwk" | "raw"}): Promise<JsonWebKey | Uint8Array> {
-        throw new Error(`Key ${this.type} does not provide serialization interface.`);
+    abstract serialize(params: SerializationParams): Promise<JsonWebKey | Uint8Array>;
+    abstract sign(params: SigningParams): Promise<Uint8Array>;
+    abstract public(): Promise<PublicKey>;
+    public async decrypt(_: DecryptionParams): Promise<Uint8Array> {
+        throw new Error(`PrivateKey ${this.type} does not provide decription interface.`);
     }
-
-    decrypt(_secret: Uint8Array): Promise<Uint8Array> {
-        throw new Error(`PrivateKey ${this.type} does not provide encyrption interface.`);
-    }
-    sign(_payload: Uint8Array): Promise<Uint8Array> {
-        throw new Error(`PrivateKey ${this.type} does not provide signing interface.`);
-    }
-    public(): Promise<PublicKey> {
-        throw new Error(`PrivateKey ${this.type} does not provide a public side interface.`);
-    };
 }
 
 export abstract class PublicKey {
     public readonly type: KeyType;
-
     constructor({type}: {type: KeyType}) {
         this.type = type;
     }
-
-    static async deserialize(_parameters: any): Promise<PublicKey> {
+    static async deserialize(_: any): Promise<PublicKey> {
         throw new Error(`PublicKey does not implement deserialization interface.`);
     }
-    serialize({format}: {format: "jwk" | "raw"} = {format: "jwk"}): Promise<JsonWebKey | Uint8Array> {
-        throw new Error(`PublicKey ${this.type} does not provide serialization interface.`);
-    }
-    encrypt(_payload: Uint8Array): Promise<Uint8Array> {
-        throw new Error(`PublicKey ${this.type} does not provide encyrption interface.`);
-    }
-    verify(_payload: Uint8Array, _signature: Uint8Array): Promise<boolean> {
-        throw new Error(`PublicKey ${this.type} does not provide signing interface.`);
-    }
+    abstract serialize(params: SerializationParams): Promise<JsonWebKey | Uint8Array>;
+    abstract verify(params: VerifyingParams): Promise<boolean>;
     abstract identifier(): Promise<Uint8Array>;
-
+    public async encrypt(_: EncryptionParams): Promise<Uint8Array> {
+        throw new Error(`PrivateKey ${this.type} does not provide encyrption interface.`);
+    }
 }
-
 
 export const getInitializationOptions = (type: KeyType): AlgorithmIdentifier | RsaHashedKeyGenParams | EcKeyGenParams | "Ed25519" => {
     switch(type) {
@@ -71,8 +79,7 @@ export const getInitializationOptions = (type: KeyType): AlgorithmIdentifier | R
                 publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
                 hash: {
                     name: "SHA-256"
-                },
-                modulusLength: 4096
+                }
             };
         case KeyType.ED_25519:
             return "Ed25519";

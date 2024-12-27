@@ -1,11 +1,20 @@
-import { KeyType, PublicKey, PrivateKey, getInitializationOptions, getSigningParameters } from "./interface";
-
+import { KeyType, PublicKey, PrivateKey, getInitializationOptions, getSigningParameters, SerializationParams } from "./interface";
 
 export class RSAPrivateKey extends PrivateKey {
     static usages: Array<KeyUsage> = ["sign", "verify"];
-    static async new({driver = crypto.subtle, type = KeyType.RSA_65537}: {driver?: SubtleCrypto, type?: KeyType} = {driver: crypto.subtle, type: KeyType.RSA_65537}): Promise<RSAPrivateKey> {
+    static async new({driver = crypto.subtle, type = KeyType.RSA_65537, modulusLength}: {driver?: SubtleCrypto, type?: KeyType, modulusLength?: number} = {driver: crypto.subtle, type: KeyType.RSA_65537}): Promise<RSAPrivateKey> {
+        if (modulusLength !== undefined) {
+            if (modulusLength < 32 * 8 || modulusLength > 512 * 8) {
+                throw new Error("modulusLength must be between 256 and 4096.");
+            }
+            if ((modulusLength & (modulusLength - 1)) !== 0) {
+                throw new Error("Modulus length must be a power of 2.");
+            }
+        } else {
+            modulusLength = 4096;
+        }
         const key = await driver.generateKey(
-            getInitializationOptions(type),
+            {...getInitializationOptions(type) as RsaHashedKeyGenParams, modulusLength},
             true,
             RSAPrivateKey.usages
           ) as CryptoKeyPair;
@@ -38,7 +47,7 @@ export class RSAPrivateKey extends PrivateKey {
 
     }
 
-    public async sign(payload: Uint8Array): Promise<Uint8Array> {
+    public async sign({payload}: {payload: Uint8Array}): Promise<Uint8Array> {
         return new Uint8Array(await this.driver.sign(
             getSigningParameters(this.type),
             this.key,
@@ -55,8 +64,14 @@ export class RSAPrivateKey extends PrivateKey {
         return this.publicKey;
     }
 
-    public async serialize(): Promise<JsonWebKey> {
-        return this.driver.exportKey("jwk", this.key);
+    public async serialize({format}: SerializationParams<"jwk">): Promise<JsonWebKey>;
+    public async serialize({format}: SerializationParams): Promise<JsonWebKey | Uint8Array> {
+        switch (format) {
+            case "jwk":
+                return this.driver.exportKey("jwk", this.key);
+            default:
+                throw new Error(`Format ${format} no suppoerted`);
+        }
     }
 }
 
@@ -78,7 +93,7 @@ export class RSAPublicKey extends PublicKey {
         return new RSAPublicKey({driver, type, key});
     }
 
-    public async verify(payload: Uint8Array, signature: Uint8Array): Promise<boolean> {
+    public async verify({payload, signature}: {payload: Uint8Array, signature: Uint8Array}): Promise<boolean> {
         switch(this.type) {
             case KeyType.RSA_65537: {
                 let result = false;
@@ -101,6 +116,9 @@ export class RSAPublicKey extends PublicKey {
 
     public async identifier(): Promise<Uint8Array> {
         return await this.serialize({format: "raw"}) as Uint8Array;
+    }
+    public async serialize(params: SerializationParams): Promise<JsonWebKey | Uint8Array> {
+        throw new Error("not implemented");
     }
 }
 

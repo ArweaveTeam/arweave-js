@@ -1,6 +1,6 @@
 import { Secp256k1, initWasmSecp256k1 } from "@solar-republic/wasm-secp256k1";
-import { KeyType, KeyTypeByte, PrivateKey, PublicKey } from "./interface";
-import { bufferTob64Url, b64UrlToBuffer } from "lib/utils";
+import { KeyType, KeyTypeByte, PrivateKey, PublicKey, SerializationParams } from "./interface";
+import { bufferTob64Url, b64UrlToBuffer } from "../../utils";
 
 // TODO: build wasm module and internalize the dependency
 export const initializeDriver = async () => {
@@ -52,18 +52,24 @@ export class SECP256k1PrivateKey extends PrivateKey {
         this.publicKey = new SECP256k1PublicKey({driver, key: driver.sk_to_pk(key, true)});
     }
 
-    public async public(): Promise<PublicKey> {
+    public async public(): Promise<SECP256k1PublicKey> {
         return this.publicKey;
     }
 
-    public async serialize(): Promise<JsonWebKey> {
-        return  {
-            ...(await this.publicKey.serialize()),
-            d: bufferTob64Url(this.key),
-        };
+    public async serialize({format}: SerializationParams<"jwk">): Promise<JsonWebKey>;
+    public async serialize({format}: SerializationParams): Promise<JsonWebKey | Uint8Array> {
+        switch (format) {
+            case "jwk":
+                return  {
+                    ...(await this.publicKey.serialize({format: "jwk"})),
+                    d: bufferTob64Url(this.key),
+                };
+            default:
+                throw new Error(`Format ${format} no suppoerted`);
+        }
     }
 
-    public async sign(payload: Uint8Array): Promise<Uint8Array> {
+    public async sign({payload}: {payload: Uint8Array}): Promise<Uint8Array> {
         const[signature, _recovery] = this.driver.sign(this.key, payload);
         return signature;
     }
@@ -106,11 +112,13 @@ export class SECP256k1PublicKey extends PublicKey {
         this.key = key;
     }
 
-    public async verify(payload: Uint8Array, signature: Uint8Array): Promise<boolean> {
+    public async verify({payload, signature}: {payload: Uint8Array, signature: Uint8Array}): Promise<boolean> {
         return this.driver.verify(signature, payload, this.key);
     }
 
-    public async serialize({format = "jwk"}: {format: "jwk" | "raw"} = {format: "jwk"}): Promise<JsonWebKey | Uint8Array> {
+    public async serialize({format}: SerializationParams<"jwk">): Promise<JsonWebKey>;
+    public async serialize({format}: SerializationParams<"raw">): Promise<Uint8Array>;
+    public async serialize({format}: SerializationParams): Promise<JsonWebKey | Uint8Array> {
         switch(format) {
             case "jwk":
                 return  {
@@ -120,24 +128,23 @@ export class SECP256k1PublicKey extends PublicKey {
                     y: bufferTob64Url(this.key.slice(33))
                 };
             case "raw":
-                return this.key;
+                const x = this.key.slice(1, 33);
+                const y = this.key.slice(33);
+                const raw_compressed = new Uint8Array(33);
+                if ((y[31] & 1) === 1) {
+                    raw_compressed[0] = 3;
+                } else {
+                    raw_compressed[0] = 2;
+                }
+                raw_compressed.set(x, 1);
+                return raw_compressed;
             default:
                 throw new Error(`Unsupported format ${format}`);
         }
     }
 
     public async identifier(): Promise<Uint8Array> {
-        const raw = await this.serialize({format: "raw"}) as Uint8Array;
-        const x = this.key.slice(1, 33);
-        const y = this.key.slice(33);
-        const raw_compressed = new Uint8Array(33);
-        if ((y[31] & 1) === 1) {
-            raw_compressed[0] = 3;
-        } else {
-            raw_compressed[0] = 2;
-        }
-        raw_compressed.set(x, 1);
-
-        return new Uint8Array([KeyTypeByte[KeyType.EC_SECP256K1], ...raw_compressed, 0]);
+        const raw = await this.serialize({format: "raw"});
+        return new Uint8Array([KeyTypeByte[KeyType.EC_SECP256K1], ...raw, 0]);
     }
 }

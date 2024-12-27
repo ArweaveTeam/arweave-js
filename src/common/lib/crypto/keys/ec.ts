@@ -1,4 +1,4 @@
-import { KeyType, KeyTypeByte, PublicKey, PrivateKey, getInitializationOptions, getSigningParameters } from "./interface";
+import { KeyType, KeyTypeByte, PublicKey, PrivateKey, getInitializationOptions, getSigningParameters, SerializationParams } from "./interface";
 
 export class EllipticCurvePrivateKey extends PrivateKey {
     static usages: Array<KeyUsage> = ["sign", "verify"];
@@ -36,10 +36,9 @@ export class EllipticCurvePrivateKey extends PrivateKey {
             this.key = key;
             this.publicKey = null;
         }
-
     }
 
-    public async sign(payload: Uint8Array): Promise<Uint8Array> {
+    public async sign({payload}: {payload: Uint8Array}): Promise<Uint8Array> {
         return new Uint8Array(await this.driver.sign(
             getSigningParameters(this.type),
             this.key,
@@ -56,18 +55,25 @@ export class EllipticCurvePrivateKey extends PrivateKey {
         return this.publicKey;
     }
 
-    public async serialize(): Promise<JsonWebKey> {
-        return this.driver.exportKey("jwk", this.key);
+    public async serialize({format}: SerializationParams<"jwk">): Promise<JsonWebKey>;
+    public async serialize({format}: SerializationParams): Promise<JsonWebKey | Uint8Array> {
+        switch (format) {
+            case "jwk":
+                return this.driver.exportKey("jwk", this.key);
+            default:
+                throw new Error(`Format ${format} no suppoerted`);
+        }
     }
 }
 
 export class EllipticCurvePublicKey extends PublicKey {
     static usages: Array<KeyUsage> = ["verify"];
     static async deserialize({driver = crypto.subtle, format, keyData, type}: {driver?: SubtleCrypto, format: "jwk" | "raw" | "pkcs8" | "spki", keyData: JsonWebKey | ArrayBuffer, type: KeyType}): Promise<EllipticCurvePublicKey> {
-        if (format === "jwk" && 'key_ops' in keyData) {
-            keyData.key_ops = EllipticCurvePublicKey.usages;
+        const data = keyData;
+        if (format === "jwk" && 'key_ops' in data) {
+            data.key_ops = EllipticCurvePublicKey.usages;
         }
-        const key = await driver.importKey(format as any, keyData as any, getInitializationOptions(type), true, EllipticCurvePublicKey.usages);
+        const key = await driver.importKey(format as any, data as any, getInitializationOptions(type), true, EllipticCurvePublicKey.usages);
         return new EllipticCurvePublicKey({driver, type, key});
     }
 
@@ -82,7 +88,7 @@ export class EllipticCurvePublicKey extends PublicKey {
         this.key = key;
     }
 
-    public async verify(payload: Uint8Array, signature: Uint8Array): Promise<boolean> {
+    public async verify({payload, signature}: {payload: Uint8Array, signature: Uint8Array}): Promise<boolean> {
         switch(this.type) {
             case KeyType.ED_25519:
                 return this.driver.verify(
@@ -96,7 +102,9 @@ export class EllipticCurvePublicKey extends PublicKey {
         }
     }
 
-    public async serialize({format = "jwk"}: {format: "jwk" | "raw"} = {format: "jwk"}): Promise<JsonWebKey | Uint8Array> {
+    public async serialize({format}: SerializationParams<"jwk">): Promise<JsonWebKey>;
+    public async serialize({format}: SerializationParams<"raw">): Promise<Uint8Array>;
+    public async serialize({format}: SerializationParams): Promise<JsonWebKey | Uint8Array> {
         switch(format) {
             case "jwk":
                 return this.driver.exportKey("jwk", this.key);
@@ -108,7 +116,7 @@ export class EllipticCurvePublicKey extends PublicKey {
     }
 
     public async identifier(): Promise<Uint8Array> {
-        const raw = await this.serialize({format: "raw"}) as Uint8Array;
+        const raw = await this.serialize({format: "raw"});
         return new Uint8Array([KeyTypeByte[KeyType.ED_25519], ...raw]);
     }
 }
