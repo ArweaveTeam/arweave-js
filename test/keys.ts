@@ -103,17 +103,15 @@ describe("Crypto: EllipticCurve secp256k1", function () {
 
         const raw = await pubKeyA.serialize({format: "raw"});
         expect(raw.byteLength).to.equal(33);
-
         const identifier = await pubKeyA.identifier();
         expect(identifier.byteLength).to.equal(35);
         expect(identifier[0]).to.equal(KeyTypeByte[KeyType.EC_SECP256K1]);
-
-        if (raw[64] % 2 === 0) {
+        // @ts-ignore
+        if (pubKeyA.key[pubKeyA.key.byteLength-1] % 2 === 0) {
             expect(identifier[1]).to.equal(2);
         } else {
             expect(identifier[1]).to.equal(3);
         }
-        expect(identifier[1])
         expect(identifier.slice(2, 34)).to.deep.equal(raw.slice(1, 33));
         expect(identifier[34]).to.deep.equal(0);
     });
