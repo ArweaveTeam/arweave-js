@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import * as chai from "chai";
 
 import { EllipticCurvePrivateKey, EllipticCurvePublicKey, SECP256k1PrivateKey, SECP256k1PublicKey } from "../src/common/lib/crypto/keys";
@@ -53,8 +53,10 @@ describe("Crypto: EdwardsCurve 25519", function () {
         expect(identifier.slice(1)).to.deep.equal(raw);
     });
     it("Erlang Crypto Compatibility", async function() {
+        throw new Error('todo!')
     });
     it("RustCrypto-k256 Compatibility", async function() {
+        throw new Error('todo!')
     });
 });
 
@@ -128,10 +130,9 @@ describe("Crypto: EllipticCurve secp256k1", function () {
         expect(((await (await privKey.public()).serialize({format: "jwk"})))['x']).to.deep.equal(pk['x']);
         expect(((await (await privKey.public()).serialize({format: "jwk"})))['y']).to.deep.equal(pk['y']);
 
-        const msg = readFileSync(`${path}/msg.bin`);
-        const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", msg));
+        const payload = readFileSync(`${path}/msg.bin`);
         const sig = new Uint8Array(readFileSync(`${path}/sig.bin`));
-        expect(await (await privKey.public()).verify({payload: digest, signature: sig})).true
+        expect(await (await privKey.public()).verify({payload, signature: sig})).true
     });
 
     it("RustCrypto-k256 Compatibility", async function() {
@@ -148,16 +149,17 @@ describe("Crypto: EllipticCurve secp256k1", function () {
         expect(((await (await privKey.public()).serialize({format: "jwk"})))['x']).to.deep.equal(pk['x']);
         expect(((await (await privKey.public()).serialize({format: "jwk"})))['y']).to.deep.equal(pk['y']);
 
-        const msg = readFileSync(`${path}/msg.bin`);
-        const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", msg));
+        const payload = readFileSync(`${path}/msg.bin`);
         const sig = new Uint8Array(readFileSync(`${path}/sig.bin`));
-        expect(await (await privKey.public()).verify({payload: digest, signature: sig})).true
+        expect(await (await privKey.public()).verify({payload, signature: sig})).true
     });
 });
 
 describe("Crypto: RSA 64437", function () {
     it("De/Serialization Sign/Verify", async function() {
+        throw new Error('todo!')
     });
     it("Erlang Crypto Compatibility", async function() {
+        throw new Error('todo!')
     });
 });

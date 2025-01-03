@@ -1,7 +1,8 @@
-import { KeyType, PublicKey, PrivateKey, getInitializationOptions, getSigningParameters, SerializationParams } from "./interface";
+import { KeyType, PublicKey, PrivateKey, getInitializationOptions, getSigningParameters, SerializationParams, VerifyingParams, SigningParams } from "./interface";
+import { b64UrlToBuffer, bufferTob64Url } from "../../utils";
 
 export class RSAPrivateKey extends PrivateKey {
-    static usages: Array<KeyUsage> = ["sign", "verify"];
+    static usages: Array<KeyUsage> = ["sign"];
     static async new({driver = crypto.subtle, type = KeyType.RSA_65537, modulusLength}: {driver?: SubtleCrypto, type?: KeyType, modulusLength?: number} = {driver: crypto.subtle, type: KeyType.RSA_65537}): Promise<RSAPrivateKey> {
         if (modulusLength !== undefined) {
             if (modulusLength < 32 * 8 || modulusLength > 512 * 8) {
@@ -47,9 +48,13 @@ export class RSAPrivateKey extends PrivateKey {
 
     }
 
-    public async sign({payload}: {payload: Uint8Array}): Promise<Uint8Array> {
+    public async sign({payload}: SigningParams, saltLength?: number): Promise<Uint8Array> {
+        let signingOptions = getSigningParameters(this.type) as RsaPssParams;
+        if (saltLength !== undefined) {
+            signingOptions = {...signingOptions, saltLength};
+        }
         return new Uint8Array(await this.driver.sign(
-            getSigningParameters(this.type),
+            signingOptions,
             this.key,
             payload
         ));
@@ -59,8 +64,14 @@ export class RSAPrivateKey extends PrivateKey {
         if (this.publicKey !== null) {
             return this.publicKey;
         }
-        let keyData = await this.driver.exportKey("spki", this.key);
-        this.publicKey = await RSAPublicKey.deserialize({driver: this.driver, format: "spki", keyData, type: this.type});
+        let keyData = await this.driver.exportKey("jwk", this.key);
+        delete keyData.d;
+        delete keyData.dp;
+        delete keyData.dq;
+        delete keyData.q;
+        delete keyData.qi;
+        delete keyData.key_ops;
+        this.publicKey = await RSAPublicKey.deserialize({driver: this.driver, format: "jwk", keyData, type: this.type});
         return this.publicKey;
     }
 
@@ -89,11 +100,19 @@ export class RSAPublicKey extends PublicKey {
     }
 
     static async deserialize({driver = crypto.subtle, format, keyData, type}: {driver?: SubtleCrypto, format: "jwk" | "raw" | "pkcs8" | "spki", keyData: JsonWebKey | ArrayBuffer, type: KeyType}): Promise<RSAPublicKey> {
+        if (format === "raw") {
+            keyData = {
+                kty: "RSA",
+                e: "AQAB",
+                n: bufferTob64Url(keyData as Uint8Array),
+            };
+            format = "jwk";
+        }
         const key = await driver.importKey(format as any, keyData as any, getInitializationOptions(type), true, RSAPublicKey.usages);
         return new RSAPublicKey({driver, type, key});
     }
 
-    public async verify({payload, signature}: {payload: Uint8Array, signature: Uint8Array}): Promise<boolean> {
+    public async verify({payload, signature}: VerifyingParams): Promise<boolean> {
         switch(this.type) {
             case KeyType.RSA_65537: {
                 let result = false;
@@ -114,12 +133,24 @@ export class RSAPublicKey extends PublicKey {
         }
     }
 
+    public async serialize({format}: SerializationParams<"jwk">): Promise<JsonWebKey>;
+    public async serialize({format}: SerializationParams<"raw">): Promise<Uint8Array>;
+    public async serialize({format}: SerializationParams): Promise<JsonWebKey | Uint8Array> {
+        const jwk = await this.driver.exportKey("jwk", this.key);
+        switch(format) {
+            case "jwk":
+                return jwk;
+            case "raw":
+                return b64UrlToBuffer(jwk.n!);
+            default:
+                throw new Error(`Unsupported format ${format}`);
+        }
+    }
+
     public async identifier(): Promise<Uint8Array> {
-        return await this.serialize({format: "raw"}) as Uint8Array;
+        return this.serialize({format: "raw"});
     }
-    public async serialize(params: SerializationParams): Promise<JsonWebKey | Uint8Array> {
-        throw new Error("not implemented");
-    }
+
 }
 
 const maxSaltSize = (key: CryptoKey): number => {

@@ -1,5 +1,3 @@
-import { Secp256k1 } from "@solar-republic/wasm-secp256k1";
-
 export enum KeyType {
     RSA_65537 = "rsa_65537",
     EC_SECP256K1 = "ec_secp256k1",
@@ -7,10 +5,10 @@ export enum KeyType {
 };
 
 export const KeyTypeByte = {
-    [KeyType.RSA_65537]: null,
     [KeyType.EC_SECP256K1]: 2,
     [KeyType.ED_25519]: 3
 }
+export const KeyTypeBytesReverse: Map<number, string> = new Map(Object.entries(KeyTypeByte).map(([key, value]) => ([value, key])));
 
 export type Format = "jwk" | "raw";
 
@@ -20,15 +18,18 @@ export interface SerializationParams<T extends Format = Format> {
 
 export interface SigningParams {
     payload: Uint8Array;
+    is_digest?: boolean;
 }
 
 export interface VerifyingParams {
     payload: Uint8Array;
     signature: Uint8Array;
+    is_digest?: boolean;
 }
 
 export interface EncryptionParams {
     secret: Uint8Array;
+
 }
 
 export interface DecryptionParams {

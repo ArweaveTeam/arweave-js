@@ -11,6 +11,7 @@ import * as ArweaveUtils from "./lib/utils";
 import Silo from "./silo";
 import Chunks from "./chunks";
 import Blocks from "./blocks";
+import { PrivateKey, PublicKey, fromJWK } from "./lib/crypto/keys";
 
 export interface Config {
   api: ApiConfig;
@@ -83,7 +84,7 @@ export default class Arweave {
 
   public async createTransaction(
     attributes: Partial<CreateTransactionInterface>,
-    jwk?: JWKInterface | "use_wallet"
+    keyData?: JWKInterface | "use_wallet" | PrivateKey | PublicKey
   ): Promise<Transaction> {
     const transaction: Partial<CreateTransactionInterface> = {};
 
@@ -95,10 +96,18 @@ export default class Arweave {
       );
     }
 
-    if (attributes.owner == undefined) {
-      if (jwk && jwk !== "use_wallet") {
-        transaction.owner = jwk.n;
+    if (attributes.owner == undefined && keyData && keyData !== "use_wallet") {
+      let pk: PublicKey;
+      if (keyData instanceof PrivateKey){
+        pk = await keyData.public()
+      } else if (keyData instanceof PublicKey) {
+        pk = keyData;
+      } else {
+        pk = await fromJWK(keyData as JsonWebKey)
+          .then(sk => sk.public());
       }
+      transaction.owner = await pk.identifier()
+        .then(id => ArweaveUtils.bufferTob64Url(id));
     }
 
     if (attributes.last_tx == undefined) {

@@ -1,9 +1,10 @@
 import Api from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
-import { KeyType, PrivateKey, RSAPrivateKey, EllipticCurvePrivateKey, SECP256k1PrivateKey } from "./lib/crypto/keys";
+import { KeyType, PrivateKey, PublicKey, RSAPrivateKey, EllipticCurvePrivateKey, SECP256k1PrivateKey } from "./lib/crypto/keys";
 import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
 import "arconnect";
+import { fromJWK } from "./lib/crypto/keys";
 
 
 export default class Wallets {
@@ -62,15 +63,11 @@ export default class Wallets {
   public async jwkToAddress(
     jwk?: JWKInterface | "use_wallet"
   ): Promise<string> {
-    if (!jwk || jwk === "use_wallet") {
-      return this.getAddress();
-    } else {
-      return this.getAddress(jwk);
-    }
+    return this.getAddress(jwk);
   }
 
-  public async getAddress(jwk?: JWKInterface | "use_wallet"): Promise<string> {
-    if (!jwk || jwk === "use_wallet") {
+  public async getAddress(keyData?: JWKInterface | "use_wallet" | PrivateKey | PublicKey): Promise<string> {
+    if (!keyData || keyData === "use_wallet") {
       try {
         // @ts-ignore
         await arweaveWallet.connect(["ACCESS_ADDRESS"]);
@@ -81,13 +78,24 @@ export default class Wallets {
       // @ts-ignore
       return arweaveWallet.getActiveAddress();
     } else {
-      return this.ownerToAddress(jwk.n);
+      let pk: PublicKey;
+      if (keyData instanceof PrivateKey){
+        pk = await keyData.public()
+      } else if (keyData instanceof PublicKey) {
+        pk = keyData;
+      } else {
+        pk = await fromJWK(keyData)
+          .then(sk => sk.public());
+      }
+      return pk.identifier()
+        .then(identifier => this.crypto.hash(identifier))
+        .then(address => ArweaveUtils.bufferTob64Url(address));
     }
   }
 
-  public async ownerToAddress(owner: string): Promise<string> {
+  public async ownerToAddress(identifier: string): Promise<string> {
     return ArweaveUtils.bufferTob64Url(
-      await this.crypto.hash(ArweaveUtils.b64UrlToBuffer(owner))
+      await this.crypto.hash(ArweaveUtils.b64UrlToBuffer(identifier))
     );
   }
 }

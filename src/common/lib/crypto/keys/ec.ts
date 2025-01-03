@@ -1,4 +1,4 @@
-import { KeyType, KeyTypeByte, PublicKey, PrivateKey, getInitializationOptions, getSigningParameters, SerializationParams } from "./interface";
+import { KeyType, KeyTypeByte, PublicKey, PrivateKey, getInitializationOptions, getSigningParameters, SerializationParams, SigningParams, VerifyingParams } from "./interface";
 
 export class EllipticCurvePrivateKey extends PrivateKey {
     static usages: Array<KeyUsage> = ["sign", "verify"];
@@ -38,7 +38,7 @@ export class EllipticCurvePrivateKey extends PrivateKey {
         }
     }
 
-    public async sign({payload}: {payload: Uint8Array}): Promise<Uint8Array> {
+    public async sign({payload}: SigningParams): Promise<Uint8Array> {
         return new Uint8Array(await this.driver.sign(
             getSigningParameters(this.type),
             this.key,
@@ -88,7 +88,7 @@ export class EllipticCurvePublicKey extends PublicKey {
         this.key = key;
     }
 
-    public async verify({payload, signature}: {payload: Uint8Array, signature: Uint8Array}): Promise<boolean> {
+    public async verify({payload, signature}: VerifyingParams): Promise<boolean> {
         switch(this.type) {
             case KeyType.ED_25519:
                 return this.driver.verify(

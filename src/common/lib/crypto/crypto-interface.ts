@@ -1,4 +1,5 @@
 import { JWKInterface } from "../wallet";
+import { PrivateKey } from "./keys";
 
 export interface SignatureOptions {
   saltLength?: number;
@@ -8,7 +9,7 @@ export default interface CryptoInterface {
   generateJWK(): Promise<JWKInterface>;
 
   sign(
-    jwk: JWKInterface,
+    jwk: JWKInterface | PrivateKey,
     data: Uint8Array,
     options?: SignatureOptions
   ): Promise<Uint8Array>;
