@@ -1,6 +1,6 @@
 import Api from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
-import { KeyType, PrivateKey, PublicKey, RSAPrivateKey, EllipticCurvePrivateKey, SECP256k1PrivateKey } from "./lib/crypto/keys";
+import { KeyType, PrivateKey, PublicKey, RSAPrivateKey, SECP256k1PrivateKey } from "./lib/crypto/keys";
 import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
 import "arconnect";
@@ -47,8 +47,6 @@ export default class Wallets {
     switch(type) {
       case KeyType.RSA_65537:
         return RSAPrivateKey.new();
-      case KeyType.ED_25519:
-        return EllipticCurvePrivateKey.new();
       case KeyType.EC_SECP256K1:
         return SECP256k1PrivateKey.new();
       default:

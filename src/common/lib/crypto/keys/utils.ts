@@ -1,4 +1,4 @@
-import { EllipticCurvePrivateKey } from "./ec";
+
 import { KeyType, PrivateKey, PublicKey, KeyTypeBytesReverse } from "./interface";
 import { RSAPrivateKey, RSAPublicKey } from "./rsa";
 import { SECP256k1PrivateKey, SECP256k1PublicKey } from "./secp256k1"
@@ -8,8 +8,6 @@ export const fromJWK = async (keyData: JsonWebKey): Promise<PrivateKey> => {
     switch(keyData.kty) {
         case "EC":
             return SECP256k1PrivateKey.deserialize({format, keyData});
-        case "OKP":
-            return EllipticCurvePrivateKey.deserialize({format, keyData, type: KeyType.ED_25519});
         case "RSA":
             return RSAPrivateKey.deserialize({format, keyData, type: KeyType.RSA_65537});
         default:
