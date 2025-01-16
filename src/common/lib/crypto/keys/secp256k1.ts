@@ -5,7 +5,7 @@ import { bufferTob64Url, b64UrlToBuffer } from "../../utils";
 
 // KeyTypeByte:1 ++ RawCompressedPubKey:33 ++ 0x00:1 = 35
 const SECP256K1_IDENTIFIER_SIZE = 1 + ByteLens.PUBLIC_KEY_COMPRESSED + 1;
-const EC_POINT_LENGTH = ByteLens.PUBLIC_KEY_UNCOMPRESSED / 2;
+const EC_POINT_LENGTH = (ByteLens.PUBLIC_KEY_UNCOMPRESSED - 1) / 2;
 const UNCOMPRESSED_PREFIX = 0x04;
 const COMPRESSED_PREFIXES = [0x02, 0x03];
 
@@ -75,10 +75,12 @@ export class SECP256k1PrivateKey extends PrivateKey {
         }
     }
 
-    public async sign({payload, is_digest = false}: SigningParams): Promise<Uint8Array> {
+    public async sign({payload, isDigest = false}: SigningParams): Promise<Uint8Array> {
         let digest = payload;
-        if (is_digest == false) {
+        if (isDigest == false) {
             digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
+        } else if (digest.byteLength !== ByteLens.MSG_HASH) {
+            Promise.reject(`Invalid digest size ${digest.byteLength}`);
         }
         const[signature, recovery]: SignatureAndRecovery = this.driver.sign(this.key, digest);
         const recovarableSignature = new Uint8Array(ByteLens.ECDSA_SIG_RECOVERABLE);
@@ -135,6 +137,8 @@ export class SECP256k1PublicKey extends PublicKey {
         let digest = payload;
         if (isDigest === false) {
             digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
+        } else if (digest.byteLength !== ByteLens.MSG_HASH) {
+            Promise.reject(`Invalid digest size ${digest.byteLength}`);
         }
         const compactSignature = signature.slice(0, ByteLens.ECDSA_SIG_COMPACT);
         const recoveryId = signature[signature.byteLength - 1];
@@ -157,14 +161,16 @@ export class SECP256k1PublicKey extends PublicKey {
         this.key = key;
     }
 
-    public async verify({payload, signature, is_digest = false}: VerifyingParams): Promise<boolean> {
+    public async verify({payload, signature, isDigest = false}: VerifyingParams): Promise<boolean> {
         if (signature.byteLength !== ByteLens.ECDSA_SIG_RECOVERABLE) {
             Promise.reject(`Invaldi signature length $${signature.byteLength} needs to by ${ByteLens.ECDSA_SIG_RECOVERABLE}`);
         }
         const compactSignature = signature.slice(0, ByteLens.ECDSA_SIG_COMPACT);
         let digest = payload;
-        if (is_digest === false) {
+        if (isDigest === false) {
             digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
+        } else if (digest.byteLength !== ByteLens.MSG_HASH) {
+            Promise.reject(`Invalid digest size ${digest.byteLength}`);
         }
         return this.driver.verify(compactSignature, digest, this.key);
     }

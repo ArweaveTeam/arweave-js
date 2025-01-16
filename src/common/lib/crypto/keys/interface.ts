@@ -18,13 +18,13 @@ export interface SerializationParams<T extends Format = Format> {
 
 export interface SigningParams {
     payload: Uint8Array;
-    is_digest?: boolean;
+    isDigest?: boolean;
 }
 
 export interface VerifyingParams {
     payload: Uint8Array;
     signature: Uint8Array;
-    is_digest?: boolean;
+    isDigest?: boolean;
 }
 
 export interface EncryptionParams {
