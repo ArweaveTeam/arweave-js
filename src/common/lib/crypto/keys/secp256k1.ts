@@ -1,8 +1,14 @@
-import { Secp256k1, initWasmSecp256k1 } from "@solar-republic/wasm-secp256k1";
+import { ByteLens, initWasmSecp256k1 } from "@samantehrani/wasm-secp256k1";
+import type { Secp256k1, SignatureAndRecovery } from "@samantehrani/wasm-secp256k1";
 import { KeyType, KeyTypeByte, PrivateKey, PublicKey, SerializationParams, SigningParams, VerifyingParams } from "./interface";
 import { bufferTob64Url, b64UrlToBuffer } from "../../utils";
 
-// TODO: build wasm module and internalize the dependency
+// KeyTypeByte:1 ++ RawCompressedPubKey:33 ++ 0x00:1 = 35
+const SECP256K1_IDENTIFIER_SIZE = 1 + ByteLens.PUBLIC_KEY_COMPRESSED + 1;
+const EC_POINT_LENGTH = ByteLens.PUBLIC_KEY_UNCOMPRESSED / 2;
+const UNCOMPRESSED_PREFIX = 0x04;
+const COMPRESSED_PREFIXES = [0x02, 0x03];
+
 export const initializeDriver = async () => {
     return await initWasmSecp256k1()
 };
@@ -29,14 +35,14 @@ export class SECP256k1PrivateKey extends PrivateKey {
                 throw new Error("Invalid JWK formatted secp256k1 PrivateKey.");
             }
             const key = b64UrlToBuffer(k.d!);
-            if (key.length !== 32) {
-                throw new Error(`Invalid secp256k1 key size ${key.length}`);
+            if (key.byteLength !== ByteLens.PRIVATE_KEY) {
+                throw new Error(`Invalid secp256k1 key size ${key.byteLength}`);
             }
             return new SECP256k1PrivateKey({driver, key});
         } else {
             const key = keyData as Uint8Array;
-            if (key.length !== 32) {
-                throw new Error(`Invalid secp256k1 key size ${key.length}`);
+            if (key.byteLength !== ByteLens.PRIVATE_KEY) {
+                throw new Error(`Invalid secp256k1 key size ${key.byteLength}`);
             }
             return new SECP256k1PrivateKey({driver, key});
         }
@@ -74,8 +80,11 @@ export class SECP256k1PrivateKey extends PrivateKey {
         if (is_digest == false) {
             digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
         }
-        const[signature, _recovery] = this.driver.sign(this.key, digest);
-        return signature;
+        const[signature, recovery]: SignatureAndRecovery = this.driver.sign(this.key, digest);
+        const recovarableSignature = new Uint8Array(ByteLens.ECDSA_SIG_RECOVERABLE);
+        recovarableSignature.set(signature, 0);
+        recovarableSignature.set([recovery], 64);
+        return recovarableSignature;
     }
 }
 
@@ -85,7 +94,7 @@ export class SECP256k1PublicKey extends PublicKey {
         if (identifier[0] !== KeyTypeByte[KeyType.EC_SECP256K1]) {
             throw new Error("Invalid prefix");
         }
-        if (identifier.byteLength !== 35) {
+        if (identifier.byteLength !== SECP256K1_IDENTIFIER_SIZE) {
             throw new Error("Invalid identifier length");
         }
         const rawCompressed = identifier.slice(1, 34);
@@ -102,29 +111,43 @@ export class SECP256k1PublicKey extends PublicKey {
             }
             const x = b64UrlToBuffer(k.x!);
             const y = b64UrlToBuffer(k.y!);
-            if (x.byteLength !== 32 || y.byteLength !== 32) {
+            if (x.byteLength !== EC_POINT_LENGTH || y.byteLength !== EC_POINT_LENGTH) {
                 throw new Error(`Invalid secp256k1 PublicKey coordinate size:  X: ${x.byteLength}, Y: ${y.byteLength}`);
             }
-            return new SECP256k1PublicKey({driver, key: Uint8Array.from([0x04, ...x, ...y])});
+            return new SECP256k1PublicKey({driver, key: Uint8Array.from([UNCOMPRESSED_PREFIX, ...x, ...y])});
         } else {
             const key = keyData as Uint8Array;
-            if (!([33, 65].includes(key.byteLength))) {
+            if (!([ByteLens.PUBLIC_KEY_COMPRESSED, ByteLens.PUBLIC_KEY_UNCOMPRESSED].includes(key.byteLength))) {
                 throw new Error(`Invalid secp256k1 PublicKey size ${key.byteLength}`);
             }
+            // TODO: need to transform to uncompressed key size
             return new SECP256k1PublicKey({driver, key});
         }
+    }
+
+    static async recover({driver = null, payload, signature, isDigest = false}: {driver?: Secp256k1 | null, payload: Uint8Array, signature: Uint8Array, isDigest: boolean}): Promise<SECP256k1PublicKey> {
+        if (driver === null) {
+            driver = (await ENGINE);
+        }
+        if (signature.byteLength !== ByteLens.ECDSA_SIG_RECOVERABLE) {
+            Promise.reject(`Invaldi signature length $${signature.byteLength} needs to by ${ByteLens.ECDSA_SIG_RECOVERABLE}`);
+        }
+        let digest = payload;
+        if (isDigest === false) {
+            digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
+        }
+        const compactSignature = signature.slice(0, ByteLens.ECDSA_SIG_COMPACT);
+        const recoveryId = signature[signature.byteLength - 1];
+        const uncompressedKey = driver.recover(compactSignature, digest, recoveryId, true);
+        return SECP256k1PublicKey.deserialize({driver, format: "raw", keyData: uncompressedKey});
     }
 
     private readonly driver: Secp256k1;
     private readonly key: Uint8Array;
     constructor({driver, key}: {driver: Secp256k1, key: Uint8Array}) {
-        if (key.byteLength === 65) {
-            if (key[0] !== 0x04) {
+        if (key.byteLength === ByteLens.PUBLIC_KEY_UNCOMPRESSED) {
+            if (key[0] !== UNCOMPRESSED_PREFIX) {
                 throw new Error('Unaccepted uncompressed format prefix!');
-            }
-        } else if(key.byteLength === 33) {
-            if (![0x02, 0x03].includes(key[0])) {
-                throw new Error('Unaccepted compressed format prefix!');
             }
         } else {
             throw new Error(`Incorrect public key size: ${key.byteLength}`);
@@ -135,11 +158,15 @@ export class SECP256k1PublicKey extends PublicKey {
     }
 
     public async verify({payload, signature, is_digest = false}: VerifyingParams): Promise<boolean> {
+        if (signature.byteLength !== ByteLens.ECDSA_SIG_RECOVERABLE) {
+            Promise.reject(`Invaldi signature length $${signature.byteLength} needs to by ${ByteLens.ECDSA_SIG_RECOVERABLE}`);
+        }
+        const compactSignature = signature.slice(0, ByteLens.ECDSA_SIG_COMPACT);
         let digest = payload;
         if (is_digest === false) {
             digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
         }
-        return this.driver.verify(signature, digest, this.key);
+        return this.driver.verify(compactSignature, digest, this.key);
     }
 
     public async serialize({format}: SerializationParams<"jwk">): Promise<JsonWebKey>;
@@ -158,9 +185,9 @@ export class SECP256k1PublicKey extends PublicKey {
                 const y = this.key.slice(33);
                 const rawCompressed = new Uint8Array(33);
                 if ((y[31] & 1) === 1) {
-                    rawCompressed[0] = 3;
+                    rawCompressed[0] = COMPRESSED_PREFIXES[1];
                 } else {
-                    rawCompressed[0] = 2;
+                    rawCompressed[0] = COMPRESSED_PREFIXES[0];
                 }
                 rawCompressed.set(x, 1);
                 return rawCompressed;
