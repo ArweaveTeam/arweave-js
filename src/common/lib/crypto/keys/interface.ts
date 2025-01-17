@@ -1,12 +1,10 @@
 export enum KeyType {
     RSA_65537 = "rsa_65537",
     EC_SECP256K1 = "ec_secp256k1",
-    ED_25519 = "ed_25519",
 };
 
 export const KeyTypeByte = {
-    [KeyType.EC_SECP256K1]: 2,
-    [KeyType.ED_25519]: 3
+    [KeyType.EC_SECP256K1]: 2
 }
 export const KeyTypeBytesReverse: Map<number, string> = new Map(Object.entries(KeyTypeByte).map(([key, value]) => ([value, key])));
 
@@ -72,7 +70,7 @@ export abstract class PublicKey {
     }
 }
 
-export const getInitializationOptions = (type: KeyType): AlgorithmIdentifier | RsaHashedKeyGenParams | EcKeyGenParams | "Ed25519" => {
+export const getInitializationOptions = (type: KeyType): AlgorithmIdentifier | RsaHashedKeyGenParams | EcKeyGenParams => {
     switch(type) {
         case KeyType.RSA_65537:
             return {
@@ -82,8 +80,6 @@ export const getInitializationOptions = (type: KeyType): AlgorithmIdentifier | R
                     name: "SHA-256"
                 }
             };
-        case KeyType.ED_25519:
-            return "Ed25519";
         default:
             throw new Error(`Unsupported RSA KeyType ${type}`);
     }
@@ -96,8 +92,6 @@ export const getSigningParameters = (type: KeyType): AlgorithmIdentifier | RsaPs
                 name: "RSA-PSS",
                 saltLength: 32,
             };
-        case KeyType.ED_25519:
-            return "Ed25519";
         default:
             throw new Error(`Unsupported RSA KeyType ${type}`);
     }

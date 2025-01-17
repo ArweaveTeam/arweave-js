@@ -1,7 +1,7 @@
 import { b64UrlToBuffer } from "../../lib/utils";
 import { JWKInterface } from "../wallet";
 import CryptoInterface, { SignatureOptions } from "./crypto-interface";
-import { PrivateKey, RSAPrivateKey, fromIdentifier } from "./keys";
+import { PrivateKey, RSAPrivateKey, SECP256k1PublicKey, fromIdentifier } from "./keys";
 import { pemTojwk, jwkTopem } from "./pem";
 import * as crypto from "crypto";
 
@@ -69,6 +69,17 @@ export default class NodeCryptoDriver implements CryptoInterface {
     data: Uint8Array,
     signature: Uint8Array
   ): Promise<boolean> {
+    // SECP256k1 key
+    if (owner === "") {
+      return SECP256k1PublicKey.recover({payload: data, signature, isDigest: false})
+        .then(
+          pk => pk.verify({payload: data, signature, isDigest: false }),
+          error => {
+            console.log('Failed to recover EC Secp256k1 public key from signature and data!');
+            return false;
+          }
+        )
+    }
     const identifier = b64UrlToBuffer(owner);
     const pk = await fromIdentifier({identifier});
     const result = await pk.verify({payload: data, signature});

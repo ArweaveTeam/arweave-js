@@ -14,7 +14,7 @@ import {
 } from "./lib/transaction-uploader";
 import Chunks from "./chunks";
 import "arconnect";
-import { PrivateKey, fromJWK } from "./lib/crypto/keys";
+import { KeyType, PrivateKey, fromJWK } from "./lib/crypto/keys";
 
 export interface TransactionConfirmedData {
   block_indep_hash: string;
@@ -230,9 +230,14 @@ export default class Transactions {
       } else {
         sk = await fromJWK(jwk as JsonWebKey);
       }
-      const owner = await sk.public()
+      let owner = await sk.public()
         .then(pk => pk.identifier())
         .then(id => ArweaveUtils.bufferTob64Url(id));
+
+      if (sk.type === KeyType.EC_SECP256K1) {
+        owner = "";
+      }
+
       transaction.setOwner(owner);
 
       let dataToSign = await transaction.getSignatureData();
@@ -241,7 +246,7 @@ export default class Transactions {
 
       transaction.setSignature({
         id: ArweaveUtils.bufferTob64Url(id),
-        owner: owner,
+        owner,
         signature: ArweaveUtils.bufferTob64Url(rawSignature),
       });
     }

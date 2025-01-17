@@ -222,7 +222,7 @@ export default class Transaction
       ),
     };
   }
-
+  // TODO: fix signature data segmenet
   public async getSignatureData(): Promise<Uint8Array> {
     switch (this.format) {
       case 1:
@@ -252,10 +252,14 @@ export default class Transaction
           tag.get("name", { decode: true, string: false }),
           tag.get("value", { decode: true, string: false }),
         ]);
+        let hashList: Array<any> = [ArweaveUtils.stringToBuffer(this.format.toString())];
 
-        return await deepHash([
-          ArweaveUtils.stringToBuffer(this.format.toString()),
-          this.get("owner", { decode: true, string: false }),
+        // ECDSA should not have owner field in the signature
+        if (this.owner !== "") {
+          hashList.push(this.get("owner", { decode: true, string: false }));
+        }
+
+        hashList = [...hashList,
           this.get("target", { decode: true, string: false }),
           ArweaveUtils.stringToBuffer(this.quantity),
           ArweaveUtils.stringToBuffer(this.reward),
@@ -263,7 +267,8 @@ export default class Transaction
           tagList,
           ArweaveUtils.stringToBuffer(this.data_size),
           this.get("data_root", { decode: true, string: false }),
-        ]);
+        ];
+        return await deepHash(hashList);
       default:
         throw new Error(`Unexpected transaction format: ${this.format}`);
     }
