@@ -75,7 +75,7 @@ export default class NodeCryptoDriver implements CryptoInterface {
         .then(
           pk => pk.verify({payload: data, signature, isDigest: false }),
           error => {
-            console.log('Failed to recover EC Secp256k1 public key from signature and data!');
+            console.log(`Failed to recover EC Secp256k1 public key from signature and data! ${error}`);
             return false;
           }
         )

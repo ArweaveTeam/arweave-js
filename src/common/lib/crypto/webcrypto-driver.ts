@@ -1,6 +1,8 @@
 import { JWKInterface, JWKPublicInterface } from "../wallet";
 import CryptoInterface, { SignatureOptions } from "./crypto-interface";
 import * as ArweaveUtils from "../utils";
+import { PrivateKey, RSAPrivateKey, SECP256k1PublicKey, fromIdentifier } from "./keys";
+import { b64UrlToBuffer } from "../../lib/utils";
 
 export default class WebCryptoDriver implements CryptoInterface {
   public readonly keyLength = 4096;
@@ -46,10 +48,16 @@ export default class WebCryptoDriver implements CryptoInterface {
   }
 
   public async sign(
-    jwk: JWKInterface,
+    jwk: JWKInterface | PrivateKey,
     data: Uint8Array,
     { saltLength }: SignatureOptions = {}
   ): Promise<Uint8Array> {
+    if (jwk instanceof RSAPrivateKey) {
+      return jwk.sign({payload: data}, saltLength);
+    } else if (jwk instanceof PrivateKey) {
+      return jwk.sign({payload: data});
+    }
+
     let signature = await this.driver.sign(
       {
         name: "RSA-PSS",
@@ -72,66 +80,26 @@ export default class WebCryptoDriver implements CryptoInterface {
   }
 
   public async verify(
-    publicModulus: string,
+    owner: string,
     data: Uint8Array,
     signature: Uint8Array
   ): Promise<boolean> {
-    const publicKey = {
-      kty: "RSA",
-      e: "AQAB",
-      n: publicModulus,
-    };
-
-    const key = await this.jwkToPublicCryptoKey(publicKey);
-    const digest = await this.driver.digest("SHA-256", data);
-
-    const salt0 = await this.driver.verify(
-      {
-        name: "RSA-PSS",
-        saltLength: 0,
-      },
-      key,
-      signature,
-      data
-    );
-
-    const salt32 = await this.driver.verify(
-      {
-        name: "RSA-PSS",
-        saltLength: 32,
-      },
-      key,
-      signature,
-      data
-    );
-
-    // saltN's salt-length is derived from a formula described here
-    // https://developer.mozilla.org/en-US/docs/Web/API/RsaPssParams
-    const saltLengthN =
-      Math.ceil(
-        ((key.algorithm as RsaHashedKeyGenParams).modulusLength - 1) / 8
-      ) -
-      digest.byteLength -
-      2;
-
-    const saltN = await this.driver.verify(
-      {
-        name: "RSA-PSS",
-        saltLength: saltLengthN,
-      },
-      key,
-      signature,
-      data
-    );
-
-    const result = salt0 || salt32 || saltN;
-
+    if (owner === "") {
+      return SECP256k1PublicKey.recover({payload: data, signature, isDigest: false})
+        .then(
+          pk => pk.verify({payload: data, signature, isDigest: false }),
+          error => {
+            console.log(`Failed to recover EC Secp256k1 public key from signature and data! ${error}`);
+            return false;
+          }
+        )
+    }
+    const identifier = b64UrlToBuffer(owner);
+    const pk = await fromIdentifier({identifier});
+    const result = await pk.verify({payload: data, signature});
     if (!result) {
       const details = {
-        algorithm: key.algorithm.name,
-        modulusLength: (key.algorithm as RsaHashedKeyAlgorithm).modulusLength,
-        keyUsages: key.usages,
-        saltLengthsAttempted: `0, 32, ${saltLengthN}`,
+        asymmetricKeyType: pk.type
       };
       console.warn(
         "Transaction Verification Failed! \n",
