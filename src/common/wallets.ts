@@ -6,6 +6,9 @@ import * as ArweaveUtils from "./lib/utils";
 import "arconnect";
 import { fromJWK } from "./lib/crypto/keys";
 
+export interface KeyGenerationParams<T extends KeyType = KeyType> {
+  type: T
+}
 
 export default class Wallets {
   private api: Api;
@@ -43,7 +46,10 @@ export default class Wallets {
     });
   }
 
-  public async generateWallet({type = KeyType.RSA_65537}: {type: KeyType} = {type: KeyType.RSA_65537}): Promise<PrivateKey> {
+  // public async generateKey({type}: SerializationParams<"jwk">): Promise<JsonWebKey>;
+  public async generateKey({type}: KeyGenerationParams<KeyType.EC_SECP256K1>): Promise<SECP256k1PrivateKey>;
+  public async generateKey({type}: KeyGenerationParams<KeyType.RSA_65537>): Promise<RSAPrivateKey>;
+  public async generateKey({type = KeyType.RSA_65537}: KeyGenerationParams): Promise<PrivateKey> {
     switch(type) {
       case KeyType.RSA_65537:
         return RSAPrivateKey.new();
@@ -54,12 +60,14 @@ export default class Wallets {
     }
   }
 
-  public generate() {
-    return this.crypto.generateJWK();
+  public async generate() {
+    return this.generateKey({type: KeyType.RSA_65537})
+      .then(k => k.serialize({format: "jwk"}))
+      .then(jwk => jwk as JWKInterface);
   }
 
   public async jwkToAddress(
-    jwk?: JWKInterface | "use_wallet"
+    jwk?: JWKInterface | "use_wallet" | PrivateKey | PublicKey
   ): Promise<string> {
     return this.getAddress(jwk);
   }

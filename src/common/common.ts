@@ -11,7 +11,7 @@ import * as ArweaveUtils from "./lib/utils";
 import Silo from "./silo";
 import Chunks from "./chunks";
 import Blocks from "./blocks";
-import { PrivateKey, PublicKey, fromJWK } from "./lib/crypto/keys";
+import { KeyType, PrivateKey, PublicKey, fromJWK } from "./lib/crypto/keys";
 
 export interface Config {
   api: ApiConfig;
@@ -108,6 +108,9 @@ export default class Arweave {
       }
       transaction.owner = await pk.identifier()
         .then(id => ArweaveUtils.bufferTob64Url(id));
+      if (pk.type === KeyType.EC_SECP256K1) {
+        transaction.owner = "";
+      }
     }
 
     if (attributes.last_tx == undefined) {

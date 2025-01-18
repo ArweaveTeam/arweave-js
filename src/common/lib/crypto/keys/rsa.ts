@@ -2,7 +2,7 @@ import { KeyType, PublicKey, PrivateKey, getInitializationOptions, getSigningPar
 import { b64UrlToBuffer, bufferTob64Url } from "../../utils";
 
 export class RSAPrivateKey extends PrivateKey {
-    static usages: Array<KeyUsage> = ["sign"];
+    static usages: Array<KeyUsage> = ["sign", "verify"];
     static async new({driver = crypto.subtle, type = KeyType.RSA_65537, modulusLength}: {driver?: SubtleCrypto, type?: KeyType, modulusLength?: number} = {driver: crypto.subtle, type: KeyType.RSA_65537}): Promise<RSAPrivateKey> {
         if (modulusLength !== undefined) {
             if (modulusLength < 32 * 8 || modulusLength > 512 * 8) {
@@ -23,7 +23,7 @@ export class RSAPrivateKey extends PrivateKey {
     }
 
     static async deserialize({driver = crypto.subtle, format, keyData, type}: {driver?: SubtleCrypto, format: "jwk" | "raw" | "pkcs8" | "spki", keyData: JsonWebKey | Uint8Array, type: KeyType}): Promise<RSAPrivateKey> {
-        const key = await driver.importKey(format as any, keyData as any, getInitializationOptions(type), true, RSAPrivateKey.usages);
+        const key = await driver.importKey(format as any, keyData as any, getInitializationOptions(type), true, ["sign"]);
         return new RSAPrivateKey({driver, type, key});
     }
 
@@ -79,7 +79,11 @@ export class RSAPrivateKey extends PrivateKey {
     public async serialize({format}: SerializationParams): Promise<JsonWebKey | Uint8Array> {
         switch (format) {
             case "jwk":
-                return this.driver.exportKey("jwk", this.key);
+                let jwk = await this.driver.exportKey("jwk", this.key);
+                delete jwk.ext;
+                delete jwk.key_ops;
+                delete jwk.alg;
+                return jwk;
             default:
                 throw new Error(`Format ${format} no suppoerted`);
         }
@@ -100,15 +104,19 @@ export class RSAPublicKey extends PublicKey {
     }
 
     static async deserialize({driver = crypto.subtle, format, keyData, type}: {driver?: SubtleCrypto, format: "jwk" | "raw" | "pkcs8" | "spki", keyData: JsonWebKey | ArrayBuffer, type: KeyType}): Promise<RSAPublicKey> {
+        let k: JsonWebKey;
         if (format === "raw") {
-            keyData = {
+            k = {
                 kty: "RSA",
                 e: "AQAB",
                 n: bufferTob64Url(keyData as Uint8Array),
+                key_ops: RSAPublicKey.usages
             };
             format = "jwk";
+        } else {
+            k = {...keyData as JsonWebKey, key_ops: RSAPublicKey.usages};
         }
-        const key = await driver.importKey(format as any, keyData as any, getInitializationOptions(type), true, RSAPublicKey.usages);
+        const key = await driver.importKey(format as any, k as any, getInitializationOptions(type), true, RSAPublicKey.usages);
         return new RSAPublicKey({driver, type, key});
     }
 
@@ -118,7 +126,7 @@ export class RSAPublicKey extends PublicKey {
                 let result = false;
                 for (let s of [0, 32, maxSaltSize(this.key)]) {
                     if (result = await this.driver.verify(
-                        {name: "RSA-PSS", saltLength: s},
+                        {...getSigningParameters(this.type) as RsaPssParams, saltLength: s},
                         this.key,
                         signature,
                         payload
@@ -139,6 +147,9 @@ export class RSAPublicKey extends PublicKey {
         const jwk = await this.driver.exportKey("jwk", this.key);
         switch(format) {
             case "jwk":
+                delete jwk.key_ops;
+                delete jwk.ext;
+                delete jwk.alg;
                 return jwk;
             case "raw":
                 return b64UrlToBuffer(jwk.n!);

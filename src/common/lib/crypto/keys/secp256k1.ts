@@ -1,10 +1,9 @@
 import { ByteLens, initWasmSecp256k1 } from "@samantehrani/wasm-secp256k1";
 import type { Secp256k1, SignatureAndRecovery } from "@samantehrani/wasm-secp256k1";
-import { KeyType, KeyTypeByte, PrivateKey, PublicKey, SerializationParams, SigningParams, VerifyingParams } from "./interface";
+import { KeyType, PrivateKey, PublicKey, SerializationParams, SigningParams, VerifyingParams } from "./interface";
 import { bufferTob64Url, b64UrlToBuffer } from "../../utils";
 
-// KeyTypeByte:1 ++ RawCompressedPubKey:33 ++ 0x00:1 = 35
-const SECP256K1_IDENTIFIER_SIZE = 1 + ByteLens.PUBLIC_KEY_COMPRESSED + 1;
+export const SECP256K1_IDENTIFIER_SIZE = ByteLens.PUBLIC_KEY_COMPRESSED;
 const EC_POINT_LENGTH = (ByteLens.PUBLIC_KEY_UNCOMPRESSED - 1) / 2;
 const UNCOMPRESSED_PREFIX = 0x04;
 const COMPRESSED_PREFIXES = [0x02, 0x03];
@@ -80,7 +79,7 @@ export class SECP256k1PrivateKey extends PrivateKey {
         if (isDigest == false) {
             digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
         } else if (digest.byteLength !== ByteLens.MSG_HASH) {
-            Promise.reject(`Invalid digest size ${digest.byteLength}`);
+            return Promise.reject(`Invalid digest size ${digest.byteLength}`);
         }
         const[signature, recovery]: SignatureAndRecovery = this.driver.sign(this.key, digest);
         const recovarableSignature = new Uint8Array(ByteLens.ECDSA_SIG_RECOVERABLE);
@@ -93,13 +92,10 @@ export class SECP256k1PrivateKey extends PrivateKey {
 export class SECP256k1PublicKey extends PublicKey {
     static usages: Array<KeyUsage> = ["verify"];
     static async fromIdentifier({identifier}: {identifier: Uint8Array}): Promise<SECP256k1PublicKey> {
-        if (identifier[0] !== KeyTypeByte[KeyType.EC_SECP256K1]) {
-            throw new Error("Invalid prefix");
-        }
         if (identifier.byteLength !== SECP256K1_IDENTIFIER_SIZE) {
             throw new Error("Invalid identifier length");
         }
-        const rawCompressed = identifier.slice(1, 34);
+        const rawCompressed = Uint8Array.from(identifier);
         return SECP256k1PublicKey.deserialize({format: "raw", keyData: rawCompressed});
     }
     static async deserialize({driver = null, format, keyData}: {driver?: Secp256k1 | null, format: "jwk" | "raw", keyData: JsonWebKey | Uint8Array}): Promise<SECP256k1PublicKey> {
@@ -132,13 +128,13 @@ export class SECP256k1PublicKey extends PublicKey {
             driver = (await ENGINE);
         }
         if (signature.byteLength !== ByteLens.ECDSA_SIG_RECOVERABLE) {
-            Promise.reject(`Invaldi signature length $${signature.byteLength} needs to by ${ByteLens.ECDSA_SIG_RECOVERABLE}`);
+            return Promise.reject(`Invaldi signature length ${signature.byteLength} needs to by ${ByteLens.ECDSA_SIG_RECOVERABLE}`);
         }
         let digest = payload;
         if (isDigest === false) {
             digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
         } else if (digest.byteLength !== ByteLens.MSG_HASH) {
-            Promise.reject(`Invalid digest size ${digest.byteLength}`);
+            return Promise.reject(`Invalid digest size ${digest.byteLength}`);
         }
         const compactSignature = signature.slice(0, ByteLens.ECDSA_SIG_COMPACT);
         const recoveryId = signature[signature.byteLength - 1];
@@ -163,14 +159,14 @@ export class SECP256k1PublicKey extends PublicKey {
 
     public async verify({payload, signature, isDigest = false}: VerifyingParams): Promise<boolean> {
         if (signature.byteLength !== ByteLens.ECDSA_SIG_RECOVERABLE) {
-            Promise.reject(`Invaldi signature length $${signature.byteLength} needs to by ${ByteLens.ECDSA_SIG_RECOVERABLE}`);
+            return Promise.reject(`Invaldi signature length ${signature.byteLength} needs to by ${ByteLens.ECDSA_SIG_RECOVERABLE}`);
         }
         const compactSignature = signature.slice(0, ByteLens.ECDSA_SIG_COMPACT);
         let digest = payload;
         if (isDigest === false) {
             digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
         } else if (digest.byteLength !== ByteLens.MSG_HASH) {
-            Promise.reject(`Invalid digest size ${digest.byteLength}`);
+            return Promise.reject(`Invalid digest size ${digest.byteLength}`);
         }
         return this.driver.verify(compactSignature, digest, this.key);
     }
@@ -203,7 +199,6 @@ export class SECP256k1PublicKey extends PublicKey {
     }
 
     public async identifier(): Promise<Uint8Array> {
-        const raw = await this.serialize({format: "raw"});
-        return new Uint8Array([KeyTypeByte[KeyType.EC_SECP256K1], ...raw, 0]);
+        return new Uint8Array([...await this.serialize({format: "raw"})]);
     }
 }

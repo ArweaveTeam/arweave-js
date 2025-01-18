@@ -253,12 +253,10 @@ export default class Transaction
           tag.get("value", { decode: true, string: false }),
         ]);
         let hashList: Array<any> = [ArweaveUtils.stringToBuffer(this.format.toString())];
-
         // ECDSA should not have owner field in the signature
         if (this.owner !== "") {
           hashList.push(this.get("owner", { decode: true, string: false }));
         }
-
         hashList = [...hashList,
           this.get("target", { decode: true, string: false }),
           ArweaveUtils.stringToBuffer(this.quantity),

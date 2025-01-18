@@ -3,11 +3,6 @@ export enum KeyType {
     EC_SECP256K1 = "ec_secp256k1",
 };
 
-export const KeyTypeByte = {
-    [KeyType.EC_SECP256K1]: 2
-}
-export const KeyTypeBytesReverse: Map<number, string> = new Map(Object.entries(KeyTypeByte).map(([key, value]) => ([value, key])));
-
 export type Format = "jwk" | "raw";
 
 export interface SerializationParams<T extends Format = Format> {
