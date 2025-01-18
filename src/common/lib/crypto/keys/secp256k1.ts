@@ -1,5 +1,5 @@
-import { ByteLens, initWasmSecp256k1 } from "@samantehrani/wasm-secp256k1";
-import type { Secp256k1, SignatureAndRecovery } from "@samantehrani/wasm-secp256k1";
+import { ByteLens, initWasmSecp256k1 } from "@arweave/wasm-secp256k1";
+import type { Secp256k1, SignatureAndRecovery } from "@arweave/wasm-secp256k1";
 import { KeyType, PrivateKey, PublicKey, SerializationParams, SigningParams, VerifyingParams } from "./interface";
 import { bufferTob64Url, b64UrlToBuffer } from "../../utils";
 

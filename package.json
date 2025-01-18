@@ -100,7 +100,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@solar-republic/wasm-secp256k1": "^0.4.2",
+    "@arweave/wasm-secp256k1": "^0.0.4",
     "arconnect": "^0.4.2",
     "asn1.js": "^5.4.1",
     "base64-js": "^1.5.1",
