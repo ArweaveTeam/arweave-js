@@ -28,8 +28,7 @@
     "prettier:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "prettier:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "version": "npm run prettier:write && git add -A src && git add -A test",
-    "postversion": "git push && git push --tags",
-    "publish": "npm publish --tag ec"
+    "postversion": "git push && git push --tags"
   },
   "mocha": {
     "extension": [
