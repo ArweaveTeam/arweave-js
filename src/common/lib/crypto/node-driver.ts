@@ -1,7 +1,12 @@
 import { b64UrlToBuffer } from "../../lib/utils";
 import { JWKInterface } from "../wallet";
 import CryptoInterface, { SignatureOptions } from "./crypto-interface";
-import { PrivateKey, RSAPrivateKey, SECP256k1PublicKey, fromIdentifier } from "./keys";
+import {
+  PrivateKey,
+  RSAPrivateKey,
+  SECP256k1PublicKey,
+  fromIdentifier,
+} from "./keys";
 import { pemTojwk, jwkTopem } from "./pem";
 import * as crypto from "crypto";
 
@@ -46,9 +51,9 @@ export default class NodeCryptoDriver implements CryptoInterface {
     { saltLength }: SignatureOptions = {}
   ): Promise<Uint8Array> {
     if (jwk instanceof RSAPrivateKey) {
-      return jwk.sign({payload: data}, saltLength);
+      return jwk.sign({ payload: data }, saltLength);
     } else if (jwk instanceof PrivateKey) {
-      return jwk.sign({payload: data});
+      return jwk.sign({ payload: data });
     }
     return new Promise((resolve, reject) => {
       resolve(
@@ -71,21 +76,26 @@ export default class NodeCryptoDriver implements CryptoInterface {
   ): Promise<boolean> {
     // SECP256k1 key
     if (owner === "") {
-      return SECP256k1PublicKey.recover({payload: data, signature, isDigest: false})
-        .then(
-          pk => pk.verify({payload: data, signature, isDigest: false }),
-          error => {
-            console.log(`Failed to recover EC Secp256k1 public key from signature and data! ${error}`);
-            return false;
-          }
-        )
+      return SECP256k1PublicKey.recover({
+        payload: data,
+        signature,
+        isDigest: false,
+      }).then(
+        (pk) => pk.verify({ payload: data, signature, isDigest: false }),
+        (error) => {
+          console.log(
+            `Failed to recover EC Secp256k1 public key from signature and data! ${error}`
+          );
+          return false;
+        }
+      );
     }
     const identifier = b64UrlToBuffer(owner);
-    const pk = await fromIdentifier({identifier});
-    const result = await pk.verify({payload: data, signature});
+    const pk = await fromIdentifier({ identifier });
+    const result = await pk.verify({ payload: data, signature });
     if (!result) {
       const details = {
-        asymmetricKeyType: pk.type
+        asymmetricKeyType: pk.type,
       };
       console.warn(
         "Transaction Verification Failed! \n" +

@@ -225,14 +225,15 @@ export default class Transactions {
       });
     } else {
       let sk: PrivateKey;
-      if (jwk instanceof PrivateKey){
+      if (jwk instanceof PrivateKey) {
         sk = jwk;
       } else {
         sk = await fromJWK(jwk as JsonWebKey);
       }
-      let owner = await sk.public()
-        .then(pk => pk.identifier())
-        .then(id => ArweaveUtils.bufferTob64Url(id));
+      let owner = await sk
+        .public()
+        .then((pk) => pk.identifier())
+        .then((id) => ArweaveUtils.bufferTob64Url(id));
 
       if (sk.type === KeyType.EC_SECP256K1) {
         owner = "";
