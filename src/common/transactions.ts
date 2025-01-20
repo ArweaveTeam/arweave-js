@@ -14,7 +14,7 @@ import {
 } from "./lib/transaction-uploader";
 import Chunks from "./chunks";
 import "arconnect";
-import { allowedNodeEnvironmentFlags } from "process";
+import { KeyType, PrivateKey, fromJWK } from "./lib/crypto/keys";
 
 export interface TransactionConfirmedData {
   block_indep_hash: string;
@@ -191,36 +191,19 @@ export default class Transactions {
 
   public async sign(
     transaction: Transaction,
-    jwk?: JWKInterface | "use_wallet", //"use_wallet" for backwards compatibility only
+    jwk?: JWKInterface | "use_wallet" | PrivateKey, //"use_wallet" for backwards compatibility only
     options?: SignatureOptions
   ): Promise<void> {
     /** Non-exhaustive (only checks key names), but previously no jwk checking was done */
     const isJwk = (obj: object): boolean => {
-      let valid = true;
-      ["n", "e", "d", "p", "q", "dp", "dq", "qi"].map(
-        (key) => !(key in obj) && (valid = false)
-      );
-      return valid;
+      return "kty" in obj;
     };
     const validJwk = typeof jwk === "object" && isJwk(jwk);
     const externalWallet = typeof arweaveWallet === "object";
-
-    if (!validJwk && !externalWallet) {
+    if (!validJwk && !externalWallet && !(jwk instanceof PrivateKey)) {
       throw new Error(
-        `No valid JWK or external wallet found to sign transaction.`
+        `No valid JWK or external wallet or PrivateKey found to sign transaction.`
       );
-    } else if (validJwk) {
-      transaction.setOwner(jwk.n);
-
-      let dataToSign = await transaction.getSignatureData();
-      let rawSignature = await this.crypto.sign(jwk, dataToSign, options);
-      let id = await this.crypto.hash(rawSignature);
-
-      transaction.setSignature({
-        id: ArweaveUtils.bufferTob64Url(id),
-        owner: jwk.n,
-        signature: ArweaveUtils.bufferTob64Url(rawSignature),
-      });
     } else if (externalWallet) {
       try {
         const existingPermissions = await arweaveWallet.getPermissions();
@@ -241,14 +224,36 @@ export default class Transactions {
         signature: signedTransaction.signature,
       });
     } else {
-      //can't get here, but for sanity we'll throw an error.
-      throw new Error(`An error occurred while signing. Check wallet is valid`);
+      let sk: PrivateKey;
+      if (jwk instanceof PrivateKey){
+        sk = jwk;
+      } else {
+        sk = await fromJWK(jwk as JsonWebKey);
+      }
+      let owner = await sk.public()
+        .then(pk => pk.identifier())
+        .then(id => ArweaveUtils.bufferTob64Url(id));
+
+      if (sk.type === KeyType.EC_SECP256K1) {
+        owner = "";
+      }
+
+      transaction.setOwner(owner);
+
+      let dataToSign = await transaction.getSignatureData();
+      let rawSignature = await this.crypto.sign(sk, dataToSign, options);
+      let id = await this.crypto.hash(rawSignature);
+
+      transaction.setSignature({
+        id: ArweaveUtils.bufferTob64Url(id),
+        owner,
+        signature: ArweaveUtils.bufferTob64Url(rawSignature),
+      });
     }
   }
 
   public async verify(transaction: Transaction): Promise<boolean> {
     const signaturePayload = await transaction.getSignatureData();
-
     /**
      * The transaction ID should be a SHA-256 hash of the raw signature bytes, so this needs
      * to be recalculated from the signature and checked against the transaction ID.
@@ -257,7 +262,6 @@ export default class Transactions {
       decode: true,
       string: false,
     });
-
     const expectedId = ArweaveUtils.bufferTob64Url(
       await this.crypto.hash(rawSignature)
     );

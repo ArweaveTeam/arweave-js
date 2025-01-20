@@ -62,12 +62,14 @@ config.webprod = {
       process: require.resolve("process/browser"),
       crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
+      buffer: require.resolve('buffer/')
     },
     extensions: [".ts", ".js"],
   },
   plugins: [
     new webpack.ProvidePlugin({
       process: "process/browser",
+      Buffer: ['buffer', 'Buffer']
     }),
   ],
   optimization: {
