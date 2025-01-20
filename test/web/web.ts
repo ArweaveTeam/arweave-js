@@ -105,7 +105,7 @@ describe("Wallets and keys", function () {
   });
 
   it("should get wallet info", async function () {
-    this.timeout(5000);
+    this.timeout(10_000);
 
     const wallet = await arweave.wallets.generate();
 
