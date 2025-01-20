@@ -100,7 +100,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@arweave/wasm-secp256k1": "^0.0.5",
+    "@arweave/wasm-secp256k1": "^0.0.6",
     "arconnect": "^0.4.2",
     "asn1.js": "^5.4.1",
     "base64-js": "^1.5.1",
