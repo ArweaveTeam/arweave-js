@@ -1,6 +1,6 @@
 {
   "name": "arweave",
-  "version": "2.0.0",
+  "version": "2.0.0-ec.0",
   "description": "Arweave JS client library",
   "main": "./node/index.js",
   "react-native": "./node/index.js",
@@ -28,7 +28,8 @@
     "prettier:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "prettier:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "version": "npm run prettier:write && git add -A src && git add -A test",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "publish": "npm publish --tag ec"
   },
   "mocha": {
     "extension": [
