@@ -1,8 +1,8 @@
-# Arweave JS 
+# Arweave JS
 
 Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave network and uploading data to the permaweb. It works in latest browsers and Node JS.
 
-> **Notes:** 
+> **Notes:**
 > 1. If you are planning to upload large batches of data transactions to the Arweave network, it is strongly advised that you use [@DHA-Team/ArBundles](https://github.com/DHA-Team/arbundles) instead of transactions with Arweave.js. You can read about bundles and their advantages on the [Arwiki](https://arwiki.wiki/#/en/bundles).
 > 2. When working with NodeJS a minimum version of 18+ is required. Bun/Deno not currently working.
 
@@ -32,7 +32,7 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
       - [Get a transaction](#get-a-transaction)
       - [Get transaction data](#get-transaction-data)
       - [Decode tags from transactions](#decode-tags-from-transactions)
-    - [Blocks](#blocks)  
+    - [Blocks](#blocks)
       - [Get a block by indep_hash](#get-a-block-by-indep_hash)
       - [Get current block](#get-current-block)
     - [GraphQL](#graphql)
@@ -131,6 +131,52 @@ const arweave = Arweave.init({
 ## Usage
 
 ### Wallets and Keys
+
+#### Create Wallets (2.0.0)
+
+```typescript
+    import { PrivateKey, KeyType, PublicKey, fromJWK, fromIdentifier } from "arweave/node/lib/crypto/keys";
+    import Arweave from "arweave";
+
+    const arweave = Arweave.init({...});
+    // you can use KeyType.RSA_65537 in the same fashion.
+    const sk: PrivateKey = await arweave.wallets.generateKey({type: KeyType.EC_SECP256K1});
+
+    // Get the public key
+    const pk: PublicKey = await sk.public();
+
+    // Serialize the Key into JsonWebKey format
+    const skJWK: JsonWebKey = await sk.serialize({format: "jwk"});
+    const pkJWK: JsonWebKey = await pk.serialize({format: "jwk"});
+
+    // Serialize the Key into raw format
+    const skRaw: Uint8Array = await sk.serialize({format: "raw"});
+    const pkRaw: Uint8Array = await pk.serialize({format: "raw"});
+
+    // Get Keys public identifier
+    const identifier: Uint8Array = await pk.identifier();
+
+    // Deserialize a PrivateKey from either JsonWebKey
+    const deserializedSK = await fromJWK(skJWK);
+
+    // Deserialize a PublicKey from Raw or JsonWebKey
+    const pk = await fromJWK(pkJWK);
+    const pk = await fromIdentifier({identifier});
+
+    // Get address of a key (private or public)
+    const addr = await arweave.wallets.jwkToAddress(pk);
+    const addr = await arweave.wallets.jwkToAddress(sk);
+
+    // Use keys directly for crypto operations
+    const payload = new Uint8Array([1,2]);
+    const signature: Uint8Array = await sk.sign({payload, isDigest: false});
+    const isValid: boolean = await pk.verify({payload, signature, isDigest: false});
+    // Recover EC PubKey from Signature and Data
+    const pk: PublicKey = await SECP256k1PublicKey.recover({payload, signature, isDigest: false});
+    // Or use the keys from the existing transaction/wallet interfaces
+    const transaction: Transaction = await arweave.createTransaction({...}, sk/pk);
+    await arweave.transactions.sign(transaction, sk);
+```
 
 #### Create a new wallet and private key
 
@@ -377,13 +423,13 @@ console.log(response.status);
 // HTTP response codes (200 - server received the transaction, 4XX - invalid transaction, 5XX - error)
 ```
 
-**N.B.** 
+**N.B.**
 _This `200` response does not mean that the transaction has mined & confirmed, and that a txid can be used as if it's immutable._ _It just means that a node has received your transaction._ _See [Get a transaction status](#get-a-transaction-status) for more detail on how to correctly determine that your transaction has been mined & confirmed._ _This also applies to the `uploader` method._
 
 
 ##### Chunked uploading advanced options
 
-You can resume an upload from a saved uploader object, that you have persisted in storage some using 
+You can resume an upload from a saved uploader object, that you have persisted in storage some using
 `JSON.stringify(uploader)` at any stage of the upload. To resume, parse it back into an object and pass it to `getUploader()` along with the transactions data:
 
 ```js
@@ -559,7 +605,7 @@ a list of zero to many transactions.
 Gets block data for given independent hash (see page 63. of [yellow-paper](https://www.arweave.org/yellow-paper.pdf) for details).
 
 ```js
-const result = await arweave.blocks.get("zbUPQFA4ybnd8h99KI9Iqh4mogXJibr0syEwuJPrFHhOhld7XBMOUDeXfsIGvYDp"); 
+const result = await arweave.blocks.get("zbUPQFA4ybnd8h99KI9Iqh4mogXJibr0syEwuJPrFHhOhld7XBMOUDeXfsIGvYDp");
 console.log(result)
 // {
 //   "nonce": "6jdzO4FzS4EVaQVcLBEmxm6uN5-1tqBXW24Pzp6JsRQ",
@@ -580,15 +626,15 @@ const {current} = await arweave.network.getInfo();
 ```
 
 ```js
-const result = await arweave.blocks.getCurrent(); 
+const result = await arweave.blocks.getCurrent();
 console.log(result)
 // {
 //   "indep_hash": "qoJwHSpzl6Ouo140HW2DTv1rGOrgfBEnHi5sHv-fJt_TsK7xA70F2QbjMCopLiMd",
 //   ...
 ```
 
-### GraphQL 
-Find your transation ids and tags by searching their metadata. GraphQL (GQL) provides flexible querying and allows you to search for transactions by tags, wallet address, block height, etc. 
+### GraphQL
+Find your transation ids and tags by searching their metadata. GraphQL (GQL) provides flexible querying and allows you to search for transactions by tags, wallet address, block height, etc.
 
 Please see the [GQL Guide](https://gql-guide.vercel.app/) for further details.
 
