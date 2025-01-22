@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
 import Arweave from "../../web";
-import { bufferToString, stringToBuffer } from "../../src/common/lib/utils";
+import { bufferToString, stringToBuffer, b64UrlToBuffer } from "../../src/common/lib/utils";
 
 const expect = chai.expect;
 
@@ -88,9 +88,8 @@ describe("Wallets and keys", function () {
 
     expect(walletA.e).to.equal("AQAB");
 
-    expect(walletA.n).to.match(/^[a-z0-9-_]{683}$/i);
-
-    expect(walletA.d).to.match(/^[a-z0-9-_]{683}$/i);
+    expect(b64UrlToBuffer(walletA.n).byteLength).to.be.equal(512);
+    expect(b64UrlToBuffer(walletA.d!).byteLength).to.be.equal(512);
 
     const addressA = await arweave.wallets.jwkToAddress(walletA);
     const addressB = await arweave.wallets.jwkToAddress(walletB);

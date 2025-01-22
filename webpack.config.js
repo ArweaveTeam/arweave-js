@@ -26,12 +26,14 @@ config.web = {
       process: require.resolve("process/browser"),
       crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
+      buffer: require.resolve('buffer/')
     },
     extensions: [".ts", ".js"],
   },
   plugins: [
     new webpack.ProvidePlugin({
       process: "process/browser",
+      Buffer: ['buffer', 'Buffer']
     }),
   ],
   output: {
@@ -108,6 +110,7 @@ config.webtests = {
       process: require.resolve("process/browser"),
       crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
+      buffer: require.resolve('buffer/')
     },
   },
   plugins: [
@@ -115,6 +118,7 @@ config.webtests = {
       process: "process/browser",
       crypto: "crypto-browserify",
       stream: "stream-browserify",
+      Buffer: ['buffer', 'Buffer']
     }),
   ],
   devtool: "inline-source-map",
