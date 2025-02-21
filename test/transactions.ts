@@ -292,4 +292,13 @@ describe("Transactions", function () {
     expect(dataRoot).to.equal(expectedDataRoot);
     expect(tx.signature).to.equal(expectedSignature);
   });
+
+  it("should get the correct owner address from an ecdsa transaction", async () => {
+    const txJson = require('./fixtures/signed_ecdsa_tx.json')
+    const tx = arweave.transactions.fromRaw(txJson)
+
+    const addr = await tx.getOwnerAddress()
+    expect(addr).equal("RymI02hes920xGugzRJ3L54eGg-jVU-_R2uCI057_nU")
+  });
+
 });
