@@ -1,6 +1,8 @@
 import * as ArweaveUtils from "./utils";
 import deepHash from "./deepHash";
 import { Chunk, Proof, generateTransactionChunks } from "./merkle";
+import { SECP256k1PublicKey } from "./crypto/keys";
+import WebCryptoDriver from './crypto/webcrypto-driver'
 
 class BaseObject {
   [key: string]: any;
@@ -86,14 +88,13 @@ export interface TransactionInterface {
   data_root: string;
 }
 
-export default class Transaction
-  extends BaseObject
-  implements TransactionInterface
-{
+export default class Transaction extends BaseObject implements TransactionInterface {
   public readonly format: number = 2;
   public id: string = "";
   public readonly last_tx: string = "";
   public owner: string = "";
+  private _owner: string = "";
+  private _address: string = "";
   public tags: Tag[] = [];
   public readonly target: string = "";
   public readonly quantity: string = "0";
@@ -274,4 +275,48 @@ export default class Transaction
         throw new Error(`Unexpected transaction format: ${this.format}`);
     }
   }
+
+  public async getOwner(): Promise<string> {
+    // if owner already set or calculated, return value
+    if (this.owner) return this.owner;
+    if (this._owner) return this._owner;
+
+    if (!this.signature) throw new Error('cannot get owner, transaction is not signed.');
+
+    // ecdsa signing key as (this.owner = "")
+    const payload = await this.getSignatureData();
+    const ecPubKey = await SECP256k1PublicKey.recover({
+      payload,
+      isDigest: false,
+      signature: ArweaveUtils.b64UrlToBuffer(this.signature),
+    });
+
+    return this._owner = ArweaveUtils.bufferTob64Url(await ecPubKey.identifier());
+  }
+
+  public async getOwnerAddress(): Promise<string> {
+    if (this._address) return this._address;
+
+    if (!this.signature) throw new Error('cannot get owner address, transaction is not signed.');
+
+    let rawOwner: Uint8Array;
+    if (this.owner) {
+      rawOwner = ArweaveUtils.b64UrlToBuffer(this.owner);
+    } else if (this._owner) {
+      rawOwner = ArweaveUtils.b64UrlToBuffer(this._owner);
+    } else {
+      const payload = await this.getSignatureData();
+      const ecPubKey = await SECP256k1PublicKey.recover({
+        payload,
+        isDigest: false,
+        signature: ArweaveUtils.b64UrlToBuffer(this.signature),
+      });
+      rawOwner = await ecPubKey.identifier();
+    }
+
+    return this._address = ArweaveUtils.bufferTob64Url(
+      await (new WebCryptoDriver).hash(rawOwner)
+    );
+  }
+
 }

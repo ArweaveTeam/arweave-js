@@ -223,6 +223,7 @@ export default class Arweave {
     return siloTransaction;
   }
 
+  /** @deprecated use GQL https://gql-guide.arweave.net */
   public arql(query: object): Promise<string[]> {
     return this.api
       .post("/arql", query)

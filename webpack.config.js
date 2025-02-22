@@ -14,27 +14,16 @@ config.web = {
   },
   resolve: {
     alias: {
-      process: "process/browser",
-      crypto: "crypto-browserify",
-      stream: "stream-browserify",
       "@crypto/node-driver": path.resolve(
         __dirname,
         "./web/lib/crypto/webcrypto-driver"
       ),
     },
     fallback: {
-      process: require.resolve("process/browser"),
-      crypto: require.resolve("crypto-browserify"),
-      stream: require.resolve("stream-browserify"),
-      buffer: require.resolve('buffer/')
     },
     extensions: [".ts", ".js"],
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      process: "process/browser",
-      Buffer: ['buffer', 'Buffer']
-    }),
   ],
   output: {
     filename: "web.bundle.js",
@@ -52,27 +41,16 @@ config.webprod = {
   },
   resolve: {
     alias: {
-      process: "process/browser",
-      crypto: "crypto-browserify",
-      stream: "stream-browserify",
       "@crypto/node-driver": path.resolve(
         __dirname,
         "./web/lib/crypto/webcrypto-driver"
       ),
     },
     fallback: {
-      process: require.resolve("process/browser"),
-      crypto: require.resolve("crypto-browserify"),
-      stream: require.resolve("stream-browserify"),
-      buffer: require.resolve('buffer/')
     },
     extensions: [".ts", ".js"],
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      process: "process/browser",
-      Buffer: ['buffer', 'Buffer']
-    }),
   ],
   optimization: {
     minimize: true,
@@ -100,26 +78,15 @@ config.webtests = {
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
     alias: {
-      process: "process/browser",
       "@crypto/node-driver": path.resolve(
         __dirname,
         "./web/lib/crypto/webcrypto-driver"
       ),
     },
     fallback: {
-      process: require.resolve("process/browser"),
-      crypto: require.resolve("crypto-browserify"),
-      stream: require.resolve("stream-browserify"),
-      buffer: require.resolve('buffer/')
     },
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      process: "process/browser",
-      crypto: "crypto-browserify",
-      stream: "stream-browserify",
-      Buffer: ['buffer', 'Buffer']
-    }),
   ],
   devtool: "inline-source-map",
   devServer: {

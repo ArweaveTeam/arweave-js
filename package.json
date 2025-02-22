@@ -1,6 +1,6 @@
 {
   "name": "arweave",
-  "version": "2.0.0-ec.0",
+  "version": "2.0.0-ec.1",
   "description": "Arweave JS client library",
   "main": "./node/index.js",
   "react-native": "./node/index.js",
@@ -100,7 +100,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@arweave/wasm-secp256k1": "^0.0.6",
+    "@arweave/wasm-secp256k1": "^0.0.7",
     "arconnect": "^0.4.2",
     "asn1.js": "^5.4.1",
     "base64-js": "^1.5.1",

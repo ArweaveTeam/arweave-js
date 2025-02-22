@@ -1,5 +1,4 @@
 import * as chai from "chai";
-import * as crypto from "crypto";
 import Arweave from "../../web";
 import { bufferToString, stringToBuffer, b64UrlToBuffer } from "../../src/common/lib/utils";
 
@@ -259,6 +258,30 @@ describe("Transactions", function () {
       .to.be.an("array")
       .which.contains("Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE");
   });
+
+  it("should determine correct owner address of ecdsa tx", async () => {
+    const rawTx = {
+      "format": 2,
+      "id": "CODy9eol1Y70rm42BPucVxvacAXqfgm-Ktn6t-KqfTo",
+      "last_tx": "6N84-ZsgAWMbiqZrzi0-sviG5FudEY1pwzxehG10YcGuOl2e8pfSW8OTfI31qGHT",
+      "owner": "",
+      "tags": [{
+        "name": "VGVzdA",
+        "value": "ZWNkc2EtdHg"
+      }],
+      "target": "Qa8AAZv-sEhQRIm7xZr3CVLtlzIH8NezaY0GZhURcAc",
+      "quantity": "1",
+      "data": "",
+      "data_size": "0",
+      "data_tree": [],
+      "data_root": "",
+      "reward": "3377063",
+      "signature": "PrPcovUN6PdzQxRcWMgj1m27IJPEHslC4xaOtYHUGKUEaCEpgaw9toeMVdYEk1rhwMlNKtBkT38MAH81xSIYbAE"
+    }
+    const tx = arweave.transactions.fromRaw(rawTx)
+    const addr = await tx.getOwnerAddress()
+    expect(addr).equal("RymI02hes920xGugzRJ3L54eGg-jVU-_R2uCI057_nU")
+  });
 });
 
 describe("Encryption", function () {
@@ -269,7 +292,7 @@ describe("Encryption", function () {
 
     const data = stringToBuffer(text);
 
-    const key = crypto.randomBytes(32);
+    const key = crypto.getRandomValues(new Uint8Array(32));
 
     const encrypted = await arweave.crypto.encrypt(data, key);
 
