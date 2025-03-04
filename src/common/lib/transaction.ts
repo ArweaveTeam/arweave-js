@@ -312,6 +312,7 @@ export default class Transaction extends BaseObject implements TransactionInterf
         signature: ArweaveUtils.b64UrlToBuffer(this.signature),
       });
       rawOwner = await ecPubKey.identifier();
+      this._owner = ArweaveUtils.bufferTob64Url(rawOwner);
     }
 
     return this._address = ArweaveUtils.bufferTob64Url(
