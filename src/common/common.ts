@@ -85,6 +85,13 @@ export default class Arweave {
     attributes: Partial<CreateTransactionInterface>,
     jwk?: JWKInterface | "use_wallet"
   ): Promise<Transaction> {
+
+    const isValidJWK = jwk && jwk !== "use_wallet" ? await this.validateJWK(jwk) : true;
+
+    if (!isValidJWK) {
+      throw new Error(`The JWK is not valid.`);
+    }
+
     const transaction: Partial<CreateTransactionInterface> = {};
 
     Object.assign(transaction, attributes);
@@ -215,5 +222,14 @@ export default class Arweave {
     return this.api
       .post("/arql", query)
       .then((response) => response.data || []);
+  }
+
+  public async validateJWK(jwk: JWKInterface): Promise<boolean> {
+    const transaction = await this.createTransaction({
+      data: "test",
+    });
+    await this.transactions.sign(transaction, jwk);
+
+    return await this.transactions.verify(transaction);
   }
 }
