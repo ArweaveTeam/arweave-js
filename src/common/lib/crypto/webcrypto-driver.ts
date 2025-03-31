@@ -53,7 +53,7 @@ export default class WebCryptoDriver implements CryptoInterface {
     let signature = await this.driver.sign(
       {
         name: "RSA-PSS",
-        saltLength: 32,
+        saltLength: saltLength ?? 32,
       },
       await this.jwkToCryptoKey(jwk),
       data
