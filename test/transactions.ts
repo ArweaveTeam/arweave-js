@@ -292,4 +292,118 @@ describe("Transactions", function () {
     expect(dataRoot).to.equal(expectedDataRoot);
     expect(tx.signature).to.equal(expectedSignature);
   });
+
+  it("should support format=2 ECDSA transaction signing data", async function () {
+    const tx = await arweave.createTransaction({
+      format: 2,
+      last_tx: "",
+      owner: arweave.utils.bufferTob64Url(new Uint8Array([1])),
+      data: "test",
+      reward: "0",
+    });
+    const otherOwnerTx = await arweave.createTransaction({
+      format: 2,
+      last_tx: "",
+      owner: arweave.utils.bufferTob64Url(new Uint8Array([2])),
+      data: "test",
+      reward: "0",
+    });
+    const signature = new Uint8Array(65).fill(1);
+    let dataToSign: Uint8Array | undefined;
+
+    const rsaSignatureData = await tx.getSignatureData();
+    const ecdsaSignatureData = await tx.getSignatureData({
+      signatureType: "ecdsa",
+    });
+    const otherOwnerEcdsaSignatureData = await otherOwnerTx.getSignatureData({
+      signatureType: "ecdsa",
+    });
+
+    expect(Buffer.from(ecdsaSignatureData).toString("hex")).to.not.equal(
+      Buffer.from(rsaSignatureData).toString("hex")
+    );
+    expect(Buffer.from(ecdsaSignatureData).toString("hex")).to.equal(
+      Buffer.from(otherOwnerEcdsaSignatureData).toString("hex")
+    );
+
+    await arweave.transactions.signEcdsa(tx, (data) => {
+      dataToSign = data;
+      return signature;
+    });
+
+    expect(Buffer.from(dataToSign!).toString("hex")).to.equal(
+      Buffer.from(ecdsaSignatureData).toString("hex")
+    );
+    expect(tx.owner).to.equal("");
+    expect(tx.signature).to.equal(arweave.utils.bufferTob64Url(signature));
+    expect(tx.id).to.equal(
+      arweave.utils.bufferTob64Url(await arweave.crypto.hash(signature))
+    );
+  });
+
+  it("should reject invalid ECDSA transaction signature lengths", async function () {
+    const tx = await arweave.createTransaction({
+      format: 2,
+      last_tx: "",
+      data: "test",
+      reward: "0",
+    });
+
+    const error = await arweave.transactions
+      .signEcdsa(tx, () => new Uint8Array(64))
+      .catch((error) => error);
+
+    expect(error)
+      .to.be.an.instanceOf(Error)
+      .with.property("message")
+      .and.equal("ECDSA transaction signatures must be 65 bytes.");
+  });
+
+  it("should reject invalid ECDSA transaction signature recovery bytes", async function () {
+    const tx = await arweave.createTransaction({
+      format: 2,
+      last_tx: "",
+      data: "test",
+      reward: "0",
+    });
+    const signature = new Uint8Array(65);
+    signature[64] = 4;
+
+    const error = await arweave.transactions
+      .signEcdsa(tx, () => signature)
+      .catch((error) => error);
+
+    expect(error)
+      .to.be.an.instanceOf(Error)
+      .with.property("message")
+      .and.equal(
+        "ECDSA transaction signature recovery byte must be between 0 and 3."
+      );
+  });
+
+  it("should reject format=1 ECDSA transaction signing", async function () {
+    const tx = new Transaction({
+      format: 1,
+      last_tx: "",
+      data: arweave.utils.stringToBuffer("test"),
+      data_root: "",
+      data_size: "4",
+      id: "",
+      owner: "",
+      quantity: "0",
+      reward: "0",
+      signature: "",
+      tags: [],
+      target: "",
+    });
+
+    const error = await arweave.transactions
+      .signEcdsa(tx, () => new Uint8Array(65))
+      .catch((error) => error);
+
+    expect(error)
+      .to.be.an.instanceOf(Error)
+      .with.property("message")
+      .and.equal("ECDSA transaction signing is only supported for format=2.");
+  });
 });
