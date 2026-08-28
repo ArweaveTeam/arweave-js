@@ -2,16 +2,28 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "outDir": "./dist/web/",
-    // "sourceMap": true,
+    "rootDir": "./src",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
     "strict": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
+    "types": [],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "target": "ES2022",
-    "moduleResolution": "node",
-    "module": "commonjs",
-    "baseUrl": "src/common",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
     "rootDirs": ["src/common", "src/web"],
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "ignoreDeprecations": "6.0",
+    "baseUrl": "src/common",
     "paths": {
       "@crypto/node-driver": ["lib/crypto/webcrypto-driver"]
     }
   },
-  "include": ["src/modules.d.ts", "src/common", "src/web"]
+  "include": ["src/modules.d.ts", "src/common", "src/web"],
+  "exclude": ["src/common/lib/crypto/node-driver.ts", "src/common/lib/crypto/pem.ts"]
 }
