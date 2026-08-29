@@ -1,8 +1,8 @@
-import * as chai from "chai";
+const chai = require("chai");
 
 const expect = chai.expect;
 
-let globals = <any>global;
+let globals = global as any;
 
 // The web distro will attach to the browser's global object so we just
 // need to mock a global self object with a subtle crypto stub
@@ -10,11 +10,11 @@ let globals = <any>global;
 if (!globals.crypto) {
   globals.crypto = {
     subtle: {
-      generateKey: async () => {},
-      importKey: async () => {},
-      exportKey: async () => {},
-      digest: async () => {},
-      sign: async () => {},
+      generateKey: async () => { },
+      importKey: async () => { },
+      exportKey: async () => { },
+      digest: async () => { },
+      sign: async () => { },
     },
   };
 
