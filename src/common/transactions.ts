@@ -14,7 +14,6 @@ import {
 } from "./lib/transaction-uploader";
 import Chunks from "./chunks";
 import "arconnect";
-import { allowedNodeEnvironmentFlags } from "process";
 
 export interface TransactionConfirmedData {
   block_indep_hash: string;
@@ -279,7 +278,7 @@ export default class Transactions {
   }
 
   public async post(
-    transaction: Transaction | Buffer | string | object
+    transaction: Transaction | Uint8Array | string | object
   ): Promise<{ status: number; statusText: string; data: any }> {
     if (typeof transaction === "string") {
       transaction = new Transaction(JSON.parse(transaction as string));

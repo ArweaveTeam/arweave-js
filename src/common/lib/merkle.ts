@@ -406,8 +406,8 @@ export async function debug(proof: Uint8Array, output = ""): Promise<string> {
   ]);
 
   const updatedOutput = `${output}\n${JSON.stringify(
-    Buffer.from(left)
-  )},${JSON.stringify(Buffer.from(right))},${offset} => ${JSON.stringify(
+    Array.from(left)
+  )},${JSON.stringify(Array.from(right))},${offset} => ${JSON.stringify(
     pathHash
   )}`;
 

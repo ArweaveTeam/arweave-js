@@ -3,8 +3,8 @@ import * as B64js from "base64-js";
 export type Base64UrlString = string;
 
 export function concatBuffers(
-  buffers: Uint8Array[] | ArrayBuffer[]
-): Uint8Array {
+  buffers: (Uint8Array | ArrayBuffer)[]
+): Uint8Array<ArrayBuffer> {
   let total_length = 0;
 
   for (let i = 0; i < buffers.length; i++) {
@@ -35,7 +35,7 @@ export function bufferToString(buffer: Uint8Array | ArrayBuffer): string {
   return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
 }
 
-export function stringToBuffer(string: string): Uint8Array {
+export function stringToBuffer(string: string): Uint8Array<ArrayBuffer> {
   return new TextEncoder().encode(string);
 }
 
@@ -43,7 +43,7 @@ export function stringToB64Url(string: string): string {
   return bufferTob64Url(stringToBuffer(string));
 }
 
-export function b64UrlToBuffer(b64UrlString: string): Uint8Array {
+export function b64UrlToBuffer(b64UrlString: string): Uint8Array<ArrayBuffer> {
   return new Uint8Array(B64js.toByteArray(b64UrlDecode(b64UrlString)));
 }
 
