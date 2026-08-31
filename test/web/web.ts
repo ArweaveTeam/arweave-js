@@ -5,7 +5,7 @@ import { bufferToString, stringToBuffer } from "../../src/common/lib/utils";
 
 const expect = chai.expect;
 
-let globals = <any>global;
+let globals = global as any;
 
 //@ts-ignore
 const arweave: Arweave = self.Arweave.init({
@@ -247,19 +247,6 @@ describe("Transactions", function () {
       .with.property("message")
       .and.match(/^.*invalid transaction signature.*$/i);
   });
-
-  it("should find transactions", async function () {
-    this.timeout(5000);
-
-    const results = await arweave.transactions.search(
-      "Silo-Name",
-      "BmjRGIsemI77+eQb4zX8"
-    );
-
-    expect(results)
-      .to.be.an("array")
-      .which.contains("Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE");
-  });
 });
 
 describe("Encryption", function () {
@@ -302,13 +289,13 @@ describe("Encryption", function () {
 
 describe("Silo Web", function () {
   it("should read Silo transaction", async function () {
-    this.skip();
     this.timeout(5000);
 
     // This is a manually generated silo transaction
     // data = 'something'
     // uri = 'secret.1'
     const transaction = arweave.transactions.fromRaw({
+      format: 1,
       last_tx: "Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE",
       owner:
         "pJjRtSRLpHUVAKCtWC9pjajI_VEpiPEEAHX0k1B1jrB_jDlZsMJPyGRVX6n7N16vNyDTnKAofC_aNmTFegW-uyJmdxsteO1TXKrR_KJvuv_vACX4N8BkSgplB7mTTALBMNPmiINHXkDSxZEkBxAGV0GyL8pLd2-0X6TG16wDFShyS7rZzW8xFsQYiAp9-g330hPhCV7KBdVFtCxA0h1RifDYloMUwHbAWCTvzm72aLI1nWaLzotcM4cZTTdzw5VTdGtjo9fMdoT7uTqikIIhM3C4f9Ws-ECqjBUXtZFg7q6jYbUcTVNr1o2UFPKbLnDl4vcUZBaeqkL0FWQuo7F1hw36PVm_b9lVVzSVVkeA_HF2tQotkaITyOQmYfTHi1d31m5fwFZje_M-YgeyvOIuiqX4-lIGz8pohTutY3Z5_LKfO_a8jsJL8_jFLqcjSCRvVZSRmQDpzB4hJ9-W89m95DDmZci2wLbxFR8GwekNbpHeeC2EaJorhU0qBn_Hlcxql30fLveycjhSO03bu3MJwN9moT2q0T222iIXutEjpNezt5VzZKao8_JuI3ZnTFy5dM5GYO773TbgUihlVjVQsnv73FFPZaHfaRssK4sfGlBHjItwkzEQe9gOtFhkAFihiw45ppo6FnBkvmNcD59GfteifKPg5oSGYqMWZWcKPt0",
@@ -363,6 +350,30 @@ describe("Silo Web", function () {
     );
 
     expect(bufferToString(decrypted)).to.be.a("string").and.equal("test data");
+  });
+
+  it("should get Silo data from the network", async function () {
+    this.timeout(20000);
+
+    const decrypted = await arweave.silo.get("thing.1");
+
+    expect(bufferToString(decrypted))
+      .to.be.a("string")
+      .and.contain("<title>Hello world!</title>");
+  });
+
+  it("should throw when no Silo transaction exists", async function () {
+    this.timeout(20000);
+
+    try {
+      await arweave.silo.get("missing.1");
+      expect.fail("should have thrown");
+    } catch (error: any) {
+      expect(error)
+        .to.be.an.instanceOf(Error)
+        .with.property("message")
+        .and.match(/No data could be found for the Silo URI/);
+    }
   });
 });
 

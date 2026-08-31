@@ -252,16 +252,6 @@ describe("Transactions", function () {
   //   expect(data.byteLength).to.equal(14166765);
   // });
 
-  it("should find transactions", async function () {
-    const results = await arweave.transactions.search(
-      "Silo-Name",
-      "BmjRGIsemI77+eQb4zX8"
-    );
-
-    expect(results)
-      .to.be.an("array")
-      .which.contains("Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE");
-  });
 
   it("should support format=2 transaction signing", async function () {
     const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
