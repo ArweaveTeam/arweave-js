@@ -1,5 +1,3 @@
-declare const arweaveWallet: Window["arweaveWallet"];
-
 import Api from "./lib/api";
 import CryptoInterface, {
   SignatureOptions,
@@ -13,7 +11,7 @@ import {
   SerializedUploader,
 } from "./lib/transaction-uploader";
 import Chunks from "./chunks";
-import "arconnect";
+import "./lib/external-wallet";
 
 export interface TransactionConfirmedData {
   block_indep_hash: string;

@@ -1,7 +1,6 @@
 import Api from "./lib/api";
 import ArweaveError, { ArweaveErrorType } from "./lib/error";
 import { Tag } from "./lib/transaction";
-import "arconnect";
 import Network from "./network";
 
 export interface BlockData {

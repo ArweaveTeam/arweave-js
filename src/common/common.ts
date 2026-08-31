@@ -12,6 +12,12 @@ import Silo from "./silo";
 import Chunks from "./chunks";
 import Blocks from "./blocks";
 
+export type {
+  ExternalWallet,
+  ExternalWalletSignedTransaction,
+  WalletPermission,
+} from "./lib/external-wallet";
+
 export interface Config {
   api: ApiConfig;
   crypto: CryptoInterface;
