@@ -210,10 +210,4 @@ export default class Arweave {
 
     return siloTransaction;
   }
-
-  public arql(query: object): Promise<string[]> {
-    return this.api
-      .post("/arql", query)
-      .then((response) => response.data || []);
-  }
 }

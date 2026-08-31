@@ -104,22 +104,6 @@ export default class Transactions {
     return new Transaction(attributes);
   }
 
-  /** @deprecated use GQL https://gql-guide.arweave.net */
-  public async search(tagName: string, tagValue: string): Promise<string[]> {
-    return this.api
-      .post(`arql`, {
-        op: "equals",
-        expr1: tagName,
-        expr2: tagValue,
-      })
-      .then((response) => {
-        if (!response.data) {
-          return [];
-        }
-        return response.data;
-      });
-  }
-
   public getStatus(id: string): Promise<TransactionStatusResponse> {
     return this.api.get(`tx/${id}/status`).then((response) => {
       if (response.status == 200) {
