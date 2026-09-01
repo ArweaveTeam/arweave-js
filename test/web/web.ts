@@ -248,6 +248,19 @@ describe("Transactions", function () {
       .with.property("message")
       .and.match(/^.*invalid transaction signature.*$/i);
   });
+
+  it("should find transactions", async function () {
+    this.timeout(5000);
+
+    const results = await arweave.transactions.search(
+      "Silo-Name",
+      "BmjRGIsemI77+eQb4zX8"
+    );
+
+    expect(results)
+      .to.be.an("array")
+      .which.contains("Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE");
+  });
 });
 
 describe("Encryption", function () {

@@ -102,6 +102,47 @@ export default class Transactions {
     return new Transaction(attributes);
   }
 
+  /** @deprecated use GQL https://gql-guide.arweave.net */
+  public async search(tagName: string, tagValue: string): Promise<string[]> {
+    const query = `query($name: String!, $value: String!, $after: String) {
+      transactions(
+        tags: [{ name: $name, values: [$value] }]
+        first: 100
+        after: $after
+        sort: HEIGHT_DESC
+      ) {
+        pageInfo { hasNextPage }
+        edges { cursor node { id } }
+      }
+    }`;
+
+    const ids: string[] = [];
+    let after: string | undefined;
+
+    for (;;) {
+      const res = await this.api.post("graphql", {
+        query,
+        variables: { name: tagName, value: tagValue, after },
+      });
+
+      if (!res.ok || res.data?.errors) {
+        throw new Error(
+          `Could not search transactions. Received: ${res.data}. Status: ${res.status}, ${res.statusText}`
+        );
+      }
+
+      const { pageInfo, edges } = res.data.data.transactions;
+
+      ids.push(...edges.map((edge: any) => edge.node.id));
+
+      if (!pageInfo.hasNextPage || !edges.length) break;
+
+      after = edges[edges.length - 1].cursor;
+    }
+
+    return ids;
+  }
+
   public getStatus(id: string): Promise<TransactionStatusResponse> {
     return this.api.get(`tx/${id}/status`).then((response) => {
       if (response.status == 200) {
