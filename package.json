@@ -93,14 +93,14 @@
     "webpack-cli": "^4.9.2"
   },
   "targets": {
-    "chrome": "70",
-    "node": "18"
+    "chrome": "124",
+    "node": "22"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "dependencies": {
     "asn1.js": "^5.4.1",
-    "bignumber.js": "^9.0.2"
+    "bignumber.js": "^9.1.2"
   }
 }
