@@ -85,3 +85,18 @@ jobs:
 
       - name: test
         run: npm test
+
+  # Single stable check name for branch protection to require. Without this,
+  # every matrix change renames the checks and the protection rule goes stale.
+  ci:
+    name: CI
+    needs: [build, test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build and test results
+        run: |
+          echo "build: ${{ needs.build.result }}"
+          echo "test:  ${{ needs.test.result }}"
+          [ "${{ needs.build.result }}" = "success" ] || exit 1
+          [ "${{ needs.test.result }}" = "success" ] || exit 1
