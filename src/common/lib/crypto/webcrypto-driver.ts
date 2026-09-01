@@ -66,7 +66,10 @@ export default class WebCryptoDriver implements CryptoInterface {
     data: Uint8Array,
     algorithm: string = "SHA-256"
   ): Promise<Uint8Array> {
-    let digest = await this.driver.digest(algorithm, data as Uint8Array<ArrayBuffer>);
+    let digest = await this.driver.digest(
+      algorithm,
+      data as Uint8Array<ArrayBuffer>
+    );
 
     return new Uint8Array(digest);
   }
@@ -83,7 +86,10 @@ export default class WebCryptoDriver implements CryptoInterface {
     };
 
     const key = await this.jwkToPublicCryptoKey(publicKey);
-    const digest = await this.driver.digest("SHA-256", data as Uint8Array<ArrayBuffer>);
+    const digest = await this.driver.digest(
+      "SHA-256",
+      data as Uint8Array<ArrayBuffer>
+    );
 
     const salt0 = await this.driver.verify(
       {

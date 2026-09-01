@@ -241,7 +241,9 @@ export default class Arweave {
           }`,
           variables: {
             owners: clause.owners.length ? clause.owners : undefined,
-            recipients: clause.recipients.length ? clause.recipients : undefined,
+            recipients: clause.recipients.length
+              ? clause.recipients
+              : undefined,
             tags: clause.tags.length ? clause.tags : undefined,
             after,
           },

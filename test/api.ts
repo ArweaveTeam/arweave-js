@@ -14,9 +14,7 @@ describe("API", function () {
     const res = await arweave.api.get(idJson);
     expect(res.ok).true;
     expect(res.bodyUsed).true;
-    expect(res.headers.get("content-type")).eq(
-      "application/json"
-    );
+    expect(res.headers.get("content-type")).eq("application/json");
     expect(typeof res.data).eq("object");
     expect(res.data).not.instanceof(ArrayBuffer);
   });
