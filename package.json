@@ -37,6 +37,7 @@
     "node-option": [
       "require=ts-node/register",
       "require=tsconfig-paths/register",
+      "no-experimental-strip-types",
       "experimental-fetch",
       "no-warnings"
     ]
