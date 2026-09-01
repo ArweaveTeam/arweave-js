@@ -6,5 +6,5 @@
     "declaration": false,
     "declarationMap": false
   },
-  "include": ["src/modules.d.ts", "src/common", "src/web", "test/web"]
+  "include": ["src/modules.d.ts", "src/common", "src/web", "test/web", "test/common"]
 }

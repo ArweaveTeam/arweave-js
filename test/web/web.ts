@@ -2,6 +2,7 @@ import * as chai from "chai";
 import * as crypto from "crypto";
 import Arweave from "../../web";
 import { bufferToString, stringToBuffer } from "../../src/common/lib/utils";
+import "../common/lib/utils";
 
 const expect = chai.expect;
 
