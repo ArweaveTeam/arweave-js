@@ -216,4 +216,120 @@ export default class Arweave {
 
     return siloTransaction;
   }
+
+  /** @deprecated use GQL https://gql-guide.arweave.net */
+  public async arql(query: object): Promise<string[]> {
+    const ids = new Set<string>();
+
+    for (const clause of arqlToClauses(query)) {
+      let after: string | undefined;
+
+      for (;;) {
+        const res = await this.api.post("graphql", {
+          query: `query($owners: [String!], $recipients: [String!], $tags: [TagFilter!], $after: String) {
+            transactions(
+              owners: $owners
+              recipients: $recipients
+              tags: $tags
+              first: 100
+              after: $after
+              sort: HEIGHT_DESC
+            ) {
+              pageInfo { hasNextPage }
+              edges { cursor node { id } }
+            }
+          }`,
+          variables: {
+            owners: clause.owners.length ? clause.owners : undefined,
+            recipients: clause.recipients.length ? clause.recipients : undefined,
+            tags: clause.tags.length ? clause.tags : undefined,
+            after,
+          },
+        });
+
+        if (!res.ok || res.data?.errors) {
+          throw new Error(
+            `Could not run arql query. Received: ${res.data}. Status: ${res.status}, ${res.statusText}`
+          );
+        }
+
+        const { pageInfo, edges } = res.data.data.transactions;
+
+        for (const edge of edges) {
+          ids.add(edge.node.id);
+        }
+
+        if (!pageInfo.hasNextPage || !edges.length) break;
+
+        after = edges[edges.length - 1].cursor;
+      }
+    }
+
+    return [...ids];
+  }
+}
+
+interface ArqlClause {
+  owners: string[];
+  recipients: string[];
+  tags: { name: string; values: string[] }[];
+}
+
+function mergeOne(a: string[], b: string[]): string[] {
+  if (a.length && b.length) {
+    throw new Error(
+      `Invalid ARQL query: cannot combine two 'from' or 'to' constraints`
+    );
+  }
+
+  return a.length ? a : b;
+}
+
+/** Expands an ARQL expression tree into a list of clauses to be OR'd together. */
+function arqlToClauses(query: any): ArqlClause[] {
+  if (!query || typeof query !== "object") {
+    throw new Error(`Invalid ARQL query: expected an expression object`);
+  }
+
+  const { op, expr1, expr2 } = query;
+
+  if (op === "equals") {
+    if (typeof expr1 !== "string" || typeof expr2 !== "string") {
+      throw new Error(`Invalid ARQL query: 'equals' expects two strings`);
+    }
+
+    if (expr1 === "from") {
+      return [{ owners: [expr2], recipients: [], tags: [] }];
+    }
+
+    if (expr1 === "to") {
+      return [{ owners: [], recipients: [expr2], tags: [] }];
+    }
+
+    return [
+      { owners: [], recipients: [], tags: [{ name: expr1, values: [expr2] }] },
+    ];
+  }
+
+  if (op === "or") {
+    return [...arqlToClauses(expr1), ...arqlToClauses(expr2)];
+  }
+
+  if (op === "and") {
+    const clauses: ArqlClause[] = [];
+
+    for (const a of arqlToClauses(expr1)) {
+      for (const b of arqlToClauses(expr2)) {
+        clauses.push({
+          owners: mergeOne(a.owners, b.owners),
+          recipients: mergeOne(a.recipients, b.recipients),
+          tags: [...a.tags, ...b.tags],
+        });
+      }
+    }
+
+    return clauses;
+  }
+
+  throw new Error(`Invalid ARQL query: unsupported op '${op}'`);
 }
