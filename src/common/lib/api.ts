@@ -152,4 +152,3 @@ export default class Api {
     return response as ResponseWithData<T>;
   }
 }
-
