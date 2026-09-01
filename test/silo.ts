@@ -67,4 +67,26 @@ describe("Silo", function () {
       .with.property("message")
       .and.match(/^.*failed to decrypt*$/i);
   });
+
+  it("should get Silo data from the network", async function () {
+    this.timeout(20000);
+
+    const decrypted = Buffer.from(await arweave.silo.get("thing.1"));
+
+    expect(decrypted.toString()).to.contain("<title>Hello world!</title>");
+  });
+
+  it("should throw when no Silo transaction exists", async function () {
+    this.timeout(20000);
+
+    try {
+      await arweave.silo.get("missing.1");
+      expect.fail("should have thrown");
+    } catch (error: any) {
+      expect(error)
+        .to.be.an.instanceOf(Error)
+        .with.property("message")
+        .and.match(/No data could be found for the Silo URI/);
+    }
+  });
 });

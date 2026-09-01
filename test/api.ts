@@ -15,10 +15,7 @@ describe("API", function () {
     expect(res.ok).true;
     expect(res.bodyUsed).true;
     expect(res.headers.get("content-type")).eq(
-      "application/json; charset=utf-8"
-    );
-    expect(res.headers.get("content-type")).eq(
-      "application/json; charset=utf-8"
+      "application/json"
     );
     expect(typeof res.data).eq("object");
     expect(res.data).not.instanceof(ArrayBuffer);
@@ -37,7 +34,7 @@ describe("API", function () {
     const res = await arweave.api.get(idText);
     expect(res.ok).true;
     expect(res.bodyUsed).true;
-    expect(res.headers.get("content-type")).eq("text/html; charset=utf-8");
+    expect(res.headers.get("content-type")).eq("text/html");
     expect(typeof res.data).eq("string");
   });
 

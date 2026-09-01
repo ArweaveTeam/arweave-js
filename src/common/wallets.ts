@@ -2,7 +2,7 @@ import Api from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
 import { JWKInterface } from "./lib/wallet";
 import * as ArweaveUtils from "./lib/utils";
-import "arconnect";
+import "./lib/external-wallet";
 
 export default class Wallets {
   private api: Api;
@@ -57,13 +57,11 @@ export default class Wallets {
   public async getAddress(jwk?: JWKInterface | "use_wallet"): Promise<string> {
     if (!jwk || jwk === "use_wallet") {
       try {
-        // @ts-ignore
         await arweaveWallet.connect(["ACCESS_ADDRESS"]);
       } catch {
         // Permission is already granted
       }
 
-      // @ts-ignore
       return arweaveWallet.getActiveAddress();
     } else {
       return this.ownerToAddress(jwk.n);

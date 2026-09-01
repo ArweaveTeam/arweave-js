@@ -56,7 +56,7 @@ export default class WebCryptoDriver implements CryptoInterface {
         saltLength: saltLength ?? 32,
       },
       await this.jwkToCryptoKey(jwk),
-      data
+      data as Uint8Array<ArrayBuffer>
     );
 
     return new Uint8Array(signature);
@@ -66,7 +66,7 @@ export default class WebCryptoDriver implements CryptoInterface {
     data: Uint8Array,
     algorithm: string = "SHA-256"
   ): Promise<Uint8Array> {
-    let digest = await this.driver.digest(algorithm, data);
+    let digest = await this.driver.digest(algorithm, data as Uint8Array<ArrayBuffer>);
 
     return new Uint8Array(digest);
   }
@@ -83,7 +83,7 @@ export default class WebCryptoDriver implements CryptoInterface {
     };
 
     const key = await this.jwkToPublicCryptoKey(publicKey);
-    const digest = await this.driver.digest("SHA-256", data);
+    const digest = await this.driver.digest("SHA-256", data as Uint8Array<ArrayBuffer>);
 
     const salt0 = await this.driver.verify(
       {
@@ -91,8 +91,8 @@ export default class WebCryptoDriver implements CryptoInterface {
         saltLength: 0,
       },
       key,
-      signature,
-      data
+      signature as Uint8Array<ArrayBuffer>,
+      data as Uint8Array<ArrayBuffer>
     );
 
     const salt32 = await this.driver.verify(
@@ -101,8 +101,8 @@ export default class WebCryptoDriver implements CryptoInterface {
         saltLength: 32,
       },
       key,
-      signature,
-      data
+      signature as Uint8Array<ArrayBuffer>,
+      data as Uint8Array<ArrayBuffer>
     );
 
     // saltN's salt-length is derived from a formula described here
@@ -120,8 +120,8 @@ export default class WebCryptoDriver implements CryptoInterface {
         saltLength: saltLengthN,
       },
       key,
-      signature,
-      data
+      signature as Uint8Array<ArrayBuffer>,
+      data as Uint8Array<ArrayBuffer>
     );
 
     const result = salt0 || salt32 || saltN;
@@ -194,13 +194,15 @@ export default class WebCryptoDriver implements CryptoInterface {
   }
 
   public async encrypt(
-    data: Buffer,
-    key: string | Buffer,
+    data: Uint8Array,
+    key: string | Uint8Array,
     salt?: string
   ): Promise<Uint8Array> {
     const initialKey = await this.driver.importKey(
       "raw",
-      typeof key == "string" ? ArweaveUtils.stringToBuffer(key) : key,
+      typeof key == "string"
+        ? ArweaveUtils.stringToBuffer(key)
+        : (key as Uint8Array<ArrayBuffer>),
       {
         name: "PBKDF2",
         length: 32,
@@ -241,20 +243,22 @@ export default class WebCryptoDriver implements CryptoInterface {
         iv: iv,
       },
       derivedkey,
-      data
+      data as Uint8Array<ArrayBuffer>
     );
 
     return ArweaveUtils.concatBuffers([iv, encryptedData]);
   }
 
   public async decrypt(
-    encrypted: Buffer,
-    key: string | Buffer,
+    encrypted: Uint8Array,
+    key: string | Uint8Array,
     salt?: string
   ): Promise<Uint8Array> {
     const initialKey = await this.driver.importKey(
       "raw",
-      typeof key == "string" ? ArweaveUtils.stringToBuffer(key) : key,
+      typeof key == "string"
+        ? ArweaveUtils.stringToBuffer(key)
+        : (key as Uint8Array<ArrayBuffer>),
       {
         name: "PBKDF2",
         length: 32,
@@ -283,7 +287,7 @@ export default class WebCryptoDriver implements CryptoInterface {
       ["encrypt", "decrypt"]
     );
 
-    const iv = encrypted.slice(0, 16);
+    const iv = encrypted.slice(0, 16) as Uint8Array<ArrayBuffer>;
 
     const data = await this.driver.decrypt(
       {
@@ -291,7 +295,7 @@ export default class WebCryptoDriver implements CryptoInterface {
         iv: iv,
       },
       derivedkey,
-      encrypted.slice(16)
+      encrypted.slice(16) as Uint8Array<ArrayBuffer>
     );
 
     // We're just using concat to convert from an array buffer to uint8array

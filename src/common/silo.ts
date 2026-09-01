@@ -24,16 +24,27 @@ export default class Silo {
 
     const resource = await this.parseUri(siloURI);
 
-    const ids = await this.transactions.search(
-      "Silo-Name",
-      resource.getAccessKey()
-    );
+    const res = await this.api.post("graphql", {
+      query: `query($accessKey: String!) {
+        transactions(
+          tags: [{ name: "Silo-Name", values: [$accessKey] }]
+          first: 1
+          sort: HEIGHT_DESC
+        ) {
+          edges { node { id } }
+        }
+      }`,
+      variables: { accessKey: resource.getAccessKey() },
+    });
 
-    if (ids.length == 0) {
+    const id: string | undefined =
+      res.data?.data?.transactions?.edges?.[0]?.node?.id;
+
+    if (!id) {
       throw new Error(`No data could be found for the Silo URI: ${siloURI}`);
     }
 
-    const transaction = await this.transactions.get(ids[0]);
+    const transaction = await this.transactions.get(id);
 
     if (!transaction) {
       throw new Error(`No data could be found for the Silo URI: ${siloURI}`);

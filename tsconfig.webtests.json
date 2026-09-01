@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.web.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "types": ["node", "mocha", "chai"],
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["src/modules.d.ts", "src/common", "src/web", "test/web", "test/common"]
+}

@@ -1,7 +1,7 @@
 name: Test
-on: 
+on:
   workflow_dispatch:
-  push: 
+  push:
     branches:
       - master
   pull_request:
@@ -17,18 +17,18 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "24"
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         id: cache-node-modules
         env:
           cache-name: cache-node-modules
         with:
           path: node_modules
-          key:  ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -43,7 +43,7 @@ jobs:
         run: npm run build
       - name: Upload ubuntu build folders
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v7
         with:
           name: build artifacts
           retention-days: 1
@@ -59,25 +59,25 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        node-version: [18, 20, 22]
+        node-version: [22, 24]
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@main
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           name: build artifacts
       - name: Use nodejs ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         id: cache-node-modules
         env:
           cache-name: cache-node-modules
         with:
           path: node_modules
-          key:  ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -85,3 +85,18 @@ jobs:
 
       - name: test
         run: npm test
+
+  # Single stable check name for branch protection to require. Without this,
+  # every matrix change renames the checks and the protection rule goes stale.
+  ci:
+    name: CI
+    needs: [build, test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build and test results
+        run: |
+          echo "build: ${{ needs.build.result }}"
+          echo "test:  ${{ needs.test.result }}"
+          [ "${{ needs.build.result }}" = "success" ] || exit 1
+          [ "${{ needs.test.result }}" = "success" ] || exit 1

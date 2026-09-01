@@ -10,10 +10,12 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
   - [Installation](#installation)
     - [NPM](#npm)
     - [Bundles](#bundles)
+    - [ES Modules](#es-modules)
   - [Initialisation](#initialisation)
     - [NPM Node](#npm-node)
     - [NPM Web](#npm-web)
     - [Web Bundles](#web-bundles)
+    - [Web ES Modules](#web-es-modules)
     - [Initialisation options](#initialisation-options)
   - [Usage](#usage)
     - [Wallets and Keys](#wallets-and-keys)
@@ -61,6 +63,38 @@ Single bundle file (web only - use the NPM method if using Node).
 <script src="https://unpkg.com/arweave@1.2.0/bundles/web.bundle.min.js"></script>
 ```
 
+### ES Modules
+The `web` build is published as native ES modules, so browsers can load it directly with `<script type="module">` — no bundler, and no bundle file.
+
+It has a single external dependency, `bignumber.js`, which is left as a bare specifier. Browsers cannot resolve bare specifiers on their own, so add an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap) pointing at its ES module build:
+
+```html
+<script type="importmap">
+{
+  "imports": {
+    "arweave": "https://unpkg.com/arweave@2.0.0/web/index.js",
+    "bignumber.js": "https://unpkg.com/bignumber.js@9.1.2/bignumber.mjs"
+  }
+}
+</script>
+
+<script type="module">
+import Arweave from 'arweave';
+</script>
+```
+
+Nothing here requires a CDN. Both files can be served from your own origin — copy `web/` and `node_modules/bignumber.js/bignumber.mjs` out of the package and point the import map at your own paths:
+
+```html
+<script type="importmap">
+{
+  "imports": {
+    "arweave": "/arweave/index.js",
+    "bignumber.js": "/bignumber.mjs"
+  }
+}
+</script>
+```
 
 ## Initialisation
 
@@ -105,9 +139,37 @@ const arweave = Arweave.init({
 <head>
     <meta charset="UTF-8">
     <title>Hello world</title>
-    <!-- n.b. update the arweave version number. replace @1.15.5 with a more recent version use or @latest, if you're risky :) -->
-    <script src="https://unpkg.com/arweave@1.15.5/bundles/web.bundle.js"></script>
+    <!-- n.b. update the arweave version number. replace @2.0.0 with a more recent version use or @latest, if you're risky :) -->
+    <script src="https://unpkg.com/arweave@2.0.0/bundles/web.bundle.js"></script>
     <script>
+    const arweave = Arweave.init({});
+    arweave.network.getInfo().then(console.log);
+    </script>
+</head>
+<body>
+
+</body>
+</html>
+```
+
+### Web ES Modules
+```js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello world</title>
+    <script type="importmap">
+    {
+      "imports": {
+        "arweave": "https://unpkg.com/arweave@2.0.0/web/index.js",
+        "bignumber.js": "https://unpkg.com/bignumber.js@9.1.2/bignumber.mjs"
+      }
+    }
+    </script>
+    <script type="module">
+    import Arweave from 'arweave';
+
     const arweave = Arweave.init({});
     arweave.network.getInfo().then(console.log);
     </script>

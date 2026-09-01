@@ -1,10 +1,10 @@
-import * as B64js from "base64-js";
-
 export type Base64UrlString = string;
 
+const B64_CHUNK_SIZE = 0x8000; // avoids String.fromCharCode stack overflow
+
 export function concatBuffers(
-  buffers: Uint8Array[] | ArrayBuffer[]
-): Uint8Array {
+  buffers: (Uint8Array | ArrayBuffer)[]
+): Uint8Array<ArrayBuffer> {
   let total_length = 0;
 
   for (let i = 0; i < buffers.length; i++) {
@@ -35,7 +35,7 @@ export function bufferToString(buffer: Uint8Array | ArrayBuffer): string {
   return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
 }
 
-export function stringToBuffer(string: string): Uint8Array {
+export function stringToBuffer(string: string): Uint8Array<ArrayBuffer> {
   return new TextEncoder().encode(string);
 }
 
@@ -43,12 +43,25 @@ export function stringToB64Url(string: string): string {
   return bufferTob64Url(stringToBuffer(string));
 }
 
-export function b64UrlToBuffer(b64UrlString: string): Uint8Array {
-  return new Uint8Array(B64js.toByteArray(b64UrlDecode(b64UrlString)));
+export function b64UrlToBuffer(b64UrlString: string): Uint8Array<ArrayBuffer> {
+  const binary = atob(b64UrlDecode(b64UrlString));
+  const buffer = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    buffer[i] = binary.charCodeAt(i);
+  }
+
+  return buffer;
 }
 
 export function bufferTob64(buffer: Uint8Array): string {
-  return B64js.fromByteArray(new Uint8Array(buffer));
+  let binary = "";
+
+  for (let i = 0; i < buffer.length; i += B64_CHUNK_SIZE) {
+    binary += String.fromCharCode(...buffer.subarray(i, i + B64_CHUNK_SIZE));
+  }
+
+  return btoa(binary);
 }
 
 export function bufferTob64Url(buffer: Uint8Array): string {

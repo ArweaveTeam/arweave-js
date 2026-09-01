@@ -2,10 +2,11 @@ import * as chai from "chai";
 import * as crypto from "crypto";
 import Arweave from "../../web";
 import { bufferToString, stringToBuffer } from "../../src/common/lib/utils";
+import "../common/lib/utils";
 
 const expect = chai.expect;
 
-let globals = <any>global;
+let globals = global as any;
 
 //@ts-ignore
 const arweave: Arweave = self.Arweave.init({
@@ -302,13 +303,13 @@ describe("Encryption", function () {
 
 describe("Silo Web", function () {
   it("should read Silo transaction", async function () {
-    this.skip();
     this.timeout(5000);
 
     // This is a manually generated silo transaction
     // data = 'something'
     // uri = 'secret.1'
     const transaction = arweave.transactions.fromRaw({
+      format: 1,
       last_tx: "Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE",
       owner:
         "pJjRtSRLpHUVAKCtWC9pjajI_VEpiPEEAHX0k1B1jrB_jDlZsMJPyGRVX6n7N16vNyDTnKAofC_aNmTFegW-uyJmdxsteO1TXKrR_KJvuv_vACX4N8BkSgplB7mTTALBMNPmiINHXkDSxZEkBxAGV0GyL8pLd2-0X6TG16wDFShyS7rZzW8xFsQYiAp9-g330hPhCV7KBdVFtCxA0h1RifDYloMUwHbAWCTvzm72aLI1nWaLzotcM4cZTTdzw5VTdGtjo9fMdoT7uTqikIIhM3C4f9Ws-ECqjBUXtZFg7q6jYbUcTVNr1o2UFPKbLnDl4vcUZBaeqkL0FWQuo7F1hw36PVm_b9lVVzSVVkeA_HF2tQotkaITyOQmYfTHi1d31m5fwFZje_M-YgeyvOIuiqX4-lIGz8pohTutY3Z5_LKfO_a8jsJL8_jFLqcjSCRvVZSRmQDpzB4hJ9-W89m95DDmZci2wLbxFR8GwekNbpHeeC2EaJorhU0qBn_Hlcxql30fLveycjhSO03bu3MJwN9moT2q0T222iIXutEjpNezt5VzZKao8_JuI3ZnTFy5dM5GYO773TbgUihlVjVQsnv73FFPZaHfaRssK4sfGlBHjItwkzEQe9gOtFhkAFihiw45ppo6FnBkvmNcD59GfteifKPg5oSGYqMWZWcKPt0",
@@ -364,6 +365,30 @@ describe("Silo Web", function () {
 
     expect(bufferToString(decrypted)).to.be.a("string").and.equal("test data");
   });
+
+  it("should get Silo data from the network", async function () {
+    this.timeout(20000);
+
+    const decrypted = await arweave.silo.get("thing.1");
+
+    expect(bufferToString(decrypted))
+      .to.be.a("string")
+      .and.contain("<title>Hello world!</title>");
+  });
+
+  it("should throw when no Silo transaction exists", async function () {
+    this.timeout(20000);
+
+    try {
+      await arweave.silo.get("missing.1");
+      expect.fail("should have thrown");
+    } catch (error: any) {
+      expect(error)
+        .to.be.an.instanceOf(Error)
+        .with.property("message")
+        .and.match(/No data could be found for the Silo URI/);
+    }
+  });
 });
 
 describe("GraphQL", function () {
@@ -412,5 +437,93 @@ describe("GraphQL", function () {
 
     expect(txs).to.be.an("array");
     expect(txs.length).to.equal(0);
+  });
+});
+
+describe("ArQL", function () {
+  this.timeout(30000);
+
+  const siloTxId = "Sgmyo7nUqPpVQWUfK72p5yIpd85QQbhGaWAF-I8L6yE";
+  const siloAccessKey = "BmjRGIsemI77+eQb4zX8";
+  const otherSiloAccessKey = "I5/Hxg5a0DVZBlxtLrTq";
+  const otherSiloTxId = "TlwKj-xyQ3vhbi0HU7HTWHfgHamDuntDFt7qR57_yqw";
+
+  it("should resolve an equals expression on a tag", async function () {
+    const results = await arweave.arql({
+      op: "equals",
+      expr1: "Silo-Name",
+      expr2: siloAccessKey,
+    });
+
+    expect(results).to.be.an("array").which.contains(siloTxId);
+  });
+
+  it("should resolve an equals expression on the 'from' pseudo tag", async function () {
+    const results = await arweave.arql({
+      op: "equals",
+      expr1: "from",
+      expr2: "hnRI7JoN2vpv__w90o4MC_ybE9fse6SUemwQeY8hFxM",
+    });
+
+    expect(results).to.be.an("array").with.lengthOf(0);
+  });
+
+  it("should narrow results with 'and'", async function () {
+    const results = await arweave.arql({
+      op: "and",
+      expr1: { op: "equals", expr1: "Silo-Name", expr2: siloAccessKey },
+      expr2: { op: "equals", expr1: "Content-Type", expr2: "text/html" },
+    });
+
+    expect(results).to.be.an("array").which.contains(siloTxId);
+  });
+
+  it("should return no results for an unsatisfiable 'and'", async function () {
+    const results = await arweave.arql({
+      op: "and",
+      expr1: { op: "equals", expr1: "Silo-Name", expr2: siloAccessKey },
+      expr2: { op: "equals", expr1: "Silo-Name", expr2: otherSiloAccessKey },
+    });
+
+    expect(results).to.be.an("array").with.lengthOf(0);
+  });
+
+  it("should union results with 'or'", async function () {
+    const results = await arweave.arql({
+      op: "or",
+      expr1: { op: "equals", expr1: "Silo-Name", expr2: siloAccessKey },
+      expr2: { op: "equals", expr1: "Silo-Name", expr2: otherSiloAccessKey },
+    });
+
+    expect(results).to.be.an("array");
+    expect(results).to.contain(siloTxId);
+    expect(results).to.contain(otherSiloTxId);
+    expect(results.length).to.equal(new Set(results).size);
+  });
+
+  it("should throw on an unsupported op", async function () {
+    const error = await (() => {
+      return new Promise((resolve) => {
+        arweave.arql({ op: "not", expr1: "a", expr2: "b" }).catch(resolve);
+      });
+    })();
+
+    expect(error)
+      .to.be.an.instanceOf(Error)
+      .with.property("message")
+      .and.match(/unsupported op/i);
+  });
+
+  it("should throw on a malformed query", async function () {
+    const error = await (() => {
+      return new Promise((resolve) => {
+        arweave.arql(null as any).catch(resolve);
+      });
+    })();
+
+    expect(error)
+      .to.be.an.instanceOf(Error)
+      .with.property("message")
+      .and.match(/invalid arql query/i);
   });
 });

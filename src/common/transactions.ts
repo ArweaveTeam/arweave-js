@@ -1,5 +1,3 @@
-declare const arweaveWallet: Window["arweaveWallet"];
-
 import Api from "./lib/api";
 import CryptoInterface, {
   SignatureOptions,
@@ -13,8 +11,7 @@ import {
   SerializedUploader,
 } from "./lib/transaction-uploader";
 import Chunks from "./chunks";
-import "arconnect";
-import { allowedNodeEnvironmentFlags } from "process";
+import "./lib/external-wallet";
 
 export interface TransactionConfirmedData {
   block_indep_hash: string;
@@ -107,18 +104,43 @@ export default class Transactions {
 
   /** @deprecated use GQL https://gql-guide.arweave.net */
   public async search(tagName: string, tagValue: string): Promise<string[]> {
-    return this.api
-      .post(`arql`, {
-        op: "equals",
-        expr1: tagName,
-        expr2: tagValue,
-      })
-      .then((response) => {
-        if (!response.data) {
-          return [];
-        }
-        return response.data;
+    const query = `query($name: String!, $value: String!, $after: String) {
+      transactions(
+        tags: [{ name: $name, values: [$value] }]
+        first: 100
+        after: $after
+        sort: HEIGHT_DESC
+      ) {
+        pageInfo { hasNextPage }
+        edges { cursor node { id } }
+      }
+    }`;
+
+    const ids: string[] = [];
+    let after: string | undefined;
+
+    for (;;) {
+      const res = await this.api.post("graphql", {
+        query,
+        variables: { name: tagName, value: tagValue, after },
       });
+
+      if (!res.ok || res.data?.errors) {
+        throw new Error(
+          `Could not search transactions. Received: ${res.data}. Status: ${res.status}, ${res.statusText}`
+        );
+      }
+
+      const { pageInfo, edges } = res.data.data.transactions;
+
+      ids.push(...edges.map((edge: any) => edge.node.id));
+
+      if (!pageInfo.hasNextPage || !edges.length) break;
+
+      after = edges[edges.length - 1].cursor;
+    }
+
+    return ids;
   }
 
   public getStatus(id: string): Promise<TransactionStatusResponse> {
@@ -279,7 +301,7 @@ export default class Transactions {
   }
 
   public async post(
-    transaction: Transaction | Buffer | string | object
+    transaction: Transaction | Uint8Array | string | object
   ): Promise<{ status: number; statusText: string; data: any }> {
     if (typeof transaction === "string") {
       transaction = new Transaction(JSON.parse(transaction as string));
