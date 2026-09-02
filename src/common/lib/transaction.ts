@@ -2,6 +2,12 @@ import * as ArweaveUtils from "./utils";
 import deepHash from "./deepHash";
 import { Chunk, Proof, generateTransactionChunks } from "./merkle";
 
+export type SignatureType = "rsa" | "ecdsa";
+
+export interface SignatureDataOptions {
+  signatureType?: SignatureType;
+}
+
 class BaseObject {
   [key: string]: any;
 
@@ -223,9 +229,17 @@ export default class Transaction
     };
   }
 
-  public async getSignatureData(): Promise<Uint8Array> {
+  public async getSignatureData(
+    options: SignatureDataOptions = {}
+  ): Promise<Uint8Array> {
     switch (this.format) {
       case 1:
+        if (options.signatureType === "ecdsa") {
+          throw new Error(
+            "ECDSA transaction signing is only supported for format=2."
+          );
+        }
+
         let tags = this.tags.reduce((accumulator: Uint8Array, tag: Tag) => {
           return ArweaveUtils.concatBuffers([
             accumulator,
@@ -255,7 +269,9 @@ export default class Transaction
 
         return await deepHash([
           ArweaveUtils.stringToBuffer(this.format.toString()),
-          this.get("owner", { decode: true, string: false }),
+          ...(options.signatureType === "ecdsa"
+            ? []
+            : [this.get("owner", { decode: true, string: false })]),
           this.get("target", { decode: true, string: false }),
           ArweaveUtils.stringToBuffer(this.quantity),
           ArweaveUtils.stringToBuffer(this.reward),

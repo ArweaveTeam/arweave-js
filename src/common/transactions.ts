@@ -13,6 +13,15 @@ import {
 import Chunks from "./chunks";
 import "./lib/external-wallet";
 
+const ECDSA_SIGNATURE_LENGTH = 65;
+const ECDSA_MAX_RECOVERY_BYTE = 3;
+
+export type EcdsaSignature = Uint8Array | ArrayBuffer;
+
+export type EcdsaSigner = (
+  data: Uint8Array
+) => EcdsaSignature | Promise<EcdsaSignature>;
+
 export interface TransactionConfirmedData {
   block_indep_hash: string;
   block_height: number;
@@ -266,6 +275,45 @@ export default class Transactions {
       //can't get here, but for sanity we'll throw an error.
       throw new Error(`An error occurred while signing. Check wallet is valid`);
     }
+  }
+
+  public async signEcdsa(
+    transaction: Transaction,
+    signer: EcdsaSigner
+  ): Promise<void> {
+    if (transaction.format !== 2) {
+      throw new Error(
+        "ECDSA transaction signing is only supported for format=2."
+      );
+    }
+
+    const dataToSign = await transaction.getSignatureData({
+      signatureType: "ecdsa",
+    });
+
+    const signature = await signer(dataToSign);
+    const rawSignature =
+      signature instanceof ArrayBuffer ? new Uint8Array(signature) : signature;
+
+    if (rawSignature.byteLength !== ECDSA_SIGNATURE_LENGTH) {
+      throw new Error(
+        `ECDSA transaction signatures must be ${ECDSA_SIGNATURE_LENGTH} bytes.`
+      );
+    }
+
+    if (rawSignature[64] > ECDSA_MAX_RECOVERY_BYTE) {
+      throw new Error(
+        `ECDSA transaction signature recovery byte must be between 0 and ${ECDSA_MAX_RECOVERY_BYTE}.`
+      );
+    }
+
+    const id = await this.crypto.hash(rawSignature);
+
+    transaction.setSignature({
+      id: ArweaveUtils.bufferTob64Url(id),
+      owner: "",
+      signature: ArweaveUtils.bufferTob64Url(rawSignature),
+    });
   }
 
   public async verify(transaction: Transaction): Promise<boolean> {
