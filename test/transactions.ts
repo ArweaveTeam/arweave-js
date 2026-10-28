@@ -1,6 +1,7 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
 import Transaction from "../src/common/lib/transaction";
+import { TransactionUploader } from "../src/common/lib/transaction-uploader";
 import { arweaveInstance } from "./_arweave";
 
 const expect = chai.expect;
@@ -339,6 +340,36 @@ describe("Transactions", function () {
       arweave.transactions.getUploader(tx),
       /Only format 2 transactions can be uploaded/
     );
+  });
+
+  it("should complete an empty-data transaction upload", async function () {
+    const tx = new Transaction({
+      format: 2,
+      id: "synthetic-transaction-id",
+      data: new Uint8Array(0),
+      data_size: "0",
+    });
+    await tx.prepareChunks(tx.data);
+
+    let postCount = 0;
+    const api = {
+      post: async () => {
+        postCount++;
+        return { status: 200, data: {} };
+      },
+    };
+    const uploader = new TransactionUploader(api as any, tx);
+
+    expect(uploader.totalChunks).to.equal(0);
+    expect(uploader.pctComplete).to.equal(0);
+
+    await uploader.uploadChunk();
+
+    expect(postCount).to.equal(1);
+    expect(uploader.isComplete).to.be.true;
+    expect(uploader.pctComplete).to.equal(100);
+    await expectRejection(uploader.uploadChunk(), /Upload is already complete/);
+    expect(postCount).to.equal(1);
   });
 });
 
