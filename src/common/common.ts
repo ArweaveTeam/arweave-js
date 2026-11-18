@@ -29,6 +29,7 @@ export interface CreateTransactionInterface {
   data_size: string;
   data_root: string;
   reward: string;
+  denomination: string;
 }
 
 export default class Arweave {
