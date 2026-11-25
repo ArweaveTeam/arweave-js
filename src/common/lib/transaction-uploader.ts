@@ -64,6 +64,7 @@ export class TransactionUploader {
   }
 
   public get pctComplete(): number {
+    if (this.totalChunks === 0) return this.txPosted ? 100 : 0;
     return Math.trunc((this.uploadedChunks / this.totalChunks) * 100);
   }
 
@@ -279,7 +280,7 @@ export class TransactionUploader {
       if (resp.status >= 200 && resp.status < 300) {
         // We are complete.
         this.txPosted = true;
-        this.chunkIndex = MAX_CHUNKS_IN_BODY;
+        this.chunkIndex = this.totalChunks;
         return;
       }
       this.lastResponseError = getError(resp);

@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import * as crypto from "crypto";
 import Transaction from "../src/common/lib/transaction";
-import { arweaveInstance } from "./_arweave";
+import { arweaveInstance, initInstance } from "./_arweave";
 
 const expect = chai.expect;
 
@@ -340,6 +340,103 @@ describe("Transactions", function () {
       /Only format 2 transactions can be uploaded/
     );
   });
+
+  it("should complete an upload of a transaction with no data", async function () {
+    const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+    const offline = initInstance({ host: "localhost", port: 1984 });
+    const posts: string[] = [];
+    (offline.api as any).post = async (endpoint: string) => {
+      posts.push(endpoint);
+      return { status: 200, ok: true, data: "OK" };
+    };
+
+    const tx = await offline.createTransaction(
+      {
+        target: "G8LChDFXDERMeF_j37vCIxGRq6xStTW6sOOVOA0Dwjs",
+        quantity: "1",
+        last_tx: "",
+        reward: "0",
+      },
+      jwk
+    );
+    await offline.transactions.sign(tx, jwk);
+
+    const uploader = await offline.transactions.getUploader(tx);
+    expect(uploader.pctComplete).to.equal(0);
+
+    await uploader.uploadChunk();
+
+    expect(uploader.isComplete).to.be.true;
+    expect(uploader.pctComplete).to.equal(100);
+    expect(uploader.uploadedChunks).to.equal(0);
+    expect(uploader.totalChunks).to.equal(0);
+    expect(posts).to.deep.equal(["tx"]);
+  });
+});
+
+describe("Transaction denomination", function () {
+  this.timeout(30000);
+
+  // Signed by the Arweave node (Erlang) with the key from test/fixtures.
+  const fixture = require("./fixtures/denomination_rsa_tx.json");
+  const rsaKey = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+  const { denomination: _, ...undenominated } = fixture.tx;
+
+  it("should verify a node-signed transaction with a denomination", async function () {
+    const tx = arweave.transactions.fromRaw(fixture.tx);
+    expect(await arweave.transactions.verify(tx)).to.be.true;
+    expect(await arweave.wallets.ownerToAddress(tx.owner)).to.equal(
+      fixture.owner_address
+    );
+  });
+
+  it("should keep the denomination in the JSON", function () {
+    const json = arweave.transactions.fromRaw(fixture.tx).toJSON();
+    expect(json.denomination).to.equal("1");
+  });
+
+  // The node rejects an explicit "0" denomination in the JSON.
+  it(`should treat denomination "0" as omitted`, async function () {
+    const omitted = arweave.transactions.fromRaw(undenominated);
+    const explicit = arweave.transactions.fromRaw({
+      ...undenominated,
+      denomination: "0",
+    });
+    expect(await explicit.getSignatureData()).to.deep.equal(
+      await omitted.getSignatureData()
+    );
+    expect(explicit.toJSON()).to.not.have.property("denomination");
+    expect(omitted.toJSON()).to.not.have.property("denomination");
+  });
+
+  for (const denomination of ["1", "2"]) {
+    it(`should round-trip a signed transaction with denomination ${denomination}`, async function () {
+      const tx = await arweave.createTransaction(
+        {
+          target: fixture.tx.target,
+          quantity: fixture.tx.quantity,
+          last_tx: fixture.tx.last_tx,
+          reward: fixture.tx.reward,
+          denomination,
+        },
+        rsaKey
+      );
+      await arweave.transactions.sign(tx, rsaKey);
+
+      const json = JSON.parse(JSON.stringify(tx));
+      expect(json.denomination).to.equal(denomination);
+
+      const parsed = arweave.transactions.fromRaw(json);
+      expect(await arweave.transactions.verify(parsed)).to.be.true;
+      expect(parsed.owner).to.equal(rsaKey.n);
+
+      const altered = arweave.transactions.fromRaw({
+        ...json,
+        denomination: "3",
+      });
+      expect(await arweave.transactions.verify(altered)).to.be.false;
+    });
+  }
 });
 
 /** Asserts a promise rejects with a message matching `pattern`. */

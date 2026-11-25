@@ -84,12 +84,12 @@ export interface TransactionInterface {
   signature: string;
   data_size: string;
   data_root: string;
+  denomination?: string;
 }
 
 export default class Transaction
   extends BaseObject
-  implements TransactionInterface
-{
+  implements TransactionInterface {
   public readonly format: number = 2;
   public id: string = "";
   public readonly last_tx: string = "";
@@ -101,6 +101,7 @@ export default class Transaction
   public data: Uint8Array = new Uint8Array();
   public data_root: string = "";
   public reward: string = "0";
+  public readonly denomination: string = "0";
   public signature: string = "";
 
   // Computed when needed.
@@ -154,6 +155,9 @@ export default class Transaction
       data_tree: this.data_tree,
       reward: this.reward,
       signature: this.signature,
+      ...(this.format === 2 && this.denomination && this.denomination !== "0"
+        ? { denomination: this.denomination }
+        : {}),
     };
   }
 
@@ -254,7 +258,7 @@ export default class Transaction
           tag.get("value", { decode: true, string: false }),
         ]);
 
-        return await deepHash([
+        const hashList = [
           ArweaveUtils.stringToBuffer(this.format.toString()),
           this.get("owner", { decode: true, string: false }),
           this.get("target", { decode: true, string: false }),
@@ -264,7 +268,11 @@ export default class Transaction
           tagList,
           ArweaveUtils.stringToBuffer(this.data_size),
           this.get("data_root", { decode: true, string: false }),
-        ]);
+        ];
+        if (this.denomination && this.denomination !== "0") {
+          hashList.unshift(ArweaveUtils.stringToBuffer(this.denomination));
+        }
+        return await deepHash(hashList);
       default:
         throw new Error(`Unexpected transaction format: ${this.format}`);
     }
