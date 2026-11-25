@@ -419,3 +419,118 @@ async function expectRejection(promise: Promise<unknown>, pattern: RegExp) {
   }
   expect.fail(`expected rejection matching ${pattern}`);
 }
+describe("Transaction denomination", function () {
+  this.timeout(30000);
+
+  // Signed by the Arweave node (Erlang) with the keys from test/fixtures.
+  const fixtures = require("./fixtures/erlang/denomination_txs.json");
+  const ecdsaKey = require("./fixtures/erlang/sk.json");
+  const rsaKey = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+
+  for (const fixture of fixtures) {
+    describe(fixture.name, function () {
+      it("should recover the owner and the owner address", async function () {
+        const tx = arweave.transactions.fromRaw(fixture.tx);
+        expect(await tx.getOwner()).to.equal(fixture.owner);
+        expect(await tx.getOwnerAddress()).to.equal(fixture.owner_address);
+      });
+
+      it("should verify the signature", async function () {
+        const tx = arweave.transactions.fromRaw(fixture.tx);
+        expect(await arweave.transactions.verify(tx)).to.be.true;
+      });
+
+      it("should keep the denomination in the JSON", function () {
+        const json = arweave.transactions.fromRaw(fixture.tx).toJSON();
+        if (fixture.tx.denomination === undefined) {
+          expect(json).to.not.have.property("denomination");
+        } else {
+          expect(json.denomination).to.equal(fixture.tx.denomination);
+        }
+      });
+    });
+  }
+
+  for (const fixture of fixtures.filter((f: any) => f.tx.owner === "")) {
+    it(`should produce the node signature: ${fixture.name}`, async function () {
+      const tx = arweave.transactions.fromRaw({
+        ...fixture.tx,
+        id: "",
+        signature: "",
+      });
+      await arweave.transactions.sign(tx, ecdsaKey);
+      expect(tx.signature).to.equal(fixture.tx.signature);
+      expect(tx.id).to.equal(fixture.tx.id);
+    });
+  }
+
+  it("should sign a new transaction with a denomination", async function () {
+    const fixture = fixtures.find(
+      (f: any) => f.name === "ecdsa data, denomination 1"
+    );
+    const tx = await arweave.createTransaction(
+      {
+        data: "arweave-js denomination fixture",
+        last_tx: fixture.tx.last_tx,
+        reward: fixture.tx.reward,
+        denomination: "1",
+      },
+      ecdsaKey
+    );
+    tx.addTag("Content-Type", "text/plain");
+    await arweave.transactions.sign(tx, ecdsaKey);
+    expect(tx.signature).to.equal(fixture.tx.signature);
+    expect(tx.toJSON().denomination).to.equal("1");
+  });
+
+  // The node rejects an explicit "0" denomination in the JSON.
+  for (const fixture of fixtures.filter(
+    (f: any) => f.tx.denomination === undefined
+  )) {
+    it(`should treat denomination "0" as omitted: ${fixture.name}`, async function () {
+      const omitted = arweave.transactions.fromRaw(fixture.tx);
+      const explicit = arweave.transactions.fromRaw({
+        ...fixture.tx,
+        denomination: "0",
+      });
+      expect(await explicit.getSignatureData()).to.deep.equal(
+        await omitted.getSignatureData()
+      );
+      expect(explicit.toJSON()).to.not.have.property("denomination");
+      expect(await explicit.getOwnerAddress()).to.equal(fixture.owner_address);
+    });
+  }
+
+  for (const denomination of ["1", "2"]) {
+    it(`should round-trip a signed RSA transaction with denomination ${denomination}`, async function () {
+      const fixture = fixtures.find(
+        (f: any) => f.name === "rsa transfer, denomination 1"
+      );
+      const tx = await arweave.createTransaction(
+        {
+          target: fixture.tx.target,
+          quantity: fixture.tx.quantity,
+          last_tx: fixture.tx.last_tx,
+          reward: fixture.tx.reward,
+          denomination,
+        },
+        rsaKey
+      );
+      await arweave.transactions.sign(tx, rsaKey);
+
+      const json = JSON.parse(JSON.stringify(tx));
+      expect(json.denomination).to.equal(denomination);
+
+      const parsed = arweave.transactions.fromRaw(json);
+      expect(await arweave.transactions.verify(parsed)).to.be.true;
+      expect(parsed.owner).to.equal(rsaKey.n);
+      expect(await parsed.getOwnerAddress()).to.equal(fixture.owner_address);
+
+      const altered = arweave.transactions.fromRaw({
+        ...json,
+        denomination: "3",
+      });
+      expect(await arweave.transactions.verify(altered)).to.be.false;
+    });
+  }
+});
