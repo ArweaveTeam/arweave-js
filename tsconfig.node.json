@@ -2,8 +2,10 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "outDir": "./dist/node/",
+    "rootDir": "./src",
     "sourceMap": true,
     "strict": true,
+    "types": ["node"],
     "lib": ["ES2022", "DOM"],
     "target": "ES2022",
     "moduleResolution": "node",
@@ -12,6 +14,7 @@
     "rootDirs": ["src/common", "src/node"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@crypto/*": ["lib/crypto/*"]
     }

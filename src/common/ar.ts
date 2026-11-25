@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import BigNumber from "bignumber.js";
 
 export default class Ar {
   /**
@@ -37,7 +37,7 @@ export default class Ar {
     let a = this.stringToBigNum(winstonStringA);
     let b = this.stringToBigNum(winstonStringB);
 
-    return a.comparedTo(b);
+    return a.comparedTo(b) ?? NaN;
   }
 
   public isEqual(winstonStringA: string, winstonStringB: string): boolean {

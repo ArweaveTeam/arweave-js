@@ -166,7 +166,7 @@ export default class Transactions {
             cause: { status, statusText },
           });
         }
-        data = resData;
+        data = new Uint8Array(resData);
       } catch (error) {
         console.error(
           `Error while trying to download contiguous data from gateway cache for ${id}`
