@@ -8,7 +8,7 @@ const idText = "Lv_IaSYGMma5vvD3jmkwl51ELchQ75rNfukltJw3Hh8"; //html page, utf-8
 const idJson = "t4B9Dufi14vTWl7nS9eiFfxojeNvmNzBwoUZ0IQMar8"; //json file
 
 describe("API", function () {
-  this.timeout(10_000);
+  this.timeout(20_000);
 
   it("should GET json requests", async function () {
     const res = await arweave.api.get(idJson);
