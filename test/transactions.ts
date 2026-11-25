@@ -333,4 +333,63 @@ describe("Transactions", function () {
     expect(posts).to.deep.equal(["tx"]);
   });
 
+  it("should still verify existing format=1 transactions", async function () {
+    const signedV1TxFixture = require("./fixtures/signed_v1_tx.json");
+
+    const tx = arweave.transactions.fromRaw(signedV1TxFixture);
+
+    expect(tx.format).to.equal(1);
+
+    const verified = await arweave.transactions.verify(tx);
+
+    expect(verified).to.be.a("boolean").and.to.be.true;
+  });
+
+  it("should refuse to create a format=1 transaction", async function () {
+    await expectRejection(
+      arweave.createTransaction({
+        format: 1,
+        last_tx: "",
+        data: "test data",
+        reward: arweave.ar.arToWinston("1"),
+      }),
+      /Only format 2 transactions can be created/
+    );
+  });
+
+  it("should refuse to sign a format=1 transaction", async function () {
+    const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+    const signedV1TxFixture = require("./fixtures/signed_v1_tx.json");
+
+    const tx = arweave.transactions.fromRaw(signedV1TxFixture);
+
+    await expectRejection(
+      arweave.transactions.sign(tx, jwk),
+      /Only format 2 transactions can be signed/
+    );
+  });
+
+  it("should refuse to upload a format=1 transaction", async function () {
+    const signedV1TxFixture = require("./fixtures/signed_v1_tx.json");
+
+    const tx = arweave.transactions.fromRaw(signedV1TxFixture);
+    await tx.prepareChunks(tx.data);
+
+    await expectRejection(
+      arweave.transactions.getUploader(tx),
+      /Only format 2 transactions can be uploaded/
+    );
+  });
 });
+
+/** Asserts a promise rejects with a message matching `pattern`. */
+async function expectRejection(promise: Promise<unknown>, pattern: RegExp) {
+  try {
+    await promise;
+  } catch (error: any) {
+    expect(error).to.be.an.instanceOf(Error);
+    expect(error.message).to.match(pattern);
+    return;
+  }
+  expect.fail(`expected rejection matching ${pattern}`);
+}
