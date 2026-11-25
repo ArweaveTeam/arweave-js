@@ -374,6 +374,71 @@ describe("Transactions", function () {
   });
 });
 
+describe("Transaction denomination", function () {
+  this.timeout(30000);
+
+  // Signed by the Arweave node (Erlang) with the key from test/fixtures.
+  const fixture = require("./fixtures/denomination_rsa_tx.json");
+  const rsaKey = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+  const { denomination: _, ...undenominated } = fixture.tx;
+
+  it("should verify a node-signed transaction with a denomination", async function () {
+    const tx = arweave.transactions.fromRaw(fixture.tx);
+    expect(await arweave.transactions.verify(tx)).to.be.true;
+    expect(await arweave.wallets.ownerToAddress(tx.owner)).to.equal(
+      fixture.owner_address
+    );
+  });
+
+  it("should keep the denomination in the JSON", function () {
+    const json = arweave.transactions.fromRaw(fixture.tx).toJSON();
+    expect(json.denomination).to.equal("1");
+  });
+
+  // The node rejects an explicit "0" denomination in the JSON.
+  it(`should treat denomination "0" as omitted`, async function () {
+    const omitted = arweave.transactions.fromRaw(undenominated);
+    const explicit = arweave.transactions.fromRaw({
+      ...undenominated,
+      denomination: "0",
+    });
+    expect(await explicit.getSignatureData()).to.deep.equal(
+      await omitted.getSignatureData()
+    );
+    expect(explicit.toJSON()).to.not.have.property("denomination");
+    expect(omitted.toJSON()).to.not.have.property("denomination");
+  });
+
+  for (const denomination of ["1", "2"]) {
+    it(`should round-trip a signed transaction with denomination ${denomination}`, async function () {
+      const tx = await arweave.createTransaction(
+        {
+          target: fixture.tx.target,
+          quantity: fixture.tx.quantity,
+          last_tx: fixture.tx.last_tx,
+          reward: fixture.tx.reward,
+          denomination,
+        },
+        rsaKey
+      );
+      await arweave.transactions.sign(tx, rsaKey);
+
+      const json = JSON.parse(JSON.stringify(tx));
+      expect(json.denomination).to.equal(denomination);
+
+      const parsed = arweave.transactions.fromRaw(json);
+      expect(await arweave.transactions.verify(parsed)).to.be.true;
+      expect(parsed.owner).to.equal(rsaKey.n);
+
+      const altered = arweave.transactions.fromRaw({
+        ...json,
+        denomination: "3",
+      });
+      expect(await arweave.transactions.verify(altered)).to.be.false;
+    });
+  }
+});
+
 /** Asserts a promise rejects with a message matching `pattern`. */
 async function expectRejection(promise: Promise<unknown>, pattern: RegExp) {
   try {

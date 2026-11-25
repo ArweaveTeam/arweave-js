@@ -1,0 +1,27 @@
+{
+  "name": "rsa transfer, denomination 1",
+  "denomination": 1,
+  "owner": "kmM4O08BJB85RbxfQ2nkka9VNO6Czm2Tc_IGQNYCTSXRzOc6W9bHRrlZ_eDhWO0OdfaRalgLeuYCXx9DV-n1djeerKHdFo2ZAjRv5WjL_b4IxbQnPFnHOSNHVg49yp7CUWUgDQOKtylt3x0YENIW37RQPZJ-Fvyk7Z0jvibj2iZ0K3K8yNenJ4mWswyQdyPaJcbP6AMWvUWT62giWHa3lDgBZNhXqakkYdoaM157kRUfrZDRSWXbilr-4f40PQF1DV5YSj81Fl72N7j30r0vL1yoj0bZn74WRquQ5j3QsiAA-SzhAxpecWniljj1wvZlyIgJpCYCvCrKZCcCq_JW1nYP6to5YM3fAqcYRadbTNdQ3oH0Sjy8vyvLYNe48Ur_TFTTAwZxJV70BgZfkJ00BxiNTb8EhSchejabeExUkCNlOrQsCHDxOig-WXOrjX5fb4NeR3jedeYWbhN922ORLuEwVLeyjc7hBfQXU2-mYraFAVTc0QST201P7rRu-UGtZ4gRavFuOvAyYrMimFVW9dTwTrcYXFK2zKCEv2aRRQAHZanKjBv0Xq9m3BqvxKy-_3Cj1O6ft7FT21drPoDRDzfnkyOeUjlXzRJzn-iQ0nqgHAQr9WBWPzLEcaTFpw3KmwDYHW_6JOkUWDyMW9anuS8cyqt_2O29SK_rHHuucD8",
+  "owner_address": "fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw",
+  "tx": {
+    "format": 2,
+    "id": "ITheedIMpx8Y-YG0h_DVTRoWvMRENGiRQ4sO6SGTdGc",
+    "last_tx": "FiFUNJPmqU439Quh0JEFyze8ZIiicHx-Cj6Aq3AXuxe8Y4GCP08O0l3h9b1jWi61",
+    "owner": "kmM4O08BJB85RbxfQ2nkka9VNO6Czm2Tc_IGQNYCTSXRzOc6W9bHRrlZ_eDhWO0OdfaRalgLeuYCXx9DV-n1djeerKHdFo2ZAjRv5WjL_b4IxbQnPFnHOSNHVg49yp7CUWUgDQOKtylt3x0YENIW37RQPZJ-Fvyk7Z0jvibj2iZ0K3K8yNenJ4mWswyQdyPaJcbP6AMWvUWT62giWHa3lDgBZNhXqakkYdoaM157kRUfrZDRSWXbilr-4f40PQF1DV5YSj81Fl72N7j30r0vL1yoj0bZn74WRquQ5j3QsiAA-SzhAxpecWniljj1wvZlyIgJpCYCvCrKZCcCq_JW1nYP6to5YM3fAqcYRadbTNdQ3oH0Sjy8vyvLYNe48Ur_TFTTAwZxJV70BgZfkJ00BxiNTb8EhSchejabeExUkCNlOrQsCHDxOig-WXOrjX5fb4NeR3jedeYWbhN922ORLuEwVLeyjc7hBfQXU2-mYraFAVTc0QST201P7rRu-UGtZ4gRavFuOvAyYrMimFVW9dTwTrcYXFK2zKCEv2aRRQAHZanKjBv0Xq9m3BqvxKy-_3Cj1O6ft7FT21drPoDRDzfnkyOeUjlXzRJzn-iQ0nqgHAQr9WBWPzLEcaTFpw3KmwDYHW_6JOkUWDyMW9anuS8cyqt_2O29SK_rHHuucD8",
+    "tags": [
+      {
+        "name": "QXBwLU5hbWU",
+        "value": "YXJ3ZWF2ZS1qcy10ZXN0"
+      }
+    ],
+    "target": "G8LChDFXDERMeF_j37vCIxGRq6xStTW6sOOVOA0Dwjs",
+    "quantity": "1000000000000",
+    "data": "",
+    "data_size": "0",
+    "data_tree": [],
+    "data_root": "",
+    "reward": "2000000",
+    "signature": "J-VzB5m8u3Fs1J7dQ4vtrDaCde6-_Ev0y-gwr9-LBkubY6X7iKYb2XYo6ZfCnzl-nZTqQ0AXdK-9qYkveV5qpHu7XKzFgsf-ZyVRXsNZUH_oenlYvvdjLvP0xm_2RznLnhGycw4OFYQUMBVyS2ePgqcOxf05ZkhhCTeAT_1CehfSQCPRHhzzJJNl_WV49E_9KLJ0yGHoOSPZw8N1Tsjd9YoXjnqxBeBLIar_m_iZVJlR35l3XwmqA3YTeQHs3UsCPf6mjUL8IpBIaOFxMnVuxmgpdOx4snnxd7BBQbVkgIQA6T945I0T-7RTaTTKFfZ7aae93QIMFX70ii46eSfITNGMaEU_lS_ij6_1VTdKafTs9SU1G9uenKt_9tti-jarIL2Fw_DEkDPS4iRJz0vlZWlyEuR7MC4Bm0Cgc-zCDY0rb9OaDqbn6x2zmOUzbuCyaTM0ChiuviiBPr33DBZjdQIDfC8nElz1Jvh54DHhoJcWqKUlYiUh4vt_myKQGEvImncx-gUo38lsl2QWUverv0mRD52nRFM2WfYaz9zfZjBPABwgXiFh-BiDFY4OkbOajiWecE2JrFlhr2FqS6glxUNenRy8VCHVMMF8Y2T17BSzJMW3Ex4G7xI2rQMx7AKBmveBBZeUq5JCEQv6XlfmWX4RDnlMVSjuNsuQtZH3tCA",
+    "denomination": "1"
+  }
+}
