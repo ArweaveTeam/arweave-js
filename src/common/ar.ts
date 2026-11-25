@@ -14,7 +14,12 @@ export default class Ar {
     // Configure and assign the constructor function for the bignumber library.
     this.BigNum = (value: string, decimals: number): BigNumber => {
       let instance = BigNumber.clone({ DECIMAL_PLACES: decimals });
-      return new instance(value);
+      // bignumber.js 11 throws on non-numeric input; keep v9's NaN result.
+      try {
+        return new instance(value);
+      } catch {
+        return new instance(NaN);
+      }
     };
   }
 
@@ -65,13 +70,13 @@ export default class Ar {
     let a = this.stringToBigNum(winstonStringA);
     let b = this.stringToBigNum(winstonStringB);
 
-    return a.plus(winstonStringB).toFixed(0);
+    return a.plus(b).toFixed(0);
   }
 
   public sub(winstonStringA: string, winstonStringB: string): string {
     let a = this.stringToBigNum(winstonStringA);
     let b = this.stringToBigNum(winstonStringB);
-    return a.minus(winstonStringB).toFixed(0);
+    return a.minus(b).toFixed(0);
   }
 
   private stringToBigNum(
