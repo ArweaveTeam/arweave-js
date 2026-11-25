@@ -93,8 +93,6 @@ export default class Transaction extends BaseObject implements TransactionInterf
   public id: string = "";
   public readonly last_tx: string = "";
   public owner: string = "";
-  private _owner: string = "";
-  private _address: string = "";
   public tags: Tag[] = [];
   public readonly target: string = "";
   public readonly quantity: string = "0";
@@ -277,10 +275,10 @@ export default class Transaction extends BaseObject implements TransactionInterf
     }
   }
 
+  // Always derived from signed fields, never cached: the constructor copies
+  // arbitrary input properties, so a cache could be preset by an attacker.
   public async getOwner(): Promise<string> {
-    // if owner already set or calculated, return value
     if (this.owner) return this.owner;
-    if (this._owner) return this._owner;
 
     if (!this.signature) throw new Error('cannot get owner, transaction is not signed.');
 
@@ -292,31 +290,15 @@ export default class Transaction extends BaseObject implements TransactionInterf
       signature: ArweaveUtils.b64UrlToBuffer(this.signature),
     });
 
-    return this._owner = ArweaveUtils.bufferTob64Url(await ecPubKey.identifier());
+    return ArweaveUtils.bufferTob64Url(await ecPubKey.identifier());
   }
 
   public async getOwnerAddress(): Promise<string> {
-    if (this._address) return this._address;
-
     if (!this.signature) throw new Error('cannot get owner address, transaction is not signed.');
 
-    let rawOwner: Uint8Array;
-    if (this.owner) {
-      rawOwner = ArweaveUtils.b64UrlToBuffer(this.owner);
-    } else if (this._owner) {
-      rawOwner = ArweaveUtils.b64UrlToBuffer(this._owner);
-    } else {
-      const payload = await this.getSignatureData();
-      const ecPubKey = await SECP256k1PublicKey.recover({
-        payload,
-        isDigest: false,
-        signature: ArweaveUtils.b64UrlToBuffer(this.signature),
-      });
-      rawOwner = await ecPubKey.identifier();
-      this._owner = ArweaveUtils.bufferTob64Url(rawOwner);
-    }
+    const rawOwner = ArweaveUtils.b64UrlToBuffer(await this.getOwner());
 
-    return this._address = ArweaveUtils.bufferTob64Url(
+    return ArweaveUtils.bufferTob64Url(
       await (new WebCryptoDriver).hash(rawOwner)
     );
   }

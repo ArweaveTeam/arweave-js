@@ -301,6 +301,32 @@ describe("Transactions", function () {
     expect(addr).equal("RymI02hes920xGugzRJ3L54eGg-jVU-_R2uCI057_nU")
   });
 
+  it("should ignore injected _owner/_address when deriving the owner", async function () {
+    const spoof = { _owner: "spoofed-owner", _address: "spoofed-address" };
+
+    const ecdsaJson = require("./fixtures/signed_ecdsa_tx.json");
+    const realOwner = await arweave.transactions.fromRaw(ecdsaJson).getOwner();
+    const ecdsaTx = arweave.transactions.fromRaw({ ...ecdsaJson, ...spoof });
+    expect(await arweave.transactions.verify(ecdsaTx)).to.be.true;
+    expect(await ecdsaTx.getOwner()).to.equal(realOwner);
+    expect(await ecdsaTx.getOwnerAddress()).to.equal(
+      "RymI02hes920xGugzRJ3L54eGg-jVU-_R2uCI057_nU"
+    );
+
+    const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+    const tx = await arweave.createTransaction(
+      { data: "spoof test", last_tx: "", reward: "0" },
+      jwk
+    );
+    await arweave.transactions.sign(tx, jwk);
+    const rsaTx = arweave.transactions.fromRaw({ ...tx.toJSON(), ...spoof });
+    expect(await arweave.transactions.verify(rsaTx)).to.be.true;
+    expect(await rsaTx.getOwner()).to.equal(jwk.n);
+    expect(await rsaTx.getOwnerAddress()).to.equal(
+      "fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw"
+    );
+  });
+
   it("should complete an upload of a transaction with no data", async function () {
     const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
     const offline = initInstance({ host: "localhost", port: 1984 });
