@@ -37,6 +37,7 @@
     "node-option": [
       "require=ts-node/register",
       "require=tsconfig-paths/register",
+      "no-experimental-strip-types",
       "experimental-fetch",
       "no-warnings"
     ]
@@ -87,23 +88,23 @@
     "ts-loader": "^9.3.0",
     "ts-node": "^10.8.0",
     "tsconfig-paths": "^4.0.0",
-    "typescript": "^5.6.2",
+    "typescript": "^6.0.3",
     "webpack": "^5.72.1",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.2"
   },
   "targets": {
-    "chrome": "70",
-    "node": "18"
+    "chrome": "124",
+    "node": "22"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "dependencies": {
     "@arweave/wasm-secp256k1": "^0.0.7",
     "arconnect": "^0.4.2",
     "asn1.js": "^5.4.1",
     "base64-js": "^1.5.1",
-    "bignumber.js": "^9.0.2"
+    "bignumber.js": "^11.1.5"
   }
 }

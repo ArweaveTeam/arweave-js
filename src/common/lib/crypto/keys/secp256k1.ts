@@ -104,7 +104,12 @@ export class SECP256k1PrivateKey extends PrivateKey {
   }: SigningParams): Promise<Uint8Array> {
     let digest = payload;
     if (isDigest == false) {
-      digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
+      digest = new Uint8Array(
+        await crypto.subtle.digest(
+          "SHA-256",
+          payload as Uint8Array<ArrayBuffer>
+        )
+      );
     } else if (digest.byteLength !== ByteLens.MSG_HASH) {
       return Promise.reject(`Invalid digest size ${digest.byteLength}`);
     }
@@ -207,7 +212,12 @@ export class SECP256k1PublicKey extends PublicKey {
     }
     let digest = payload;
     if (isDigest === false) {
-      digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
+      digest = new Uint8Array(
+        await crypto.subtle.digest(
+          "SHA-256",
+          payload as Uint8Array<ArrayBuffer>
+        )
+      );
     } else if (digest.byteLength !== ByteLens.MSG_HASH) {
       return Promise.reject(`Invalid digest size ${digest.byteLength}`);
     }
@@ -254,7 +264,12 @@ export class SECP256k1PublicKey extends PublicKey {
     const compactSignature = signature.slice(0, ByteLens.ECDSA_SIG_COMPACT);
     let digest = payload;
     if (isDigest === false) {
-      digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
+      digest = new Uint8Array(
+        await crypto.subtle.digest(
+          "SHA-256",
+          payload as Uint8Array<ArrayBuffer>
+        )
+      );
     } else if (digest.byteLength !== ByteLens.MSG_HASH) {
       return Promise.reject(`Invalid digest size ${digest.byteLength}`);
     }
