@@ -101,7 +101,11 @@ export class RSAPrivateKey extends PrivateKey {
       signingOptions = { ...signingOptions, saltLength };
     }
     return new Uint8Array(
-      await this.driver.sign(signingOptions, this.key, payload)
+      await this.driver.sign(
+        signingOptions,
+        this.key,
+        payload as Uint8Array<ArrayBuffer>
+      )
     );
   }
 
@@ -173,7 +177,7 @@ export class RSAPublicKey extends PublicKey {
   }: {
     driver?: SubtleCrypto;
     format: "jwk" | "raw" | "pkcs8" | "spki";
-    keyData: JsonWebKey | ArrayBuffer;
+    keyData: JsonWebKey | Uint8Array;
     type: KeyType;
   }): Promise<RSAPublicKey> {
     let k: JsonWebKey;
@@ -213,8 +217,8 @@ export class RSAPublicKey extends PublicKey {
                 saltLength: s,
               },
               this.key,
-              signature,
-              payload
+              signature as Uint8Array<ArrayBuffer>,
+              payload as Uint8Array<ArrayBuffer>
             ))
           ) {
             break;

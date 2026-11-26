@@ -166,7 +166,7 @@ export default class Transactions {
             cause: { status, statusText },
           });
         }
-        data = resData;
+        data = new Uint8Array(resData);
       } catch (error) {
         console.error(
           `Error while trying to download contiguous data from gateway cache for ${id}`
@@ -194,6 +194,13 @@ export default class Transactions {
     jwk?: JWKInterface | "use_wallet" | PrivateKey, //"use_wallet" for backwards compatibility only
     options?: SignatureOptions
   ): Promise<void> {
+    if (transaction.format !== 2) {
+      throw new Error(
+        `Only format 2 transactions can be signed. Format ${transaction.format} is no longer ` +
+          `supported for signing; existing format 1 transactions can still be read and verified.`
+      );
+    }
+
     /** Non-exhaustive (only checks key names), but previously no jwk checking was done */
     const isJwk = (obj: object): boolean => {
       return "kty" in obj;
@@ -254,6 +261,13 @@ export default class Transactions {
   }
 
   public async verify(transaction: Transaction): Promise<boolean> {
+    if (transaction.format === 1) {
+      console.warn(
+        `Verifying legacy format 1 transaction ${transaction.id}. Format 1 is deprecated: ` +
+          `new format 1 transactions can no longer be created or signed.`
+      );
+    }
+
     const signaturePayload = await transaction.getSignatureData();
     /**
      * The transaction ID should be a SHA-256 hash of the raw signature bytes, so this needs

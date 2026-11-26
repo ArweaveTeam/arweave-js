@@ -6,7 +6,7 @@ declare global {
   interface Window {
     Arweave: typeof Arweave;
   }
-  module globalThis {
+  namespace globalThis {
     var Arweave: unknown;
   }
 }
