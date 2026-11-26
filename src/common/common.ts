@@ -19,6 +19,7 @@ export interface Config {
 }
 
 export interface CreateTransactionInterface {
+  /** @deprecated Only format 2 is supported; anything else is rejected. */
   format: number;
   last_tx: string;
   owner: string;
@@ -29,6 +30,7 @@ export interface CreateTransactionInterface {
   data_size: string;
   data_root: string;
   reward: string;
+  denomination: string;
 }
 
 export default class Arweave {
@@ -89,6 +91,12 @@ export default class Arweave {
     const transaction: Partial<CreateTransactionInterface> = {};
 
     Object.assign(transaction, attributes);
+
+    if (attributes.format !== undefined && attributes.format !== 2) {
+      throw new Error(`Only format 2 transactions can be created`);
+    }
+
+    transaction.format = 2;
 
     if (!attributes.data && !(attributes.target && attributes.quantity)) {
       throw new Error(

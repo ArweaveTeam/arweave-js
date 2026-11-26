@@ -69,6 +69,9 @@ export class TransactionUploader {
   }
 
   constructor(private api: Api, transaction: Transaction) {
+    if (transaction.format !== 2) {
+      throw new Error(`Only format 2 transactions can be uploaded`);
+    }
     if (!transaction.id) {
       throw new Error(`Transaction is not signed`);
     }
