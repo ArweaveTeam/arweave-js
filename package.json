@@ -1,6 +1,9 @@
 {
   "name": "arweave",
-  "version": "2.0.0-ec.2",
+  "version": "2.1.1-ec.3",
+  "publishConfig": {
+    "tag": "ec"
+  },
   "description": "Arweave JS client library",
   "main": "./node/index.js",
   "react-native": "./node/index.js",
