@@ -15,7 +15,6 @@ config.web = {
   resolve: {
     alias: {
       process: "process/browser",
-      crypto: "crypto-browserify",
       stream: "stream-browserify",
       "@crypto/node-driver": path.resolve(
         __dirname,
@@ -24,7 +23,6 @@ config.web = {
     },
     fallback: {
       process: require.resolve("process/browser"),
-      crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
     },
     extensions: [".ts", ".js"],
@@ -51,7 +49,6 @@ config.webprod = {
   resolve: {
     alias: {
       process: "process/browser",
-      crypto: "crypto-browserify",
       stream: "stream-browserify",
       "@crypto/node-driver": path.resolve(
         __dirname,
@@ -60,7 +57,6 @@ config.webprod = {
     },
     fallback: {
       process: require.resolve("process/browser"),
-      crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
     },
     extensions: [".ts", ".js"],
@@ -107,14 +103,12 @@ config.webtests = {
     },
     fallback: {
       process: require.resolve("process/browser"),
-      crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
     },
   },
   plugins: [
     new webpack.ProvidePlugin({
       process: "process/browser",
-      crypto: "crypto-browserify",
       stream: "stream-browserify",
     }),
   ],
