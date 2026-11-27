@@ -11,6 +11,7 @@ Arweave JS is the JavaScript/TypeScript SDK for interacting with the Arweave net
     - [NPM](#npm)
     - [Bundles](#bundles)
     - [ES Modules](#es-modules)
+    - [React Native](#react-native)
   - [Initialisation](#initialisation)
     - [NPM Node](#npm-node)
     - [NPM Web](#npm-web)
@@ -95,6 +96,26 @@ Nothing here requires a CDN. Both files can be served from your own origin — c
 }
 </script>
 ```
+
+### React Native
+arweave-js uses WebCrypto, which React Native doesn't provide, so add a polyfill that sets a global `crypto.subtle`, such as [react-native-quick-crypto](https://github.com/margelo/react-native-quick-crypto) (1.x, React Native 0.75+).
+
+The polyfill must be installed before arweave-js is imported, because arweave-js sets up its crypto when it loads. Imports run before the rest of a file, so install it in a separate file and import that first:
+
+```js
+// polyfills.js
+import { install } from 'react-native-quick-crypto';
+
+install();
+```
+
+```js
+// index.js
+import './polyfills';
+import Arweave from 'arweave';
+```
+
+arweave-js needs `crypto.subtle` (RSA-PSS, SHA-256 and SHA-384, PBKDF2 and AES-CBC), `crypto.getRandomValues`, `TextEncoder`, `TextDecoder`, `atob`, `btoa` and `BigInt`.
 
 ## Initialisation
 
