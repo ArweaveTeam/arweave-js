@@ -116,6 +116,16 @@ describe("Encryption", function () {
     }
   });
 
+  it("should encrypt string data as UTF-8, like the node:crypto driver", async function () {
+    const text = "some data to encrypt ✓";
+
+    // Not allowed by the types, but plain JS callers relied on it
+    const encrypted = await arweave.crypto.encrypt(text as any, "pass");
+    const decrypted = await arweave.crypto.decrypt(encrypted, "pass");
+
+    expect(arweave.utils.bufferToString(decrypted)).to.equal(text);
+  });
+
   it("should use a random IV for every encryption", async function () {
     const data = arweave.utils.stringToBuffer("some data to encrypt");
 

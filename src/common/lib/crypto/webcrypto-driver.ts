@@ -286,7 +286,10 @@ export default class WebCryptoDriver implements CryptoInterface {
         iv: iv,
       },
       derivedkey,
-      data as Uint8Array<ArrayBuffer>
+      // The old Node driver encrypted strings as UTF-8, so keep accepting them
+      (typeof data === "string"
+        ? ArweaveUtils.stringToBuffer(data)
+        : data) as Uint8Array<ArrayBuffer>
     );
 
     return ArweaveUtils.concatBuffers([iv, encryptedData]);
