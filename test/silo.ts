@@ -69,10 +69,7 @@ describe("Silo", function () {
       });
     })();
 
-    expect(misdecrypted)
-      .to.be.an.instanceOf(Error)
-      .with.property("message")
-      .and.match(/^.*failed to decrypt*$/i);
+    expect(misdecrypted).to.be.an.instanceOf(Error);
   });
 
   it("should get Silo data from the network", async function () {

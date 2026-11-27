@@ -1,0 +1,29 @@
+{
+  "_comment": "Made by the node:crypto NodeCryptoDriver before the WebCrypto migration. Key for signature: arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json",
+  "plaintext": "some data to encrypt",
+  "passphrase": "super-secret-password",
+  "salt": "hello arweave",
+  "keyBytes": "0x00..0x1f",
+  "encrypted": {
+    "passphrase": "-QrwnfopvVQdjVrZBqaOl2m-AW3Ai21_eTlDIjT68LJm64vbtlYYTnPysTglR_KX",
+    "passphraseSalt": "nlKhIMlMF_d1WMAx4ntetz19zUQ5qyBFkrcY5tAJLJsB3zeTUSR9qN8gI6noC5Ae",
+    "keyBytes": "HBAf2t7T4OLOuM-Zlav_GNAt0X6cDVkIf7Zm-a9ofBhSdE5wJGhromdMUq9dIzTv"
+  },
+  "signedData": "arweave-js node driver fixture",
+  "signatureMaxSalt": "AFuv4IqYJs0zzN75t9PHDdQUNz-YmF5SiD6HOL3hCqIb1PAtXC-Uq02I21f0zlxrCn28vFfiFwZCTZBpsuAAhjH6BbznTKBCxAOOjVKX8TjXIhMduJuuSedah7eol4lHqFnIebngCprjTP3NvxYOvJIFSJR4ZtALnQLPkRUPwkR3roW3BKM8h9iEAgWTjr0IySBFt1J6Vr2bAjiIuT4OcHwNzFn9FOVN8zF0odZCIVlPYg_aLQfYfngWYfwSjyav6m5l7CcX-ig2t4qvYwsOgKTH-4BCtT0j7XRmjsjdJ9X_Z3CFJeVVXf5LyRLOJmxkGh0x7UiuAgwrLC2gNZ9KCW4jFOYotEbmlhZT2C0irPiWMPgYqSwiLjn4Dcx_lHiZYW3a7TgxDtnzRlBLSK6G_THjLtTRgBRDwuWR95QDgl__gr5w2OD_j6eeu3D114T_0Rb2HnzC0XdmC9DKIyrt1YTtR5kfzNvAA9GdYJ6FaJfvIdzkm7Z6kGrWtxtuyX3JHdyN0Yu3U5OGJj7aheSX92Ay0X13Qh0QgyGuQlIrDJsO1XmMtYxYxsFshS-_qbyjkd-EYy6vhU6pEPBZ3rC4VwmxmmzLDrDO1om4XPtrtzOG3lsacnus8C0chyvZ9RMivvlF0z0bhPQcrusjpne71nZ8JmKJi-v-K_LELjhhaYU",
+  "unicode": {
+    "passphrase": "pässwörd 密码 🔑",
+    "salt": "sält 🧂",
+    "encrypted": "ybL0WTHyQyxBCQ4J9UsqQ1TQmBCSZCjCtrmEXblxxJ_mfL14u7yEPaDYvcvfKSyz"
+  },
+  "sizes": [
+    {
+      "plaintext": "",
+      "encrypted": "PrUB9xzGXA3zhwygOoA57VqnoegtXAA4rnDgmxlZ9yA"
+    },
+    {
+      "plaintext": "0123456789abcdef",
+      "encrypted": "DUZZnqw3rerSSMvS9WmU8A3uZbSDKAvpmhVXr07lXNOjg2HsJUYLEuor_yU8DlDE"
+    }
+  ]
+}

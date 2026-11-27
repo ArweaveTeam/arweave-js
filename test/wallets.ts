@@ -118,3 +118,37 @@ describe("Wallets and keys", function () {
       .and.equal("fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw");
   });
 });
+
+describe("Signature verification", function () {
+  this.timeout(20000);
+  const jwk = require("./fixtures/arweave-keyfile-fOVzBRTBnyt4VrUUYadBH8yras_-jhgpmNgg-5b3vEw.json");
+  const fixture = require("./fixtures/node_driver_crypto.json");
+  const data = arweave.utils.stringToBuffer(fixture.signedData);
+
+  it("should verify a signature made by the node:crypto driver", async function () {
+    const signature = arweave.utils.b64UrlToBuffer(fixture.signatureMaxSalt);
+
+    expect(await arweave.crypto.verify(jwk.n, data, signature)).to.be.true;
+  });
+
+  // Before salt length recovery, only 0, 32 and the maximum (478) verified
+  for (const saltLength of [0, 20, 32, 64, 478]) {
+    it(`should verify a signature with salt length ${saltLength}`, async function () {
+      const signature = await arweave.crypto.sign(jwk, data, { saltLength });
+
+      expect(await arweave.crypto.verify(jwk.n, data, signature)).to.be.true;
+    });
+  }
+
+  it("should reject a tampered signature or tampered data", async function () {
+    const signature = await arweave.crypto.sign(jwk, data, { saltLength: 20 });
+
+    const badSignature = Uint8Array.from(signature);
+    badSignature[10] ^= 1;
+    expect(await arweave.crypto.verify(jwk.n, data, badSignature)).to.be.false;
+
+    const badData = Uint8Array.from(data);
+    badData[0] ^= 1;
+    expect(await arweave.crypto.verify(jwk.n, badData, signature)).to.be.false;
+  });
+});

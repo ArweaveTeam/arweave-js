@@ -1,5 +1,4 @@
 import * as chai from "chai";
-import * as crypto from "crypto";
 import Arweave from "../../web";
 import { bufferToString, stringToBuffer } from "../../src/common/lib/utils";
 import "../common/lib/utils";
@@ -272,7 +271,7 @@ describe("Encryption", function () {
 
     const data = stringToBuffer(text);
 
-    const key = crypto.randomBytes(32);
+    const key = crypto.getRandomValues(new Uint8Array(32));
 
     const encrypted = await arweave.crypto.encrypt(data, key);
 
