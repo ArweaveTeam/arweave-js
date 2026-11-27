@@ -25,5 +25,5 @@
     }
   },
   "include": ["src/modules.d.ts", "src/common", "src/web"],
-  "exclude": ["src/common/lib/crypto/node-driver.ts", "src/common/lib/crypto/pem.ts"]
+  "exclude": ["src/common/lib/crypto/node-driver.ts"]
 }

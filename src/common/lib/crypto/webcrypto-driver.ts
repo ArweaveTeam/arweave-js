@@ -86,73 +86,110 @@ export default class WebCryptoDriver implements CryptoInterface {
     };
 
     const key = await this.jwkToPublicCryptoKey(publicKey);
-    const digest = await this.driver.digest(
-      "SHA-256",
-      data as Uint8Array<ArrayBuffer>
+    const modulusLength = (key.algorithm as RsaHashedKeyAlgorithm)
+      .modulusLength;
+
+    // Largest salt PSS allows with SHA-256 (RFC 8017 §9.1.1)
+    const maxSaltLength = Math.ceil((modulusLength - 1) / 8) - 32 - 2;
+
+    // WebCrypto needs the exact salt length. Try the one the signature
+    // encodes first, then the common ones in case recovery finds nothing.
+    const recovered = await this.recoverPssSaltLength(
+      publicModulus,
+      modulusLength,
+      signature
     );
+    const saltLengths = [
+      ...new Set([recovered, 0, 32, maxSaltLength]),
+    ].filter((length): length is number => length !== undefined && length >= 0);
 
-    const salt0 = await this.driver.verify(
-      {
-        name: "RSA-PSS",
-        saltLength: 0,
-      },
-      key,
-      signature as Uint8Array<ArrayBuffer>,
-      data as Uint8Array<ArrayBuffer>
-    );
-
-    const salt32 = await this.driver.verify(
-      {
-        name: "RSA-PSS",
-        saltLength: 32,
-      },
-      key,
-      signature as Uint8Array<ArrayBuffer>,
-      data as Uint8Array<ArrayBuffer>
-    );
-
-    // saltN's salt-length is derived from a formula described here
-    // https://developer.mozilla.org/en-US/docs/Web/API/RsaPssParams
-    const saltLengthN =
-      Math.ceil(
-        ((key.algorithm as RsaHashedKeyGenParams).modulusLength - 1) / 8
-      ) -
-      digest.byteLength -
-      2;
-
-    const saltN = await this.driver.verify(
-      {
-        name: "RSA-PSS",
-        saltLength: saltLengthN,
-      },
-      key,
-      signature as Uint8Array<ArrayBuffer>,
-      data as Uint8Array<ArrayBuffer>
-    );
-
-    const result = salt0 || salt32 || saltN;
-
-    if (!result) {
-      const details = {
-        algorithm: key.algorithm.name,
-        modulusLength: (key.algorithm as RsaHashedKeyAlgorithm).modulusLength,
-        keyUsages: key.usages,
-        saltLengthsAttempted: `0, 32, ${saltLengthN}`,
-      };
-      console.warn(
-        "Transaction Verification Failed! \n",
-        `Details: ${JSON.stringify(details, null, 2)} \n`,
-        "N.B. ArweaveJS is only guaranteed to verify txs created using ArweaveJS."
+    for (const saltLength of saltLengths) {
+      const valid = await this.driver.verify(
+        {
+          name: "RSA-PSS",
+          saltLength,
+        },
+        key,
+        signature as Uint8Array<ArrayBuffer>,
+        data as Uint8Array<ArrayBuffer>
       );
+      if (valid) {
+        return true;
+      }
     }
 
-    return result;
+    const details = {
+      algorithm: key.algorithm.name,
+      modulusLength,
+      keyUsages: key.usages,
+      saltLengthsAttempted: saltLengths.join(", "),
+    };
+    console.warn(
+      "Transaction Verification Failed! \n",
+      `Details: ${JSON.stringify(details, null, 2)} \n`,
+      "N.B. ArweaveJS is only guaranteed to verify txs created using ArweaveJS."
+    );
+
+    return false;
+  }
+
+  /**
+   * Reads the salt length out of an RSA-PSS signature (RFC 8017 §9.1.2), so
+   * signatures made with any salt length can be verified. Returns undefined
+   * for a malformed encoding. This is only a hint: WebCrypto does the actual
+   * verification.
+   */
+  private async recoverPssSaltLength(
+    publicModulus: string,
+    modulusLength: number,
+    signature: Uint8Array
+  ): Promise<number | undefined> {
+    const hashLength = 32;
+    const n = bytesToBigInt(ArweaveUtils.b64UrlToBuffer(publicModulus));
+    const s = bytesToBigInt(signature);
+    if (signature.byteLength !== Math.ceil(modulusLength / 8) || s >= n) {
+      return undefined;
+    }
+
+    const emBits = modulusLength - 1;
+    const emLength = Math.ceil(emBits / 8);
+    const em = bigIntToBytes(modPow(s, 65537n, n), emLength);
+    if (!em || em[emLength - 1] !== 0xbc) {
+      return undefined;
+    }
+
+    const dbLength = emLength - hashLength - 1;
+    const h = em.slice(dbLength, emLength - 1);
+    const db = em.slice(0, dbLength);
+
+    // Unmask with MGF1(SHA-256)
+    for (let counter = 0; counter * hashLength < dbLength; counter++) {
+      const block = new Uint8Array(hashLength + 4);
+      block.set(h);
+      new DataView(block.buffer).setUint32(hashLength, counter);
+      const mask = new Uint8Array(await this.driver.digest("SHA-256", block));
+      const offset = counter * hashLength;
+      for (let i = 0; i < hashLength && offset + i < dbLength; i++) {
+        db[offset + i] ^= mask[i];
+      }
+    }
+    db[0] &= 0xff >> (8 * emLength - emBits);
+
+    // DB is zero padding, then 0x01, then the salt
+    const separator = db.findIndex((byte) => byte !== 0);
+    if (separator === -1 || db[separator] !== 0x01) {
+      return undefined;
+    }
+    return dbLength - separator - 1;
   }
 
   private async jwkToCryptoKey(jwk: JWKInterface): Promise<CryptoKey> {
+    // Import only the RSA fields. WebCrypto rejects keys whose extra JWK
+    // metadata (alg, key_ops, use) doesn't fit RSA-PSS signing.
+    const { kty, e, n, d, p, q, dp, dq, qi } = jwk;
     return this.driver.importKey(
       "jwk",
-      jwk,
+      { kty, e, n, d, p, q, dp, dq, qi },
       {
         name: "RSA-PSS",
         hash: {
@@ -307,4 +344,37 @@ export default class WebCryptoDriver implements CryptoInterface {
     // We're just using concat to convert from an array buffer to uint8array
     return ArweaveUtils.concatBuffers([data]);
   }
+}
+
+function bytesToBigInt(bytes: Uint8Array): bigint {
+  let hex = "";
+  for (const byte of bytes) {
+    hex += byte.toString(16).padStart(2, "0");
+  }
+  return BigInt("0x" + (hex || "0"));
+}
+
+function bigIntToBytes(value: bigint, length: number): Uint8Array | undefined {
+  const hex = value.toString(16).padStart(length * 2, "0");
+  if (hex.length > length * 2) {
+    return undefined;
+  }
+  const bytes = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
+    bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+  }
+  return bytes;
+}
+
+function modPow(base: bigint, exponent: bigint, modulus: bigint): bigint {
+  let result = 1n;
+  base %= modulus;
+  while (exponent > 0n) {
+    if (exponent & 1n) {
+      result = (result * base) % modulus;
+    }
+    base = (base * base) % modulus;
+    exponent >>= 1n;
+  }
+  return result;
 }

@@ -101,7 +101,6 @@
     "node": ">=22"
   },
   "dependencies": {
-    "asn1.js": "^5.4.1",
     "bignumber.js": "^11.1.5"
   }
 }
