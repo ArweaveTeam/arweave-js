@@ -35,7 +35,7 @@ describe("Initialization", function () {
 
     expect(arweave.network).to.an("object");
 
-    expect(arweave.crypto).to.an("object");
+    expect(Arweave.crypto).to.an("object");
 
     expect(arweave.silo).to.an("object");
   });
@@ -70,39 +70,30 @@ describe("Wallets and keys", function () {
 
     const walletA = await arweave.wallets.generate();
     const walletB = await arweave.wallets.generate();
+    const data = stringToBuffer("arweave");
 
-    expect(walletA).to.be.an("object", "New wallet is not an object");
+    for (const [wallet, other] of [
+      [walletA, walletB],
+      [walletB, walletA],
+    ]) {
+      expect(wallet).to.have.all.keys("kty", "n", "e", "d", "p", "q", "dp", "dq", "qi");
+      expect(wallet.kty).to.equal("RSA");
+      expect(wallet.e).to.equal("AQAB");
 
-    expect(walletA).to.have.all.keys(
-      "kty",
-      "n",
-      "e",
-      "d",
-      "p",
-      "q",
-      "dp",
-      "dq",
-      "qi"
-    );
+      // 4096-bit modulus, as Arweave requires
+      const owner = Arweave.utils.b64UrlToBuffer(wallet.n);
+      expect(owner.byteLength).to.equal(512);
 
-    expect(walletA.kty).to.equal("RSA");
+      // the private key signs for its own public key and no other
+      const signature = await Arweave.crypto.sign(wallet, data);
+      expect(await Arweave.crypto.verify(wallet.n, data, signature)).to.be.true;
+      expect(await Arweave.crypto.verify(other.n, data, signature)).to.be.false;
 
-    expect(walletA.e).to.equal("AQAB");
-
-    expect(walletA.n).to.match(/^[a-z0-9-_]{683}$/i);
-
-    expect(walletA.d).to.match(/^[a-z0-9-_]{683}$/i);
-
-    const addressA = await arweave.wallets.jwkToAddress(walletA);
-    const addressB = await arweave.wallets.jwkToAddress(walletB);
-
-    expect(addressA).to.be.a("string");
-
-    expect(addressA).to.match(digestRegex);
-
-    expect(addressB).to.match(digestRegex);
-
-    expect(addressA).to.not.equal(addressB);
+      // the address is the SHA-256 of the public key
+      expect(await arweave.wallets.jwkToAddress(wallet)).to.equal(
+        Arweave.utils.bufferTob64Url(await Arweave.crypto.hash(owner))
+      );
+    }
   });
 
   it("should get wallet info", async function () {
@@ -273,11 +264,11 @@ describe("Encryption", function () {
 
     const key = crypto.getRandomValues(new Uint8Array(32));
 
-    const encrypted = await arweave.crypto.encrypt(data, key);
+    const encrypted = await Arweave.crypto.encrypt(data, key);
 
     expect(encrypted).to.have.lengthOf(48);
 
-    const decrypted = await arweave.crypto.decrypt(encrypted, key);
+    const decrypted = await Arweave.crypto.decrypt(encrypted, key);
 
     expect(bufferToString(decrypted)).to.equal(text);
   });
@@ -291,11 +282,11 @@ describe("Encryption", function () {
 
     const key = "super-secret-password";
 
-    const encrypted = await arweave.crypto.encrypt(data, key);
+    const encrypted = await Arweave.crypto.encrypt(data, key);
 
     expect(encrypted).to.have.lengthOf(48);
 
-    const decrypted = await arweave.crypto.decrypt(encrypted, key);
+    const decrypted = await Arweave.crypto.decrypt(encrypted, key);
 
     expect(bufferToString(decrypted)).to.equal(text);
   });
