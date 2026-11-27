@@ -17,12 +17,7 @@
     "moduleResolution": "nodenext",
     "rootDirs": ["src/common", "src/node"],
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "ignoreDeprecations": "6.0",
-    "baseUrl": "src/common",
-    "paths": {
-      "@crypto/*": ["lib/crypto/*"]
-    }
+    "resolveJsonModule": true
   },
   "include": ["src/common", "src/node"]
 }

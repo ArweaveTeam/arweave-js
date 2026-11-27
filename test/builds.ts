@@ -39,7 +39,7 @@ describe("Node distribution", function () {
 
     expect(instance.network.constructor.name).to.equal("Network");
 
-    expect(instance.crypto.constructor.name).to.equal("NodeCryptoDriver");
+    expect(instance.crypto.constructor.name).to.equal("WebCryptoDriver");
 
     expect(instance.silo.constructor.name).to.equal("Silo");
   });

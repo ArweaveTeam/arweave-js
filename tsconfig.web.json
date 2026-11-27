@@ -17,12 +17,7 @@
     "moduleResolution": "bundler",
     "rootDirs": ["src/common", "src/web"],
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "ignoreDeprecations": "6.0",
-    "baseUrl": "src/common",
-    "paths": {
-      "@crypto/node-driver": ["lib/crypto/webcrypto-driver"]
-    }
+    "resolveJsonModule": true
   },
   "include": ["src/common", "src/web"],
   "exclude": ["src/common/lib/crypto/node-driver.ts"]

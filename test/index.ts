@@ -1,6 +1,6 @@
 import * as chai from "chai";
 import Api from "../src/common/lib/api";
-import NodeCryptoDriver from "../src/common/lib/crypto/node-driver";
+import WebCryptoDriver from "../src/common/lib/crypto/webcrypto-driver";
 import Network from "../src/common/network";
 import Silo from "../src/common/silo";
 import Transactions from "../src/common/transactions";
@@ -24,7 +24,7 @@ describe("Initialization", function () {
 
     expect(arweave.network).to.be.an.instanceOf(Network);
 
-    expect(arweave.crypto).to.be.an.instanceOf(NodeCryptoDriver);
+    expect(arweave.crypto).to.be.an.instanceOf(WebCryptoDriver);
 
     expect(arweave.silo).to.be.an.instanceOf(Silo);
   });
@@ -67,8 +67,3 @@ describe("Network Info", function () {
   });
 });
 
-// describe('API ', ()=> {
-//   it('tests that API can POST requests', async function(){
-
-//   })
-// })

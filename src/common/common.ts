@@ -1,7 +1,7 @@
 import Ar from "./ar";
 import Api, { ApiConfig } from "./lib/api";
 import CryptoInterface from "./lib/crypto/crypto-interface";
-import CryptoDriver from "@crypto/node-driver";
+import CryptoDriver from "./lib/crypto/webcrypto-driver";
 import Network from "./network";
 import Transactions from "./transactions";
 import Wallets from "./wallets";

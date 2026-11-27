@@ -11,8 +11,8 @@
     "bundles"
   ],
   "scripts": {
-    "compile:node": "tsc --declaration -project tsconfig.node.json && resolve-tspaths -p tsconfig.node.json",
-    "compile:web": "tsc --declaration -project tsconfig.web.json && resolve-tspaths -p tsconfig.web.json",
+    "compile:node": "tsc --declaration -project tsconfig.node.json",
+    "compile:web": "tsc --declaration -project tsconfig.web.json",
     "bundle:web": "webpack --config-name web",
     "bundle:web-prod": "webpack --config-name web-prod",
     "profile:web": "webpack --config-name web --json > ./web.profile.json && webpack-bundle-analyzer ./web.profile.json",
@@ -36,7 +36,6 @@
     ],
     "node-option": [
       "require=ts-node/register",
-      "require=tsconfig-paths/register",
       "no-experimental-strip-types",
       "experimental-fetch",
       "no-warnings"
@@ -77,13 +76,11 @@
     "ncp": "^2.0.0",
     "opener": "^1.5.2",
     "prettier": "^2.8.1",
-    "resolve-tspaths": "^0.6.0",
     "rimraf": "^3.0.2",
     "terser-webpack-plugin": "^5.3.3",
     "ts-loader": "^9.3.0",
     "ts-node": "^10.8.0",
     "tsc-alias": "^1.9.2",
-    "tsconfig-paths": "^4.0.0",
     "typescript": "^6.0.3",
     "webpack": "^5.72.1",
     "webpack-bundle-analyzer": "^4.5.0",
