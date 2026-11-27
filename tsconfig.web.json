@@ -24,6 +24,6 @@
       "@crypto/node-driver": ["lib/crypto/webcrypto-driver"]
     }
   },
-  "include": ["src/modules.d.ts", "src/common", "src/web"],
+  "include": ["src/common", "src/web"],
   "exclude": ["src/common/lib/crypto/node-driver.ts"]
 }

@@ -24,5 +24,5 @@
       "@crypto/*": ["lib/crypto/*"]
     }
   },
-  "include": ["src/modules.d.ts", "src/common", "src/node"]
+  "include": ["src/common", "src/node"]
 }
